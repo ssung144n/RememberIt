@@ -32,6 +32,7 @@
 		EDC1F65518C8199700A2027D /* icons.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = EDC1F65418C8199700A2027D /* icons.xcassets */; };
 		EDCA3E4218CE79CD00C7ED00 /* RememberItLaunch2x.png in Resources */ = {isa = PBXBuildFile; fileRef = EDCA3E4118CE79CD00C7ED00 /* RememberItLaunch2x.png */; };
 		EDD7753618D57E1700255634 /* ShowPhotoViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = EDD7753518D57E1700255634 /* ShowPhotoViewController.m */; };
+		EDE6D46618D8F838006FCF4D /* ReadMe.md in Resources */ = {isa = PBXBuildFile; fileRef = EDE6D46518D8F838006FCF4D /* ReadMe.md */; };
 		EDF4052D18BB09DA007D18AB /* camera_icon120.jpg in Resources */ = {isa = PBXBuildFile; fileRef = EDF4052C18BB09DA007D18AB /* camera_icon120.jpg */; };
 		EDF4053818BC2EE7007D18AB /* MapViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = EDF4053718BC2EE7007D18AB /* MapViewController.m */; };
 		EDF4053A18BD2923007D18AB /* MapKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = EDF4053918BD2923007D18AB /* MapKit.framework */; };
@@ -83,6 +84,7 @@
 		EDCA3E4118CE79CD00C7ED00 /* RememberItLaunch2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = RememberItLaunch2x.png; sourceTree = "<group>"; };
 		EDD7753418D57E1700255634 /* ShowPhotoViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ShowPhotoViewController.h; sourceTree = "<group>"; };
 		EDD7753518D57E1700255634 /* ShowPhotoViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ShowPhotoViewController.m; sourceTree = "<group>"; };
+		EDE6D46518D8F838006FCF4D /* ReadMe.md */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = ReadMe.md; sourceTree = "<group>"; };
 		EDF4052C18BB09DA007D18AB /* camera_icon120.jpg */ = {isa = PBXFileReference; lastKnownFileType = image.jpeg; path = camera_icon120.jpg; sourceTree = "<group>"; };
 		EDF4053618BC2EE7007D18AB /* MapViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = MapViewController.h; sourceTree = "<group>"; };
 		EDF4053718BC2EE7007D18AB /* MapViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = MapViewController.m; sourceTree = "<group>"; };
@@ -130,6 +132,7 @@
 		ED71E29C188E729400276ABE = {
 			isa = PBXGroup;
 			children = (
+				EDE6D46518D8F838006FCF4D /* ReadMe.md */,
 				ED71E2B0188E729400276ABE /* TripJournal */,
 				ED71E2CD188E729400276ABE /* TripJournalTests */,
 				ED71E2A7188E729400276ABE /* Frameworks */,
@@ -301,6 +304,7 @@
 				ED71E2B5188E729400276ABE /* InfoPlist.strings in Resources */,
 				ED71E2C0188E729400276ABE /* Images.xcassets in Resources */,
 				EDC1F65518C8199700A2027D /* icons.xcassets in Resources */,
+				EDE6D46618D8F838006FCF4D /* ReadMe.md in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
