@@ -139,7 +139,7 @@ sqlite3_stmt *statement;
             //tripEntry.tripId = [NSNumber numberWithLongLong:sqlite3_last_insert_rowid(tripDB)];
             tripEntry.tripId = [NSString stringWithFormat:@"%lld", sqlite3_last_insert_rowid(tripDB)];
             
-            NSLog(@"... DBHelper:saveData-%@:%@:%@", tripEntry.place, tripEntry.latitude, tripEntry.longitude);
+            //NSLog(@"... DBHelper:saveData-%@:%@:%@", tripEntry.place, tripEntry.latitude, tripEntry.longitude);
             sqlite3_finalize(statement);
         }
     }
@@ -219,7 +219,7 @@ sqlite3_stmt *statement;
             sqlite3_prepare_v2(tripDB, stmt, -1, &statement, NULL);
             if (sqlite3_step(statement) == SQLITE_DONE)
             {
-                NSLog(@"..deleted from TripPhotos where TripId:%@", tripId);
+                //NSLog(@"..deleted from TripPhotos where TripId:%@", tripId);
                 success = TRUE;
             }
             sqlite3_finalize(statement);
@@ -232,7 +232,7 @@ sqlite3_stmt *statement;
                 sqlite3_prepare_v2(tripDB, stmt, -1, &statement, NULL);
                 if (sqlite3_step(statement) == SQLITE_DONE)
                 {
-                    NSLog(@"..DELETED from TripJournal where Id:%@", tripId);
+                    //NSLog(@"..DELETED from TripJournal where Id:%@", tripId);
                 }
                 else
                 {
@@ -276,7 +276,6 @@ sqlite3_stmt *statement;
         {
             if (sqlite3_open(dbpath, &tripDB) == SQLITE_OK)
             {
-                //stmtSQL = [NSString stringWithFormat:@"Delete From TripPhotos Where TripId = \"%@\"", tripId];
                 stmtSQL = [NSString stringWithFormat:
                            @"Delete From TripPhotos Where TripId = \"%@\" and ImagePath = \"%@\"", tripId, photosToDelete[i]];
                 
@@ -284,7 +283,7 @@ sqlite3_stmt *statement;
                 sqlite3_prepare_v2(tripDB, stmt, -1, &statement, NULL);
                 if (sqlite3_step(statement) == SQLITE_DONE)
                 {
-                    NSLog(@"..Deleted Photo: %@", photosToDelete[i]);
+                    //NSLog(@"..Deleted Photo: %@", photosToDelete[i]);
                 }
                 sqlite3_finalize(statement);
                 [tripPhotos removeObject:photosToDelete[i]];

@@ -162,7 +162,7 @@
     else if([segue.identifier isEqualToString:@"ShowPhoto"]) {
         ShowPhotoViewController *vc = [segue destinationViewController];
         [vc setPhotoName:selectedPhoto];
-        NSLog(@"...prepareForSegue-ShowPhoto:%@", selectedPhoto);
+        //NSLog(@"...prepareForSegue-ShowPhoto:%@", selectedPhoto);
     }
 }
 
@@ -232,7 +232,7 @@ didFinishPickingMediaWithInfo:(NSDictionary *)info
         NSURL *imageUrl = info[UIImagePickerControllerReferenceURL];
 
         NSString *selectedImage = [imageUrl absoluteString];
-        NSLog(@"...selectedImage: %@", selectedImage);
+        //NSLog(@"...selectedImage: %@", selectedImage);
         
         Boolean success = [dbHelper saveSelectedPhotoToDB:selectedImage tripId:self.selectedTrip.tripId];
         if(success)

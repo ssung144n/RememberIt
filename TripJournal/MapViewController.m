@@ -30,7 +30,7 @@
     [super viewDidLoad];
 	// Do any additional setup after loading the view.
     //self.tripMap.showsUserLocation = YES;
-    NSLog(@"... MapViewController:viewDidLoad-%@:%@:%@", self.selectedTrip.place, self.selectedTrip.latitude, self.selectedTrip.latitude);
+    //NSLog(@"... MapViewController:viewDidLoad-%@:%@:%@", self.selectedTrip.place, self.selectedTrip.latitude, self.selectedTrip.latitude);
 }
 
 - (void)viewWillAppear:(BOOL)animated {
