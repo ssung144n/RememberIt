@@ -97,7 +97,7 @@
 {
     selectedTrip = tripsTable[indexPath.row];
     
-    NSLog(@"...didSelectRowAtIndex -  %@:%@:%@:%@", selectedTrip.tripId, selectedTrip.place, selectedTrip.latitude, selectedTrip.longitude);
+    //NSLog(@"...didSelectRowAtIndex -  %@:%@:%@:%@", selectedTrip.tripId, selectedTrip.place, selectedTrip.latitude, selectedTrip.longitude);
     
     [self performSegueWithIdentifier:@"tripsToPhotos" sender:self];
 }

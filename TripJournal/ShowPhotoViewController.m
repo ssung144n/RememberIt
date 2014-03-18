@@ -27,8 +27,7 @@
 {
     [super viewDidLoad];
 	// Do any additional setup after loading the view.
-    
-    //self.photoImageView.image = [UIImage imageNamed:self.photoName];
+
     NSURL* aURL = [NSURL URLWithString:self.photoName];
     
     ALAssetsLibrary *library = [[ALAssetsLibrary alloc] init];
