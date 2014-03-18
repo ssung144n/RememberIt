@@ -48,7 +48,7 @@ sqlite3_stmt *statement;
                         [tripPhotos addObject:imagePath];
                         
                     }
-                    NSLog(@"..db loadTriphotos - tripPhotos.count:%lu", (unsigned long)tripPhotos.count);
+                    //NSLog(@"..db loadTriphotos - tripPhotos.count:%lu", (unsigned long)tripPhotos.count);
                     sqlite3_finalize(statement);
                 }
             }
@@ -84,7 +84,7 @@ sqlite3_stmt *statement;
                 
                 if (sqlite3_exec(tripDB, sql_stmt, NULL, NULL, &errMsg) == SQLITE_OK)
                 {
-                    NSLog(@"...created table TRIPJournal");
+                    //NSLog(@"...created table TRIPJournal");
                     
                     //create the TripJournal table
                     sql_stmt =

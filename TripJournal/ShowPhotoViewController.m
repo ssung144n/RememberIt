@@ -36,7 +36,7 @@
          UIImage  *copyOfOriginalImage = [UIImage imageWithCGImage:[[asset defaultRepresentation] fullScreenImage] scale:1.0 orientation:UIImageOrientationUp];
          
          self.photoImageView.image = copyOfOriginalImage;
-         NSLog(@"...ShowPhotoView:%@", self.photoName);
+         //NSLog(@"...ShowPhotoView:%@", self.photoName);
      }
             failureBlock:^(NSError *error)
      {
