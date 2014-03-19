@@ -29,7 +29,6 @@
 		ED71E2E4188E7A1500276ABE /* camera_icon.jpeg in Resources */ = {isa = PBXBuildFile; fileRef = ED71E2E3188E7A1500276ABE /* camera_icon.jpeg */; };
 		ED7EED5518989A1C004C9BDB /* CoreLocation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = ED7EED5418989A1C004C9BDB /* CoreLocation.framework */; };
 		EDC1DE5F18D156580085F30A /* RememberItLaunch640by960.png in Resources */ = {isa = PBXBuildFile; fileRef = EDC1DE5E18D156580085F30A /* RememberItLaunch640by960.png */; };
-		EDC1F65518C8199700A2027D /* icons.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = EDC1F65418C8199700A2027D /* icons.xcassets */; };
 		EDCA3E4218CE79CD00C7ED00 /* RememberItLaunch2x.png in Resources */ = {isa = PBXBuildFile; fileRef = EDCA3E4118CE79CD00C7ED00 /* RememberItLaunch2x.png */; };
 		EDD7753618D57E1700255634 /* ShowPhotoViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = EDD7753518D57E1700255634 /* ShowPhotoViewController.m */; };
 		EDE6D46618D8F838006FCF4D /* ReadMe.md in Resources */ = {isa = PBXBuildFile; fileRef = EDE6D46518D8F838006FCF4D /* ReadMe.md */; };
@@ -80,7 +79,6 @@
 		ED71E2E3188E7A1500276ABE /* camera_icon.jpeg */ = {isa = PBXFileReference; lastKnownFileType = image.jpeg; path = camera_icon.jpeg; sourceTree = "<group>"; };
 		ED7EED5418989A1C004C9BDB /* CoreLocation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreLocation.framework; path = System/Library/Frameworks/CoreLocation.framework; sourceTree = SDKROOT; };
 		EDC1DE5E18D156580085F30A /* RememberItLaunch640by960.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = RememberItLaunch640by960.png; sourceTree = "<group>"; };
-		EDC1F65418C8199700A2027D /* icons.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; name = icons.xcassets; path = ../icons.xcassets; sourceTree = "<group>"; };
 		EDCA3E4118CE79CD00C7ED00 /* RememberItLaunch2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = RememberItLaunch2x.png; sourceTree = "<group>"; };
 		EDD7753418D57E1700255634 /* ShowPhotoViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ShowPhotoViewController.h; sourceTree = "<group>"; };
 		EDD7753518D57E1700255634 /* ShowPhotoViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ShowPhotoViewController.m; sourceTree = "<group>"; };
@@ -193,7 +191,6 @@
 		ED71E2B1188E729400276ABE /* Supporting Files */ = {
 			isa = PBXGroup;
 			children = (
-				EDC1F65418C8199700A2027D /* icons.xcassets */,
 				ED6718E718B2B6D0008D7AC5 /* images */,
 				ED71E2B2188E729400276ABE /* RememberIt-Info.plist */,
 				ED71E2B3188E729400276ABE /* InfoPlist.strings */,
@@ -304,7 +301,6 @@
 				EDCA3E4218CE79CD00C7ED00 /* RememberItLaunch2x.png in Resources */,
 				ED71E2B5188E729400276ABE /* InfoPlist.strings in Resources */,
 				ED71E2C0188E729400276ABE /* Images.xcassets in Resources */,
-				EDC1F65518C8199700A2027D /* icons.xcassets in Resources */,
 				EDE6D46618D8F838006FCF4D /* ReadMe.md in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
