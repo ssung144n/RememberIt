@@ -15,7 +15,7 @@
             <BuildableReference
                BuildableIdentifier = "primary"
                BlueprintIdentifier = "ED71E2A4188E729400276ABE"
-               BuildableName = "TripJournal.app"
+               BuildableName = "RememberIt.app"
                BlueprintName = "RememberIt"
                ReferencedContainer = "container:RememberIt.xcodeproj">
             </BuildableReference>
@@ -33,7 +33,7 @@
             <BuildableReference
                BuildableIdentifier = "primary"
                BlueprintIdentifier = "ED71E2C4188E729400276ABE"
-               BuildableName = "TripJournalTests.xctest"
+               BuildableName = "RememberItTests.xctest"
                BlueprintName = "RememberItTests"
                ReferencedContainer = "container:RememberIt.xcodeproj">
             </BuildableReference>
@@ -43,7 +43,7 @@
          <BuildableReference
             BuildableIdentifier = "primary"
             BlueprintIdentifier = "ED71E2A4188E729400276ABE"
-            BuildableName = "TripJournal.app"
+            BuildableName = "RememberIt.app"
             BlueprintName = "RememberIt"
             ReferencedContainer = "container:RememberIt.xcodeproj">
          </BuildableReference>
@@ -62,7 +62,7 @@
          <BuildableReference
             BuildableIdentifier = "primary"
             BlueprintIdentifier = "ED71E2A4188E729400276ABE"
-            BuildableName = "TripJournal.app"
+            BuildableName = "RememberIt.app"
             BlueprintName = "RememberIt"
             ReferencedContainer = "container:RememberIt.xcodeproj">
          </BuildableReference>
@@ -84,7 +84,7 @@
          <BuildableReference
             BuildableIdentifier = "primary"
             BlueprintIdentifier = "ED71E2A4188E729400276ABE"
-            BuildableName = "TripJournal.app"
+            BuildableName = "RememberIt.app"
             BlueprintName = "RememberIt"
             ReferencedContainer = "container:RememberIt.xcodeproj">
          </BuildableReference>
