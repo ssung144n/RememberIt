@@ -2,6 +2,6 @@
 <Workspace
    version = "1.0">
    <FileRef
-      location = "self:TripJournal.xcodeproj">
+      location = "self:RememberIt.xcodeproj">
    </FileRef>
 </Workspace>

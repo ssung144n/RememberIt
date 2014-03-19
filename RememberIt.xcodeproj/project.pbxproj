@@ -58,20 +58,20 @@
 		ED65627718B13D870023CDE2 /* PhotosTripViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = PhotosTripViewController.m; sourceTree = "<group>"; };
 		ED696FDC18C2C87300B37508 /* DBHelper.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = DBHelper.h; sourceTree = "<group>"; };
 		ED696FDD18C2C87300B37508 /* DBHelper.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = DBHelper.m; sourceTree = "<group>"; };
-		ED71E2A5188E729400276ABE /* TripJournal.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = TripJournal.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		ED71E2A5188E729400276ABE /* RememberIt.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = RememberIt.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		ED71E2A8188E729400276ABE /* Foundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Foundation.framework; path = System/Library/Frameworks/Foundation.framework; sourceTree = SDKROOT; };
 		ED71E2AA188E729400276ABE /* CoreGraphics.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreGraphics.framework; path = System/Library/Frameworks/CoreGraphics.framework; sourceTree = SDKROOT; };
 		ED71E2AC188E729400276ABE /* UIKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = UIKit.framework; path = System/Library/Frameworks/UIKit.framework; sourceTree = SDKROOT; };
-		ED71E2B2188E729400276ABE /* TripJournal-Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = "TripJournal-Info.plist"; sourceTree = "<group>"; };
+		ED71E2B2188E729400276ABE /* RememberIt-Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = "RememberIt-Info.plist"; sourceTree = "<group>"; };
 		ED71E2B4188E729400276ABE /* en */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = en; path = en.lproj/InfoPlist.strings; sourceTree = "<group>"; };
 		ED71E2B6188E729400276ABE /* main.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = main.m; sourceTree = "<group>"; };
-		ED71E2B8188E729400276ABE /* TripJournal-Prefix.pch */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "TripJournal-Prefix.pch"; sourceTree = "<group>"; };
+		ED71E2B8188E729400276ABE /* RememberIt-Prefix.pch */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "RememberIt-Prefix.pch"; sourceTree = "<group>"; };
 		ED71E2B9188E729400276ABE /* sssAppDelegate.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = sssAppDelegate.h; sourceTree = "<group>"; };
 		ED71E2BA188E729400276ABE /* sssAppDelegate.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = sssAppDelegate.m; sourceTree = "<group>"; };
 		ED71E2BF188E729400276ABE /* Images.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Images.xcassets; sourceTree = "<group>"; };
-		ED71E2C5188E729400276ABE /* TripJournalTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = TripJournalTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
+		ED71E2C5188E729400276ABE /* RememberItTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = RememberItTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		ED71E2C6188E729400276ABE /* XCTest.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = XCTest.framework; path = Library/Frameworks/XCTest.framework; sourceTree = DEVELOPER_DIR; };
-		ED71E2CF188E729400276ABE /* TripJournalTests-Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = "TripJournalTests-Info.plist"; sourceTree = "<group>"; };
+		ED71E2CF188E729400276ABE /* RememberItTests-Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = "RememberItTests-Info.plist"; sourceTree = "<group>"; };
 		ED71E2D1188E729400276ABE /* en */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = en; path = en.lproj/InfoPlist.strings; sourceTree = "<group>"; };
 		ED71E2D3188E729400276ABE /* TripJournalTests.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = TripJournalTests.m; sourceTree = "<group>"; };
 		ED71E2DD188E72F000276ABE /* Trip.storyboard */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.storyboard; name = Trip.storyboard; path = ../Trip.storyboard; sourceTree = "<group>"; };
@@ -133,7 +133,7 @@
 			isa = PBXGroup;
 			children = (
 				EDE6D46518D8F838006FCF4D /* ReadMe.md */,
-				ED71E2B0188E729400276ABE /* TripJournal */,
+				ED71E2B0188E729400276ABE /* RememberIt */,
 				ED71E2CD188E729400276ABE /* TripJournalTests */,
 				ED71E2A7188E729400276ABE /* Frameworks */,
 				ED71E2A6188E729400276ABE /* Products */,
@@ -143,8 +143,8 @@
 		ED71E2A6188E729400276ABE /* Products */ = {
 			isa = PBXGroup;
 			children = (
-				ED71E2A5188E729400276ABE /* TripJournal.app */,
-				ED71E2C5188E729400276ABE /* TripJournalTests.xctest */,
+				ED71E2A5188E729400276ABE /* RememberIt.app */,
+				ED71E2C5188E729400276ABE /* RememberItTests.xctest */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -163,7 +163,7 @@
 			name = Frameworks;
 			sourceTree = "<group>";
 		};
-		ED71E2B0188E729400276ABE /* TripJournal */ = {
+		ED71E2B0188E729400276ABE /* RememberIt */ = {
 			isa = PBXGroup;
 			children = (
 				ED71E2DD188E72F000276ABE /* Trip.storyboard */,
@@ -186,6 +186,7 @@
 				EDD7753418D57E1700255634 /* ShowPhotoViewController.h */,
 				EDD7753518D57E1700255634 /* ShowPhotoViewController.m */,
 			);
+			name = RememberIt;
 			path = TripJournal;
 			sourceTree = "<group>";
 		};
@@ -194,10 +195,10 @@
 			children = (
 				EDC1F65418C8199700A2027D /* icons.xcassets */,
 				ED6718E718B2B6D0008D7AC5 /* images */,
-				ED71E2B2188E729400276ABE /* TripJournal-Info.plist */,
+				ED71E2B2188E729400276ABE /* RememberIt-Info.plist */,
 				ED71E2B3188E729400276ABE /* InfoPlist.strings */,
 				ED71E2B6188E729400276ABE /* main.m */,
-				ED71E2B8188E729400276ABE /* TripJournal-Prefix.pch */,
+				ED71E2B8188E729400276ABE /* RememberIt-Prefix.pch */,
 			);
 			name = "Supporting Files";
 			sourceTree = "<group>";
@@ -214,7 +215,7 @@
 		ED71E2CE188E729400276ABE /* Supporting Files */ = {
 			isa = PBXGroup;
 			children = (
-				ED71E2CF188E729400276ABE /* TripJournalTests-Info.plist */,
+				ED71E2CF188E729400276ABE /* RememberItTests-Info.plist */,
 				ED71E2D0188E729400276ABE /* InfoPlist.strings */,
 			);
 			name = "Supporting Files";
@@ -223,9 +224,9 @@
 /* End PBXGroup section */
 
 /* Begin PBXNativeTarget section */
-		ED71E2A4188E729400276ABE /* TripJournal */ = {
+		ED71E2A4188E729400276ABE /* RememberIt */ = {
 			isa = PBXNativeTarget;
-			buildConfigurationList = ED71E2D7188E729400276ABE /* Build configuration list for PBXNativeTarget "TripJournal" */;
+			buildConfigurationList = ED71E2D7188E729400276ABE /* Build configuration list for PBXNativeTarget "RememberIt" */;
 			buildPhases = (
 				ED71E2A1188E729400276ABE /* Sources */,
 				ED71E2A2188E729400276ABE /* Frameworks */,
@@ -235,14 +236,14 @@
 			);
 			dependencies = (
 			);
-			name = TripJournal;
+			name = RememberIt;
 			productName = TripJournal;
-			productReference = ED71E2A5188E729400276ABE /* TripJournal.app */;
+			productReference = ED71E2A5188E729400276ABE /* RememberIt.app */;
 			productType = "com.apple.product-type.application";
 		};
-		ED71E2C4188E729400276ABE /* TripJournalTests */ = {
+		ED71E2C4188E729400276ABE /* RememberItTests */ = {
 			isa = PBXNativeTarget;
-			buildConfigurationList = ED71E2DA188E729400276ABE /* Build configuration list for PBXNativeTarget "TripJournalTests" */;
+			buildConfigurationList = ED71E2DA188E729400276ABE /* Build configuration list for PBXNativeTarget "RememberItTests" */;
 			buildPhases = (
 				ED71E2C1188E729400276ABE /* Sources */,
 				ED71E2C2188E729400276ABE /* Frameworks */,
@@ -253,9 +254,9 @@
 			dependencies = (
 				ED71E2CC188E729400276ABE /* PBXTargetDependency */,
 			);
-			name = TripJournalTests;
+			name = RememberItTests;
 			productName = TripJournalTests;
-			productReference = ED71E2C5188E729400276ABE /* TripJournalTests.xctest */;
+			productReference = ED71E2C5188E729400276ABE /* RememberItTests.xctest */;
 			productType = "com.apple.product-type.bundle.unit-test";
 		};
 /* End PBXNativeTarget section */
@@ -273,7 +274,7 @@
 					};
 				};
 			};
-			buildConfigurationList = ED71E2A0188E729400276ABE /* Build configuration list for PBXProject "TripJournal" */;
+			buildConfigurationList = ED71E2A0188E729400276ABE /* Build configuration list for PBXProject "RememberIt" */;
 			compatibilityVersion = "Xcode 3.2";
 			developmentRegion = English;
 			hasScannedForEncodings = 0;
@@ -285,8 +286,8 @@
 			projectDirPath = "";
 			projectRoot = "";
 			targets = (
-				ED71E2A4188E729400276ABE /* TripJournal */,
-				ED71E2C4188E729400276ABE /* TripJournalTests */,
+				ED71E2A4188E729400276ABE /* RememberIt */,
+				ED71E2C4188E729400276ABE /* RememberItTests */,
 			);
 		};
 /* End PBXProject section */
@@ -348,7 +349,7 @@
 /* Begin PBXTargetDependency section */
 		ED71E2CC188E729400276ABE /* PBXTargetDependency */ = {
 			isa = PBXTargetDependency;
-			target = ED71E2A4188E729400276ABE /* TripJournal */;
+			target = ED71E2A4188E729400276ABE /* RememberIt */;
 			targetProxy = ED71E2CB188E729400276ABE /* PBXContainerItemProxy */;
 		};
 /* End PBXTargetDependency section */
@@ -449,9 +450,9 @@
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_LAUNCHIMAGE_NAME = LaunchImage;
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
-				GCC_PREFIX_HEADER = "TripJournal/TripJournal-Prefix.pch";
-				INFOPLIST_FILE = "TripJournal/TripJournal-Info.plist";
-				PRODUCT_NAME = "$(TARGET_NAME)";
+				GCC_PREFIX_HEADER = "TripJournal/RememberIt-Prefix.pch";
+				INFOPLIST_FILE = "TripJournal/RememberIt-Info.plist";
+				PRODUCT_NAME = RememberIt;
 				PROVISIONING_PROFILE = "";
 				WRAPPER_EXTENSION = app;
 			};
@@ -463,9 +464,9 @@
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_LAUNCHIMAGE_NAME = LaunchImage;
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
-				GCC_PREFIX_HEADER = "TripJournal/TripJournal-Prefix.pch";
-				INFOPLIST_FILE = "TripJournal/TripJournal-Info.plist";
-				PRODUCT_NAME = "$(TARGET_NAME)";
+				GCC_PREFIX_HEADER = "TripJournal/RememberIt-Prefix.pch";
+				INFOPLIST_FILE = "TripJournal/RememberIt-Info.plist";
+				PRODUCT_NAME = RememberIt;
 				WRAPPER_EXTENSION = app;
 			};
 			name = Release;
@@ -485,8 +486,8 @@
 					"DEBUG=1",
 					"$(inherited)",
 				);
-				INFOPLIST_FILE = "TripJournalTests/TripJournalTests-Info.plist";
-				PRODUCT_NAME = "$(TARGET_NAME)";
+				INFOPLIST_FILE = "TripJournalTests/RememberItTests-Info.plist";
+				PRODUCT_NAME = RememberItTests;
 				TEST_HOST = "$(BUNDLE_LOADER)";
 				WRAPPER_EXTENSION = xctest;
 			};
@@ -503,8 +504,8 @@
 				);
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
 				GCC_PREFIX_HEADER = "TripJournal/TripJournal-Prefix.pch";
-				INFOPLIST_FILE = "TripJournalTests/TripJournalTests-Info.plist";
-				PRODUCT_NAME = "$(TARGET_NAME)";
+				INFOPLIST_FILE = "TripJournalTests/RememberItTests-Info.plist";
+				PRODUCT_NAME = RememberItTests;
 				TEST_HOST = "$(BUNDLE_LOADER)";
 				WRAPPER_EXTENSION = xctest;
 			};
@@ -513,7 +514,7 @@
 /* End XCBuildConfiguration section */
 
 /* Begin XCConfigurationList section */
-		ED71E2A0188E729400276ABE /* Build configuration list for PBXProject "TripJournal" */ = {
+		ED71E2A0188E729400276ABE /* Build configuration list for PBXProject "RememberIt" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
 				ED71E2D5188E729400276ABE /* Debug */,
@@ -522,7 +523,7 @@
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
 		};
-		ED71E2D7188E729400276ABE /* Build configuration list for PBXNativeTarget "TripJournal" */ = {
+		ED71E2D7188E729400276ABE /* Build configuration list for PBXNativeTarget "RememberIt" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
 				ED71E2D8188E729400276ABE /* Debug */,
@@ -531,7 +532,7 @@
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
 		};
-		ED71E2DA188E729400276ABE /* Build configuration list for PBXNativeTarget "TripJournalTests" */ = {
+		ED71E2DA188E729400276ABE /* Build configuration list for PBXNativeTarget "RememberItTests" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
 				ED71E2DB188E729400276ABE /* Debug */,

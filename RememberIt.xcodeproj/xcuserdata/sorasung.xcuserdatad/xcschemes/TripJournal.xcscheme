@@ -16,8 +16,8 @@
                BuildableIdentifier = "primary"
                BlueprintIdentifier = "ED71E2A4188E729400276ABE"
                BuildableName = "TripJournal.app"
-               BlueprintName = "TripJournal"
-               ReferencedContainer = "container:TripJournal.xcodeproj">
+               BlueprintName = "RememberIt"
+               ReferencedContainer = "container:RememberIt.xcodeproj">
             </BuildableReference>
          </BuildActionEntry>
       </BuildActionEntries>
@@ -34,8 +34,8 @@
                BuildableIdentifier = "primary"
                BlueprintIdentifier = "ED71E2C4188E729400276ABE"
                BuildableName = "TripJournalTests.xctest"
-               BlueprintName = "TripJournalTests"
-               ReferencedContainer = "container:TripJournal.xcodeproj">
+               BlueprintName = "RememberItTests"
+               ReferencedContainer = "container:RememberIt.xcodeproj">
             </BuildableReference>
          </TestableReference>
       </Testables>
@@ -44,8 +44,8 @@
             BuildableIdentifier = "primary"
             BlueprintIdentifier = "ED71E2A4188E729400276ABE"
             BuildableName = "TripJournal.app"
-            BlueprintName = "TripJournal"
-            ReferencedContainer = "container:TripJournal.xcodeproj">
+            BlueprintName = "RememberIt"
+            ReferencedContainer = "container:RememberIt.xcodeproj">
          </BuildableReference>
       </MacroExpansion>
    </TestAction>
@@ -63,8 +63,8 @@
             BuildableIdentifier = "primary"
             BlueprintIdentifier = "ED71E2A4188E729400276ABE"
             BuildableName = "TripJournal.app"
-            BlueprintName = "TripJournal"
-            ReferencedContainer = "container:TripJournal.xcodeproj">
+            BlueprintName = "RememberIt"
+            ReferencedContainer = "container:RememberIt.xcodeproj">
          </BuildableReference>
       </BuildableProductRunnable>
       <AdditionalOptions>
@@ -85,8 +85,8 @@
             BuildableIdentifier = "primary"
             BlueprintIdentifier = "ED71E2A4188E729400276ABE"
             BuildableName = "TripJournal.app"
-            BlueprintName = "TripJournal"
-            ReferencedContainer = "container:TripJournal.xcodeproj">
+            BlueprintName = "RememberIt"
+            ReferencedContainer = "container:RememberIt.xcodeproj">
          </BuildableReference>
       </BuildableProductRunnable>
    </ProfileAction>
