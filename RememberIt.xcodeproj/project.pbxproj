@@ -7,6 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		ED025ABF18D94F3E008614BB /* orangeGd1.png in Resources */ = {isa = PBXBuildFile; fileRef = ED025ABE18D94F3E008614BB /* orangeGd1.png */; };
 		ED57F95F1891DA9300CFF1D5 /* libsqlite3.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = ED57F95E1891DA9300CFF1D5 /* libsqlite3.dylib */; };
 		ED57F96518972BB500CFF1D5 /* TripsTableViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = ED57F96418972BB500CFF1D5 /* TripsTableViewController.m */; };
 		ED57F9681897350100CFF1D5 /* TripEntry.m in Sources */ = {isa = PBXBuildFile; fileRef = ED57F9671897350100CFF1D5 /* TripEntry.m */; };
@@ -48,6 +49,7 @@
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
+		ED025ABE18D94F3E008614BB /* orangeGd1.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = orangeGd1.png; sourceTree = "<group>"; };
 		ED57F95E1891DA9300CFF1D5 /* libsqlite3.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = libsqlite3.dylib; path = usr/lib/libsqlite3.dylib; sourceTree = SDKROOT; };
 		ED57F96318972BB500CFF1D5 /* TripsTableViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = TripsTableViewController.h; sourceTree = "<group>"; };
 		ED57F96418972BB500CFF1D5 /* TripsTableViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = TripsTableViewController.m; sourceTree = "<group>"; };
@@ -119,6 +121,7 @@
 		ED6718E718B2B6D0008D7AC5 /* images */ = {
 			isa = PBXGroup;
 			children = (
+				ED025ABE18D94F3E008614BB /* orangeGd1.png */,
 				EDC1DE5E18D156580085F30A /* RememberItLaunch640by960.png */,
 				EDCA3E4118CE79CD00C7ED00 /* RememberItLaunch2x.png */,
 				EDF4052C18BB09DA007D18AB /* camera_icon120.jpg */,
@@ -296,6 +299,7 @@
 			files = (
 				EDF4052D18BB09DA007D18AB /* camera_icon120.jpg in Resources */,
 				ED71E2DE188E72F000276ABE /* Trip.storyboard in Resources */,
+				ED025ABF18D94F3E008614BB /* orangeGd1.png in Resources */,
 				ED71E2E4188E7A1500276ABE /* camera_icon.jpeg in Resources */,
 				EDC1DE5F18D156580085F30A /* RememberItLaunch640by960.png in Resources */,
 				EDCA3E4218CE79CD00C7ED00 /* RememberItLaunch2x.png in Resources */,
@@ -445,6 +449,7 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_LAUNCHIMAGE_NAME = LaunchImage;
+				CODE_SIGN_IDENTITY = "iPhone Developer";
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
 				GCC_PREFIX_HEADER = "TripJournal/RememberIt-Prefix.pch";
 				INFOPLIST_FILE = "TripJournal/RememberIt-Info.plist";

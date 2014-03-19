@@ -18,18 +18,24 @@
     //self.window.backgroundColor = [UIColor whiteColor];
     //[self.window makeKeyAndVisible];
     
+    /*
     NSShadow *shadow = [[NSShadow alloc] init];
     shadow.shadowColor = [UIColor colorWithRed:0.0 green:0.0 blue:0.0 alpha:0.8];
     shadow.shadowOffset = CGSizeMake(0, 1);
-    
-    [[UINavigationBar appearance] setTitleTextAttributes: [NSDictionary dictionaryWithObjectsAndKeys:
-                                                           [UIColor colorWithRed:245.0/255.0 green:245.0/255.0 blue:245.0/255.0 alpha:1.0], NSForegroundColorAttributeName,
-                                                           shadow, NSShadowAttributeName,
-                                                           [UIFont fontWithName:@"HelveticaNeue-CondensedBlack" size:21.0], NSFontAttributeName, nil]];
-
+     
+     [[UINavigationBar appearance] setTitleTextAttributes: [NSDictionary dictionaryWithObjectsAndKeys:
+     [UIColor colorWithRed:245.0/255.0 green:245.0/255.0 blue:245.0/255.0 alpha:1.0], NSForegroundColorAttributeName,
+     shadow, NSShadowAttributeName,
+     [UIFont fontWithName:@"HelveticaNeue-CondensedBlack" size:21.0], NSFontAttributeName, nil]];
+     
     UIColor * color = [UIColor colorWithRed:26/255.0f green:51/255.0f blue:156/255.0f alpha:1.0f];
     //UIColor * color = [UIColor colorWithRed:255/255.0f green:168/255.0f blue:8/255.0f alpha:1.0f];
     [[UINavigationBar appearance] setTintColor:color];
+     */
+    
+    
+    [[UINavigationBar appearance] setBackgroundImage:[UIImage imageNamed:@"orangeGd1.png"] forBarMetrics:UIBarMetricsDefault];
+
     return YES;
 }
 

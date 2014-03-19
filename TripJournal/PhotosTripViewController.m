@@ -210,10 +210,9 @@
         imagePicker.mediaTypes = @[(NSString *) kUTTypeImage];
         imagePicker.allowsEditing = NO;
         //imagePicker.
-        
-        //UIColor * color = [UIColor colorWithRed:255/255.0f green:121/255.0f blue:12/255.0f alpha:1.0f];
-        UIColor * color = [UIColor colorWithRed:255/255.0f green:74/255.0f blue:5/255.0f alpha:1.0f];
-        imagePicker.navigationBar.barTintColor = color;
+
+        //UIColor * color = [UIColor colorWithRed:255/255.0f green:74/255.0f blue:5/255.0f alpha:1.0f];
+        //imagePicker.navigationBar.barTintColor = color;
         
         [self presentViewController:imagePicker
                            animated:YES completion:nil];
