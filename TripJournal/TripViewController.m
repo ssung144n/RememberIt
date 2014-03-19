@@ -190,6 +190,8 @@
         
         CLGeocoder *geocoder = [[CLGeocoder alloc] init];
         [geocoder geocodeAddressString:_address.text completionHandler:^(NSArray *placemarks, NSError *error) {
+            
+            //NSLog(@"..saving location:%@ - %ld", error, (long)error.code);
             if (error && error.code == 8) {
                 NSLog(@"Invalid address: %@", error);
                 UIAlertView *alert = [[UIAlertView alloc] initWithTitle:@"Unable to save: Invalid address" message:@""
@@ -197,7 +199,7 @@
                 [alert show];
                 success = FALSE;
             }
-            else if (error && error.code == -1009) {
+            else if (error && (error.code == -1009 || error.code == 2)) {
                 NSLog(@"Invalid address: %@", error);
                 UIAlertView *alert = [[UIAlertView alloc] initWithTitle:@"Unable to save: Please check WiFi permissions" message:@""
                                                                delegate:nil cancelButtonTitle:@"OK" otherButtonTitles: nil];
