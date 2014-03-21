@@ -44,7 +44,6 @@
     
     self.tripName.text = self.selectedTrip.place;
     self.tripNote.text = self.selectedTrip.note;
-    self.tripSegControls.selectedSegmentIndex =  UISegmentedControlNoSegment;
 
     photosToDelete = [NSMutableArray array];
     
@@ -166,29 +165,8 @@
     }
 }
 
-- (IBAction)controlSelection:(id)sender {
-    //NSLog(@"...controlSelection, index: %ld", (long)self.tripSegControls.selectedSegmentIndex);
-    if (self.tripSegControls.selectedSegmentIndex==0)
-    {
-        //Delete Trip
-        NSString * msg = [NSString stringWithFormat:@"Confirm delete: %@", self.selectedTrip.place];
-        UIAlertView *updateAlert = [[UIAlertView alloc] initWithTitle:msg message:@"" delegate: self cancelButtonTitle: @"YES"  otherButtonTitles:@"NO",nil];
-        
-        [updateAlert show];
-    }
-    else if (self.tripSegControls.selectedSegmentIndex==1)
-    {
-        [self performSegueWithIdentifier:@"ToMap" sender:self];
-    }
-    else if (self.tripSegControls.selectedSegmentIndex==2)
-    {
-        //delete selected photos from trip
-        tripPhotos = [dbHelper deletePhotos:photosToDelete tripId:self.selectedTrip.tripId tripPhotos:tripPhotos];
-        [self.photoCollectionView reloadData];
-        self.tripSegControls.selectedSegmentIndex =  UISegmentedControlNoSegment;
-    }
-}
 
+//when user confirms delete on trip, then delete and remove current controller
 - (void)alertView:(UIAlertView *)alertView clickedButtonAtIndex:(NSInteger)buttonIndex
 {
     if(buttonIndex==0)
@@ -217,6 +195,23 @@
         [self presentViewController:imagePicker
                            animated:YES completion:nil];
     }
+}
+
+- (IBAction)deleteEntry:(id)sender {
+    NSString * msg = [NSString stringWithFormat:@"Confirm delete: %@", self.selectedTrip.place];
+    UIAlertView *updateAlert = [[UIAlertView alloc] initWithTitle:msg message:@"" delegate: self cancelButtonTitle: @"YES"  otherButtonTitles:@"NO",nil];
+    
+    [updateAlert show];
+}
+
+- (IBAction)showMap:(id)sender {
+    [self performSegueWithIdentifier:@"ToMap" sender:self];
+}
+
+- (IBAction)deletePhotos:(id)sender {
+    tripPhotos = [dbHelper deletePhotos:photosToDelete tripId:self.selectedTrip.tripId tripPhotos:tripPhotos];
+    [self.photoCollectionView reloadData];
+    self.tripSegControls.selectedSegmentIndex =  UISegmentedControlNoSegment;
 }
 
 #pragma mark UIImagePickerControllerDelegate

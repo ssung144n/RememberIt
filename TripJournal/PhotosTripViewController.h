@@ -22,7 +22,10 @@
 @property (strong, nonatomic) IBOutlet UISegmentedControl *tripSegControls;
 @property (weak, nonatomic) IBOutlet UILabel *tripNote;
 
-- (IBAction)controlSelection:(id)sender;
 - (IBAction)selectPhotos:(id)sender;
+
+- (IBAction)deleteEntry:(id)sender;
+- (IBAction)showMap:(id)sender;
+- (IBAction)deletePhotos:(id)sender;
 
 @end

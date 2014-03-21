@@ -286,7 +286,7 @@
                         <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
                         <subviews>
                             <collectionView opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="scaleToFill" fixedFrame="YES" minimumZoomScale="0.0" maximumZoomScale="0.0" dataMode="prototypes" translatesAutoresizingMaskIntoConstraints="NO" id="Is8-t1-dSH">
-                                <rect key="frame" x="0.0" y="138" width="320" height="344"/>
+                                <rect key="frame" x="0.0" y="102" width="320" height="413"/>
                                 <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                                 <color key="backgroundColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
                                 <collectionViewFlowLayout key="collectionViewLayout" minimumLineSpacing="1" minimumInteritemSpacing="0.0" id="ruT-RR-i2l">
@@ -317,19 +317,6 @@
                                     <outlet property="delegate" destination="pjn-z0-gj2" id="euU-Ms-Rsg"/>
                                 </connections>
                             </collectionView>
-                            <segmentedControl opaque="NO" contentMode="scaleToFill" fixedFrame="YES" contentHorizontalAlignment="left" contentVerticalAlignment="top" segmentControlStyle="bordered" selectedSegmentIndex="0" translatesAutoresizingMaskIntoConstraints="NO" id="kEe-Oq-BOe">
-                                <rect key="frame" x="6" y="108" width="309" height="29"/>
-                                <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
-                                <color key="backgroundColor" red="1" green="0.55442954239999998" blue="0.21585540550000001" alpha="1" colorSpace="calibratedRGB"/>
-                                <segments>
-                                    <segment title="Delete Entry"/>
-                                    <segment title="Map"/>
-                                    <segment title="Delete Photos"/>
-                                </segments>
-                                <connections>
-                                    <action selector="controlSelection:" destination="pjn-z0-gj2" eventType="valueChanged" id="rqq-Uw-lQP"/>
-                                </connections>
-                            </segmentedControl>
                             <label opaque="NO" clipsSubviews="YES" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" fixedFrame="YES" text="Trip Name" textAlignment="center" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="hgw-IV-gHu">
                                 <rect key="frame" x="51" y="68" width="218" height="21"/>
                                 <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
@@ -344,6 +331,31 @@
                                 <color key="textColor" red="0.16780542640000001" green="0.1245308797" blue="0.51766304350000003" alpha="1" colorSpace="calibratedRGB"/>
                                 <nil key="highlightedColor"/>
                             </label>
+                            <toolbar opaque="NO" clearsContextBeforeDrawing="NO" contentMode="scaleToFill" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="5nm-L5-PiX">
+                                <rect key="frame" x="-5" y="525" width="325" height="44"/>
+                                <autoresizingMask key="autoresizingMask" widthSizable="YES" flexibleMinY="YES"/>
+                                <items>
+                                    <barButtonItem systemItem="trash" id="Iws-Ck-gsf">
+                                        <inset key="imageInsets" minX="12" minY="0.0" maxX="0.0" maxY="0.0"/>
+                                        <connections>
+                                            <action selector="deleteEntry:" destination="pjn-z0-gj2" id="bnc-tM-7dj"/>
+                                        </connections>
+                                    </barButtonItem>
+                                    <barButtonItem width="96" style="plain" systemItem="fixedSpace" id="FEd-t7-rA1"/>
+                                    <barButtonItem image="marker44by44.png" id="lfL-9P-JZt">
+                                        <inset key="imageInsets" minX="0.0" minY="2" maxX="0.0" maxY="2"/>
+                                        <connections>
+                                            <action selector="showMap:" destination="pjn-z0-gj2" id="JST-5h-Mbj"/>
+                                        </connections>
+                                    </barButtonItem>
+                                    <barButtonItem width="67" style="plain" systemItem="fixedSpace" id="zSL-Bd-FaN"/>
+                                    <barButtonItem image="deletePhotos.png" id="UwL-07-RZw">
+                                        <connections>
+                                            <action selector="deletePhotos:" destination="pjn-z0-gj2" id="b98-NN-QcX"/>
+                                        </connections>
+                                    </barButtonItem>
+                                </items>
+                            </toolbar>
                         </subviews>
                         <color key="backgroundColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
                         <color key="tintColor" red="0.16780542640000001" green="0.1245308797" blue="0.51766304350000003" alpha="1" colorSpace="calibratedRGB"/>
@@ -369,7 +381,6 @@
                         <outlet property="photoCollectionView" destination="Is8-t1-dSH" id="LBx-gH-I3g"/>
                         <outlet property="tripName" destination="hgw-IV-gHu" id="IWd-Zg-DwF"/>
                         <outlet property="tripNote" destination="6hp-QE-iMS" id="1cv-Y2-KWS"/>
-                        <outlet property="tripSegControls" destination="kEe-Oq-BOe" id="Mcw-aq-44g"/>
                         <segue destination="7Cy-Cc-MlF" kind="push" identifier="ToMap" id="OPs-uY-y53"/>
                         <segue destination="WSF-HC-kGS" kind="push" identifier="ShowPhoto" id="1k6-Xi-bEu"/>
                     </connections>
@@ -403,6 +414,8 @@
     <resources>
         <image name="RememberItLaunch640by960.png" width="640" height="960"/>
         <image name="camera_icon.jpeg" width="127" height="127"/>
+        <image name="deletePhotos.png" width="44" height="44"/>
+        <image name="marker44by44.png" width="44" height="44"/>
     </resources>
     <simulatedMetricsContainer key="defaultSimulatedMetrics">
         <simulatedStatusBarMetrics key="statusBar"/>
@@ -410,7 +423,7 @@
         <simulatedScreenMetrics key="destination"/>
     </simulatedMetricsContainer>
     <inferredMetricsTieBreakers>
+        <segue reference="SJX-Wg-ggb"/>
         <segue reference="OBK-XG-BU9"/>
-        <segue reference="GA3-2b-ipm"/>
     </inferredMetricsTieBreakers>
 </document>
