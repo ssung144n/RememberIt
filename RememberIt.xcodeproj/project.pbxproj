@@ -33,8 +33,8 @@
 		ED71E2E4188E7A1500276ABE /* camera_icon.jpeg in Resources */ = {isa = PBXBuildFile; fileRef = ED71E2E3188E7A1500276ABE /* camera_icon.jpeg */; };
 		ED7EED5518989A1C004C9BDB /* CoreLocation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = ED7EED5418989A1C004C9BDB /* CoreLocation.framework */; };
 		EDA1D1FE18E4C8DE00CF1A26 /* AddressBookUI.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = EDA1D1FD18E4C8DE00CF1A26 /* AddressBookUI.framework */; };
-		EDC1DE5F18D156580085F30A /* RememberItLaunch640by960.png in Resources */ = {isa = PBXBuildFile; fileRef = EDC1DE5E18D156580085F30A /* RememberItLaunch640by960.png */; };
-		EDCA3E4218CE79CD00C7ED00 /* RememberItLaunch2x.png in Resources */ = {isa = PBXBuildFile; fileRef = EDCA3E4118CE79CD00C7ED00 /* RememberItLaunch2x.png */; };
+		EDA1D20618E4D66D00CF1A26 /* RememberItLaunch_640by1136.png in Resources */ = {isa = PBXBuildFile; fileRef = EDA1D20518E4D66D00CF1A26 /* RememberItLaunch_640by1136.png */; };
+		EDA1D20818E4D70100CF1A26 /* RememberItLaunch_640by960_bg.png in Resources */ = {isa = PBXBuildFile; fileRef = EDA1D20718E4D70100CF1A26 /* RememberItLaunch_640by960_bg.png */; };
 		EDD7753618D57E1700255634 /* ShowPhotoViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = EDD7753518D57E1700255634 /* ShowPhotoViewController.m */; };
 		EDE6D46618D8F838006FCF4D /* ReadMe.md in Resources */ = {isa = PBXBuildFile; fileRef = EDE6D46518D8F838006FCF4D /* ReadMe.md */; };
 		EDF4052D18BB09DA007D18AB /* camera_icon120.jpg in Resources */ = {isa = PBXBuildFile; fileRef = EDF4052C18BB09DA007D18AB /* camera_icon120.jpg */; };
@@ -88,8 +88,8 @@
 		ED71E2E3188E7A1500276ABE /* camera_icon.jpeg */ = {isa = PBXFileReference; lastKnownFileType = image.jpeg; path = camera_icon.jpeg; sourceTree = "<group>"; };
 		ED7EED5418989A1C004C9BDB /* CoreLocation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreLocation.framework; path = System/Library/Frameworks/CoreLocation.framework; sourceTree = SDKROOT; };
 		EDA1D1FD18E4C8DE00CF1A26 /* AddressBookUI.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = AddressBookUI.framework; path = System/Library/Frameworks/AddressBookUI.framework; sourceTree = SDKROOT; };
-		EDC1DE5E18D156580085F30A /* RememberItLaunch640by960.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = RememberItLaunch640by960.png; sourceTree = "<group>"; };
-		EDCA3E4118CE79CD00C7ED00 /* RememberItLaunch2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = RememberItLaunch2x.png; sourceTree = "<group>"; };
+		EDA1D20518E4D66D00CF1A26 /* RememberItLaunch_640by1136.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = RememberItLaunch_640by1136.png; sourceTree = "<group>"; };
+		EDA1D20718E4D70100CF1A26 /* RememberItLaunch_640by960_bg.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = RememberItLaunch_640by960_bg.png; sourceTree = "<group>"; };
 		EDD7753418D57E1700255634 /* ShowPhotoViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ShowPhotoViewController.h; sourceTree = "<group>"; };
 		EDD7753518D57E1700255634 /* ShowPhotoViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ShowPhotoViewController.m; sourceTree = "<group>"; };
 		EDE6D46518D8F838006FCF4D /* ReadMe.md */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = ReadMe.md; sourceTree = "<group>"; };
@@ -130,12 +130,12 @@
 		ED6718E718B2B6D0008D7AC5 /* images */ = {
 			isa = PBXGroup;
 			children = (
+				EDA1D20718E4D70100CF1A26 /* RememberItLaunch_640by960_bg.png */,
+				EDA1D20518E4D66D00CF1A26 /* RememberItLaunch_640by1136.png */,
 				ED54C22C18E3845B00BD5AF1 /* edit_icon.png */,
 				ED4B6F9F18DCFAE1009D622B /* deletePhotos.png */,
 				ED4B6F9D18DCF8B4009D622B /* marker44by44.png */,
 				ED025ABE18D94F3E008614BB /* orangeGd1.png */,
-				EDC1DE5E18D156580085F30A /* RememberItLaunch640by960.png */,
-				EDCA3E4118CE79CD00C7ED00 /* RememberItLaunch2x.png */,
 				EDF4052C18BB09DA007D18AB /* camera_icon120.jpg */,
 				ED71E2E3188E7A1500276ABE /* camera_icon.jpeg */,
 			);
@@ -313,14 +313,14 @@
 				EDF4052D18BB09DA007D18AB /* camera_icon120.jpg in Resources */,
 				ED71E2DE188E72F000276ABE /* Trip.storyboard in Resources */,
 				ED025ABF18D94F3E008614BB /* orangeGd1.png in Resources */,
+				EDA1D20618E4D66D00CF1A26 /* RememberItLaunch_640by1136.png in Resources */,
 				ED71E2E4188E7A1500276ABE /* camera_icon.jpeg in Resources */,
 				ED4B6F9E18DCF8B4009D622B /* marker44by44.png in Resources */,
-				EDC1DE5F18D156580085F30A /* RememberItLaunch640by960.png in Resources */,
 				ED54C22D18E3845B00BD5AF1 /* edit_icon.png in Resources */,
-				EDCA3E4218CE79CD00C7ED00 /* RememberItLaunch2x.png in Resources */,
 				ED4B6FA018DCFAE1009D622B /* deletePhotos.png in Resources */,
 				ED71E2B5188E729400276ABE /* InfoPlist.strings in Resources */,
 				ED71E2C0188E729400276ABE /* Images.xcassets in Resources */,
+				EDA1D20818E4D70100CF1A26 /* RememberItLaunch_640by960_bg.png in Resources */,
 				EDE6D46618D8F838006FCF4D /* ReadMe.md in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;

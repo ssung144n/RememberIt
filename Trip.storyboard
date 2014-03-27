@@ -16,7 +16,7 @@
                         <rect key="frame" x="0.0" y="0.0" width="320" height="480"/>
                         <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
                         <subviews>
-                            <imageView userInteractionEnabled="NO" contentMode="scaleToFill" horizontalHuggingPriority="251" verticalHuggingPriority="251" fixedFrame="YES" image="RememberItLaunch640by960.png" translatesAutoresizingMaskIntoConstraints="NO" id="jFZ-1o-5sl">
+                            <imageView userInteractionEnabled="NO" contentMode="scaleToFill" horizontalHuggingPriority="251" verticalHuggingPriority="251" fixedFrame="YES" image="RememberItLaunch_640by960_bg.png" translatesAutoresizingMaskIntoConstraints="NO" id="jFZ-1o-5sl">
                                 <rect key="frame" x="0.0" y="63" width="363" height="543"/>
                                 <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
                             </imageView>
@@ -431,7 +431,7 @@
         </scene>
     </scenes>
     <resources>
-        <image name="RememberItLaunch640by960.png" width="640" height="960"/>
+        <image name="RememberItLaunch_640by960_bg.png" width="640" height="960"/>
         <image name="camera_icon.jpeg" width="127" height="127"/>
     </resources>
     <simulatedMetricsContainer key="defaultSimulatedMetrics">
