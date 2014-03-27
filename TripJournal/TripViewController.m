@@ -11,7 +11,7 @@
 #import "DBHelper.h"
 #import "TripEntry.h"
 
-//#import <AddressBookUI/AddressBookUI.h>
+#import <AddressBookUI/AddressBookUI.h>
 
 @interface TripViewController ()
 {
@@ -62,18 +62,29 @@
     [self dismissTextViewKeyBoard];
     
     //check if edit entry
-    NSLog(@"..viewDidLoad in TripView-tripId:%@", self.selectedTrip.tripId);
-    if(self.selectedTrip.place.length > 0)
+    //NSLog(@"..viewDidLoad in TripView-tripId:%@", self.selectedTrip.tripId);
+    if(self.selectedTrip.tripId != nil)
         [self setEntry];
 }
 
 -(void)setEntry
 {
+    self.navigationTitle.title = @"Edit";
+    
     self.place.text = self.selectedTrip.place;
     self.startDate.text = self.selectedTrip.startDate;
     self.endDate.text = self.selectedTrip.endDate;
     self.note.text = self.selectedTrip.note;
-    //add location - current location to off and forward geo-location to address or add currentLocation table field?
+    
+    //add location - current location switch to off and reverse geo-location to address
+    self.locSwitch.on = FALSE;
+    self.locLabel.text = @"Off";
+    self.locLabel.textColor = [UIColor redColor];
+    self.address.enabled = TRUE;
+    self.address.backgroundColor = [UIColor whiteColor];
+    
+    CLLocation *loc = [[CLLocation alloc] initWithLatitude:[self.selectedTrip.latitude doubleValue] longitude:[self.selectedTrip.longitude doubleValue]];
+    [self reverseGeocode:loc];
 }
 
 //dismiss the keyboard for textview
@@ -292,6 +303,19 @@
         self.endDate.text = @"";
         self.address.text = @"";
     }
+}
+
+- (void)reverseGeocode:(CLLocation *)location {
+    CLGeocoder *geocoder = [[CLGeocoder alloc] init];
+    [geocoder reverseGeocodeLocation:location completionHandler:^(NSArray *placemarks, NSError *error) {
+        NSLog(@"Finding address");
+        if (error) {
+            NSLog(@"Error %@", error.description);
+        } else {
+            CLPlacemark *placemark = [placemarks lastObject];
+            self.address.text = [NSString stringWithFormat:@"%@", ABCreateStringWithAddressDictionary(placemark.addressDictionary, NO)];
+        }
+    }];
 }
 
 - (IBAction)returnedRemoveKB:(id)sender {

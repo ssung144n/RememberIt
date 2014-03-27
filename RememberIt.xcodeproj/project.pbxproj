@@ -32,6 +32,7 @@
 		ED71E2E1188E784900276ABE /* TripViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = ED71E2E0188E784900276ABE /* TripViewController.m */; };
 		ED71E2E4188E7A1500276ABE /* camera_icon.jpeg in Resources */ = {isa = PBXBuildFile; fileRef = ED71E2E3188E7A1500276ABE /* camera_icon.jpeg */; };
 		ED7EED5518989A1C004C9BDB /* CoreLocation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = ED7EED5418989A1C004C9BDB /* CoreLocation.framework */; };
+		EDA1D1FE18E4C8DE00CF1A26 /* AddressBookUI.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = EDA1D1FD18E4C8DE00CF1A26 /* AddressBookUI.framework */; };
 		EDC1DE5F18D156580085F30A /* RememberItLaunch640by960.png in Resources */ = {isa = PBXBuildFile; fileRef = EDC1DE5E18D156580085F30A /* RememberItLaunch640by960.png */; };
 		EDCA3E4218CE79CD00C7ED00 /* RememberItLaunch2x.png in Resources */ = {isa = PBXBuildFile; fileRef = EDCA3E4118CE79CD00C7ED00 /* RememberItLaunch2x.png */; };
 		EDD7753618D57E1700255634 /* ShowPhotoViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = EDD7753518D57E1700255634 /* ShowPhotoViewController.m */; };
@@ -86,6 +87,7 @@
 		ED71E2E0188E784900276ABE /* TripViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = TripViewController.m; sourceTree = "<group>"; };
 		ED71E2E3188E7A1500276ABE /* camera_icon.jpeg */ = {isa = PBXFileReference; lastKnownFileType = image.jpeg; path = camera_icon.jpeg; sourceTree = "<group>"; };
 		ED7EED5418989A1C004C9BDB /* CoreLocation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreLocation.framework; path = System/Library/Frameworks/CoreLocation.framework; sourceTree = SDKROOT; };
+		EDA1D1FD18E4C8DE00CF1A26 /* AddressBookUI.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = AddressBookUI.framework; path = System/Library/Frameworks/AddressBookUI.framework; sourceTree = SDKROOT; };
 		EDC1DE5E18D156580085F30A /* RememberItLaunch640by960.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = RememberItLaunch640by960.png; sourceTree = "<group>"; };
 		EDCA3E4118CE79CD00C7ED00 /* RememberItLaunch2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = RememberItLaunch2x.png; sourceTree = "<group>"; };
 		EDD7753418D57E1700255634 /* ShowPhotoViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ShowPhotoViewController.h; sourceTree = "<group>"; };
@@ -102,6 +104,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				EDA1D1FE18E4C8DE00CF1A26 /* AddressBookUI.framework in Frameworks */,
 				EDF4053A18BD2923007D18AB /* MapKit.framework in Frameworks */,
 				ED57F95F1891DA9300CFF1D5 /* libsqlite3.dylib in Frameworks */,
 				ED7EED5518989A1C004C9BDB /* CoreLocation.framework in Frameworks */,
@@ -162,6 +165,7 @@
 		ED71E2A7188E729400276ABE /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
+				EDA1D1FD18E4C8DE00CF1A26 /* AddressBookUI.framework */,
 				EDF4053918BD2923007D18AB /* MapKit.framework */,
 				ED57F95E1891DA9300CFF1D5 /* libsqlite3.dylib */,
 				ED7EED5418989A1C004C9BDB /* CoreLocation.framework */,
