@@ -90,15 +90,6 @@
     tripDates = [NSString stringWithFormat:@"%@%@%@", trip.startDate, @"-", trip.endDate];
     cell.detailTextLabel.text = tripDates;
     
-    /*
-    if( [indexPath row] % 2){
-        cell.backgroundColor=[UIColor whiteColor];
-    }
-    else{
-        UIColor * color = [UIColor colorWithRed:255/255.0f green:167/255.0f blue:3/255.0f alpha:1.0f];
-        cell.backgroundColor = color;
-    }
-    */
     return cell;
 }
 

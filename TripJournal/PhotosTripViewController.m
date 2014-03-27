@@ -10,6 +10,7 @@
 #import "TripsTableViewController.h"
 #import "MapViewController.h"
 #import "ShowPhotoViewController.h"
+#import "TripViewController.h"
 
 #import "DBHelper.h"
 
@@ -42,23 +43,50 @@
     dbHelper = [[DBHelper alloc] init];
     tripPhotos = [dbHelper loadTripPhotos:self.selectedTrip.tripId];
     
-    self.tripName.text = self.selectedTrip.place;
-    self.tripNote.text = self.selectedTrip.note;
+    //self.tripName.text = self.selectedTrip.place;
+    self.title = self.selectedTrip.place;
+    
+    //add note properties
+    self.note.text = self.selectedTrip.note;
+    // For the border and rounded corners
+    //[self.note.layer setBorderColor:[[UIColor blackColor] CGColor]];
+    //[[self.note layer] setBorderWidth:4];
+    //[[self.note layer] setCornerRadius:10];
+    //[self.note setClipsToBounds: YES];
+    [self.note setEditable:NO];
+    //---
 
     photosToDelete = [NSMutableArray array];
     
     self.photoCollectionView.allowsMultipleSelection = TRUE;
+    //self.photoCollectionView.layer.borderColor = [UIColor blackColor].CGColor;
+    //self.photoCollectionView.layer.borderWidth = 3.0f;
     
     UILongPressGestureRecognizer *lpgr = [[UILongPressGestureRecognizer alloc]
        initWithTarget:self action:@selector(longPressHandler:)];
     lpgr.minimumPressDuration = 1.0; //seconds
     lpgr.delegate = self;
     [self.photoCollectionView addGestureRecognizer:lpgr];
-    
 }
+
+ - (void)longPressHandler:(UILongPressGestureRecognizer *)lpgr {
+     
+     if (lpgr.state == UIGestureRecognizerStateBegan) {
+         //UIGestureRecognizerStateBegan, UIGestureRecognizerStateEnded
+         
+         CGPoint p = [lpgr locationInView:self.photoCollectionView];
+         
+         NSIndexPath *indexPath = [self.photoCollectionView indexPathForItemAtPoint:p];
+         if (indexPath != nil) {
+             selectedPhoto = [tripPhotos objectAtIndex:indexPath.row];
+             [self performSegueWithIdentifier:@"ShowPhoto" sender:self];
+         }
+     }
+ }
 
 - (UIEdgeInsets)collectionView:(UICollectionView*)collectionView layout:(UICollectionViewLayout *)collectionViewLayout insetForSectionAtIndex:(NSInteger)section {
     return UIEdgeInsetsMake(-55, 0, 0, 0); // top, left, bottom, right
+    //return UIEdgeInsetsMake(0, 0, 0, 0);
 }
 
 - (CGFloat)collectionView:(UICollectionView *)collectionView layout:(UICollectionViewLayout*)collectionViewLayout minimumLineSpacingForSectionAtIndex:(NSInteger)section
@@ -66,10 +94,6 @@
     return 1;
 }
 
-- (void)viewWillAppear:(BOOL)animated {
-    
-    self.tripSegControls.selectedSegmentIndex =  UISegmentedControlNoSegment;
-}
 
 - (void)didReceiveMemoryWarning
 {
@@ -81,21 +105,6 @@
 - (NSInteger)collectionView:(UICollectionView *)collectionView numberOfItemsInSection:(NSInteger)section
 {
     return tripPhotos.count;
-}
-
-- (void)longPressHandler:(UILongPressGestureRecognizer *)gr {
-
-    if (gr.state == UIGestureRecognizerStateBegan) {
-        //UIGestureRecognizerStateBegan, UIGestureRecognizerStateEnded
-        
-        CGPoint p = [gr locationInView:self.photoCollectionView];
-        
-        NSIndexPath *indexPath = [self.photoCollectionView indexPathForItemAtPoint:p];
-        if (indexPath != nil) {
-            selectedPhoto = [tripPhotos objectAtIndex:indexPath.row];
-            [self performSegueWithIdentifier:@"ShowPhoto" sender:self];
-        }
-    }
 }
 
 - (UICollectionViewCell *)collectionView:(UICollectionView *)collectionView cellForItemAtIndexPath:(NSIndexPath *)indexPath
@@ -156,14 +165,21 @@
         MapViewController *vc = [segue destinationViewController];
         [vc setSelectedTrip: self.selectedTrip];
     }
+    /*
     else if([segue.identifier isEqualToString:@"BackToMyTrips"]) {
         TripsTableViewController *vc = [segue destinationViewController];
         [vc setTripId: self.selectedTrip.tripId];
     }
+    */
     else if([segue.identifier isEqualToString:@"ShowPhoto"]) {
         ShowPhotoViewController *vc = [segue destinationViewController];
         [vc setPhotoName:selectedPhoto];
         //NSLog(@"...prepareForSegue-ShowPhoto:%@", selectedPhoto);
+    }
+    else if([segue.identifier isEqualToString:@"ToEdit"]) {
+        TripViewController *vc = [segue destinationViewController];
+        NSLog(@"..ToEdit segue-tripId:%@", self.selectedTrip.tripId);
+        [vc setSelectedTrip:self.selectedTrip];
     }
 }
 
@@ -213,7 +229,10 @@
 - (IBAction)deletePhotos:(id)sender {
     tripPhotos = [dbHelper deletePhotos:photosToDelete tripId:self.selectedTrip.tripId tripPhotos:tripPhotos];
     [self.photoCollectionView reloadData];
-    self.tripSegControls.selectedSegmentIndex =  UISegmentedControlNoSegment;
+}
+
+- (IBAction)editEntry:(id)sender {
+    [self performSegueWithIdentifier:@"ToEdit" sender:self];
 }
 
 #pragma mark UIImagePickerControllerDelegate

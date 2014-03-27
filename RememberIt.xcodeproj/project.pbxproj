@@ -10,6 +10,7 @@
 		ED025ABF18D94F3E008614BB /* orangeGd1.png in Resources */ = {isa = PBXBuildFile; fileRef = ED025ABE18D94F3E008614BB /* orangeGd1.png */; };
 		ED4B6F9E18DCF8B4009D622B /* marker44by44.png in Resources */ = {isa = PBXBuildFile; fileRef = ED4B6F9D18DCF8B4009D622B /* marker44by44.png */; };
 		ED4B6FA018DCFAE1009D622B /* deletePhotos.png in Resources */ = {isa = PBXBuildFile; fileRef = ED4B6F9F18DCFAE1009D622B /* deletePhotos.png */; };
+		ED54C22D18E3845B00BD5AF1 /* edit_icon.png in Resources */ = {isa = PBXBuildFile; fileRef = ED54C22C18E3845B00BD5AF1 /* edit_icon.png */; };
 		ED57F95F1891DA9300CFF1D5 /* libsqlite3.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = ED57F95E1891DA9300CFF1D5 /* libsqlite3.dylib */; };
 		ED57F96518972BB500CFF1D5 /* TripsTableViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = ED57F96418972BB500CFF1D5 /* TripsTableViewController.m */; };
 		ED57F9681897350100CFF1D5 /* TripEntry.m in Sources */ = {isa = PBXBuildFile; fileRef = ED57F9671897350100CFF1D5 /* TripEntry.m */; };
@@ -54,6 +55,7 @@
 		ED025ABE18D94F3E008614BB /* orangeGd1.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = orangeGd1.png; sourceTree = "<group>"; };
 		ED4B6F9D18DCF8B4009D622B /* marker44by44.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = marker44by44.png; sourceTree = "<group>"; };
 		ED4B6F9F18DCFAE1009D622B /* deletePhotos.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = deletePhotos.png; sourceTree = "<group>"; };
+		ED54C22C18E3845B00BD5AF1 /* edit_icon.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = edit_icon.png; sourceTree = "<group>"; };
 		ED57F95E1891DA9300CFF1D5 /* libsqlite3.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = libsqlite3.dylib; path = usr/lib/libsqlite3.dylib; sourceTree = SDKROOT; };
 		ED57F96318972BB500CFF1D5 /* TripsTableViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = TripsTableViewController.h; sourceTree = "<group>"; };
 		ED57F96418972BB500CFF1D5 /* TripsTableViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = TripsTableViewController.m; sourceTree = "<group>"; };
@@ -125,6 +127,7 @@
 		ED6718E718B2B6D0008D7AC5 /* images */ = {
 			isa = PBXGroup;
 			children = (
+				ED54C22C18E3845B00BD5AF1 /* edit_icon.png */,
 				ED4B6F9F18DCFAE1009D622B /* deletePhotos.png */,
 				ED4B6F9D18DCF8B4009D622B /* marker44by44.png */,
 				ED025ABE18D94F3E008614BB /* orangeGd1.png */,
@@ -309,6 +312,7 @@
 				ED71E2E4188E7A1500276ABE /* camera_icon.jpeg in Resources */,
 				ED4B6F9E18DCF8B4009D622B /* marker44by44.png in Resources */,
 				EDC1DE5F18D156580085F30A /* RememberItLaunch640by960.png in Resources */,
+				ED54C22D18E3845B00BD5AF1 /* edit_icon.png in Resources */,
 				EDCA3E4218CE79CD00C7ED00 /* RememberItLaunch2x.png in Resources */,
 				ED4B6FA018DCFAE1009D622B /* deletePhotos.png in Resources */,
 				ED71E2B5188E729400276ABE /* InfoPlist.strings in Resources */,

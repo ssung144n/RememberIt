@@ -12,7 +12,6 @@
 
 @interface MapViewController : UIViewController
 
-//@property (strong, nonatomic) NSNumber *tripId;
 @property (strong, nonatomic) TripEntry *selectedTrip;
 
 @property (weak, nonatomic) IBOutlet MKMapView *tripMap;

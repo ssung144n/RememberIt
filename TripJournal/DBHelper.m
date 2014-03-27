@@ -144,12 +144,54 @@ sqlite3_stmt *statement;
         }
     }
     @catch (NSException * ex) {
-        NSLog(@"Exception: createDB:%@", ex.description);
+        NSLog(@"Exception: saveData:%@", ex.description);
     }
     @finally {
         sqlite3_close(tripDB);
     }
     return tripEntry;
+}
+
+-(TripEntry *)editData:(TripEntry *) trip
+{
+    const char *dbpath = [self dbPath];
+    @try
+    {
+        if (sqlite3_open(dbpath, &tripDB) == SQLITE_OK)
+        {
+            NSString *updateSQL = [NSString stringWithFormat:
+                                   @"Update TripJournal Set Place = \"%@\", Note = \"%@\", StartDate = \"%@\", EndDate = \"%@\", Latitude = \"%@\", Longitude = \"%@\" Where Id = %d", trip.place, trip.note, trip.startDate, trip.endDate, trip.latitude, trip.longitude, [trip.tripId intValue]];
+            
+            const char *update_stmt = [updateSQL UTF8String];
+            sqlite3_prepare_v2(tripDB, update_stmt, -1, &statement, NULL);
+            int resultCode = sqlite3_step(statement);
+            NSLog(@"...resultCode for edit entry:%d - stmt:%s", resultCode, update_stmt);
+            if (resultCode == SQLITE_DONE)
+            {
+                UIAlertView *alert = [[UIAlertView alloc] initWithTitle:@"Updated Entry" message:@""
+                                                               delegate:nil cancelButtonTitle:@"OK" otherButtonTitles: nil];
+                [alert show];
+                
+            }
+            else
+            {
+                UIAlertView *alert = [[UIAlertView alloc] initWithTitle:@"Unable To Update Entry" message:@""
+                                                               delegate:nil cancelButtonTitle:@"OK" otherButtonTitles: nil];
+                [alert show];
+            }
+            
+            //trip.tripId = [NSString stringWithFormat:@"%lld", sqlite3_last_insert_rowid(tripDB)];
+
+            sqlite3_finalize(statement);
+        }
+    }
+    @catch (NSException * ex) {
+        NSLog(@"Exception: editData:%@", ex.description);
+    }
+    @finally {
+        sqlite3_close(tripDB);
+    }
+    return trip;
 }
 
 -(NSMutableArray *)selectAllFromDB
@@ -196,7 +238,7 @@ sqlite3_stmt *statement;
         }
     }
     @catch (NSException * ex) {
-        NSLog(@"Exception: selectAllFromDB");
+        NSLog(@"Exception: selectAllFromDB:%@", ex.description);
     }
     @finally {
         sqlite3_close(tripDB);
@@ -250,17 +292,6 @@ sqlite3_stmt *statement;
     @finally
     {
         sqlite3_close(tripDB);
-        /*
-        UIAlertView *alert = [[UIAlertView alloc] initWithTitle:@"Deleted Trip"
-                                                        message:@""
-                                                       delegate:nil
-                                              cancelButtonTitle:@"Cancel"
-                                              otherButtonTitles:@"OK", nil];
-        [alert show];
-        UIAlertView *alert = [[UIAlertView alloc] initWithTitle:@"Deleted Trip" message:@""
-                                                       delegate:nil cancelButtonTitle:@"OK" otherButtonTitles: nil];
-        [alert show];
-         */
     }
     return success;
 }

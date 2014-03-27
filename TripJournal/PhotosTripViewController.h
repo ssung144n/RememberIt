@@ -19,13 +19,14 @@
 @property (strong, nonatomic) IBOutlet UINavigationItem *navigationTitle;
 
 @property (strong, nonatomic) IBOutlet UILabel *tripName;
-@property (strong, nonatomic) IBOutlet UISegmentedControl *tripSegControls;
-@property (weak, nonatomic) IBOutlet UILabel *tripNote;
+
+@property (weak, nonatomic) IBOutlet UITextView *note;
 
 - (IBAction)selectPhotos:(id)sender;
 
 - (IBAction)deleteEntry:(id)sender;
 - (IBAction)showMap:(id)sender;
 - (IBAction)deletePhotos:(id)sender;
+- (IBAction)editEntry:(id)sender;
 
 @end

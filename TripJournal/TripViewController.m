@@ -50,7 +50,57 @@
     [self.locationManager startUpdatingLocation];
     self.locationManager.delegate = self;
     self.location = [[CLLocation alloc] init];
+    
+    //text view note properties
+    //UIColor * color = [UIColor colorWithRed:255/255.0f green:254/255.0f blue:253/255.0f alpha:1.0f];
+    [self.note.layer setBorderColor: [[UIColor whiteColor] CGColor]];
+    [[self.note layer] setBorderWidth:2.3];
+    [[self.note layer] setCornerRadius:10];
+    [self.note setClipsToBounds: YES];
+    [self.note setEditable:YES];
+    //method to dismiss virtual keyboard on textview
+    [self dismissTextViewKeyBoard];
+    
+    //check if edit entry
+    NSLog(@"..viewDidLoad in TripView-tripId:%@", self.selectedTrip.tripId);
+    if(self.selectedTrip.place.length > 0)
+        [self setEntry];
 }
+
+-(void)setEntry
+{
+    self.place.text = self.selectedTrip.place;
+    self.startDate.text = self.selectedTrip.startDate;
+    self.endDate.text = self.selectedTrip.endDate;
+    self.note.text = self.selectedTrip.note;
+    //add location - current location to off and forward geo-location to address or add currentLocation table field?
+}
+
+//dismiss the keyboard for textview
+-(void)dismissTextViewKeyBoard
+{
+    CGRect screenRect = [[UIScreen mainScreen] bounds];
+    CGFloat screenWidth = screenRect.size.width;
+    CGFloat screenHeight = screenRect.size.height;
+    
+    //view to catch  tap
+    UIView *view = [[UIView alloc] init];
+    
+    //leave the navigation bar alone
+    view.frame = CGRectMake(0, 60, screenWidth, screenHeight-60);
+    
+    UITapGestureRecognizer *tap = [[UITapGestureRecognizer alloc] initWithTarget:self
+                                                                          action:@selector(dismissKeyboard)];
+    [view addGestureRecognizer:tap];
+    [self.view addSubview:view];
+    [self.view sendSubviewToBack:view];
+}
+
+-(void)dismissKeyboard {
+    if([self.note isFirstResponder])
+        [self.note resignFirstResponder];
+}
+
 /*
  //Instead of calling delegate methods to be called automatically,calling when adding new trip with setLocation
 -(void)locationManager:(CLLocationManager *)manager didUpdateLocations:(NSArray *)locations {
@@ -174,12 +224,14 @@
         return;
     
     __block BOOL success=TRUE;
-    __block TripEntry *newTrip = [[TripEntry alloc] init]; //need write access to var
+    __block TripEntry *trip = [[TripEntry alloc] init]; //need write access to var in block
     
-    newTrip.place =self.place.text;
-    newTrip.note = self.note.text;
-    newTrip.startDate = self.startDate.text;
-    newTrip.endDate = self.endDate.text;
+    trip.place =self.place.text;
+    trip.note = self.note.text;
+    trip.startDate = self.startDate.text;
+    trip.endDate = self.endDate.text;
+    if(self.selectedTrip.tripId.length > 0)
+        trip.tripId = self.selectedTrip.tripId;
     
     //Use Forward-Geocoding to get Location if enter address
     if(self.address.text.length > 0 && haveLocationSrv)
@@ -209,21 +261,27 @@
             else {
                 CLPlacemark *placemark = [placemarks lastObject];
 
-                newTrip.latitude = [NSString stringWithFormat: @"%f", placemark.location.coordinate.latitude];
-                newTrip.longitude = [NSString stringWithFormat: @"%f", placemark.location.coordinate.longitude];
+                trip.latitude = [NSString stringWithFormat: @"%f", placemark.location.coordinate.latitude];
+                trip.longitude = [NSString stringWithFormat: @"%f", placemark.location.coordinate.longitude];
                 //NSLog(@"...saveData - Address:%@ - %@:%@", _address.text, newTrip.latitude, newTrip.longitude);
-                newTrip = [dbHelper saveData:newTrip];
+                if(self.selectedTrip.place.length > 0) //edit
+                    trip = [dbHelper editData:trip];
+                else
+                    trip = [dbHelper saveData:trip];
             }
         }];
     }
     else //get current user location
     {
         [self setLocation];
-        newTrip.latitude = self.latitude;
-        newTrip.longitude = self.longitude;
+        trip.latitude = self.latitude;
+        trip.longitude = self.longitude;
         
         //NSLog(@"...saveData - Current - %@:%@", self.latitude, self.longitude);
-        newTrip = [dbHelper saveData:newTrip];
+        if(self.selectedTrip.place.length > 0) //edit
+            trip = [dbHelper editData:trip];
+        else
+            trip = [dbHelper saveData:trip];
     }
     
     if(success)
@@ -256,7 +314,6 @@
 - (IBAction)enterEndDate:(id)sender {
     if([_endDate isFirstResponder]){
         UIDatePicker *picker = (UIDatePicker*)_endDate.inputView;
-        //_endDate.text = [NSString stringWithFormat:@"%@",picker.date];
         
         NSDateFormatter *df = [[NSDateFormatter alloc]init];
         df.dateStyle = NSDateFormatterMediumStyle;

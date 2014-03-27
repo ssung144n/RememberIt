@@ -14,6 +14,8 @@
 
 //properties for TripViewController - Add Trip
 -(TripEntry *)saveData:(TripEntry *) tripEntry;
+-(TripEntry *)editData:(TripEntry *) trip;
+
 -(void) createDB;
 
 //properties for TripsTableViewController - My Trips

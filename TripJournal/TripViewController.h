@@ -9,8 +9,11 @@
 #import <UIKit/UIKit.h>
 #import <CoreLocation/CoreLocation.h>
 
+#import "TripEntry.h"
+
 @interface TripViewController : UIViewController <CLLocationManagerDelegate>
 
+@property (strong, nonatomic) TripEntry *selectedTrip;
 //Location
 @property (strong, nonatomic) CLLocationManager *locationManager;
 @property (strong, nonatomic) CLLocation *location;
@@ -20,7 +23,8 @@
 
 
 @property (strong, nonatomic) IBOutlet UITextField *place;
-@property (strong, nonatomic) IBOutlet UITextField *note;
+@property (weak, nonatomic) IBOutlet UITextView *note;
+
 @property (strong, nonatomic) IBOutlet UINavigationItem *navigationTitle;
 @property (strong, nonatomic) IBOutlet UITextField *startDate;
 @property (strong, nonatomic) IBOutlet UITextField *endDate;
