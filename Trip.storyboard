@@ -119,7 +119,7 @@
                     <extendedEdge key="edgesForExtendedLayout" top="YES"/>
                     <toolbarItems/>
                     <navigationItem key="navigationItem" title="Add" id="EPB-E8-JBh">
-                        <barButtonItem key="rightBarButtonItem" title="My List" id="Xyu-Th-1LL">
+                        <barButtonItem key="rightBarButtonItem" title="List" id="Xyu-Th-1LL">
                             <color key="tintColor" red="0.16780542640000001" green="0.1245308797" blue="0.51766304350000003" alpha="1" colorSpace="calibratedRGB"/>
                             <connections>
                                 <segue destination="N93-MB-aoR" kind="push" identifier="ToMyTrips" id="fOu-Qa-0VC"/>
@@ -143,7 +143,7 @@
             </objects>
             <point key="canvasLocation" x="599" y="534"/>
         </scene>
-        <!--Trips Table View Controller - My List-->
+        <!--Trips Table View Controller - List-->
         <scene sceneID="EIC-DZ-OEM">
             <objects>
                 <tableViewController id="N93-MB-aoR" customClass="TripsTableViewController" sceneMemberID="viewController">
@@ -153,7 +153,7 @@
                         <color key="backgroundColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
                         <color key="separatorColor" red="0.94184470659999997" green="0.3306099596" blue="0.14119785909999999" alpha="1" colorSpace="calibratedRGB"/>
                         <prototypes>
-                            <tableViewCell autoresizesSubviews="NO" contentMode="scaleToFill" selectionStyle="blue" accessoryType="disclosureIndicator" hidesAccessoryWhenEditing="NO" indentationLevel="1" indentationWidth="0.0" reuseIdentifier="Cell" textLabel="OPF-VP-gc0" detailTextLabel="Fi3-ad-gHv" rowHeight="62" style="IBUITableViewCellStyleSubtitle" id="heb-jr-2Pe">
+                            <tableViewCell autoresizesSubviews="NO" contentMode="scaleToFill" selectionStyle="blue" accessoryType="disclosureIndicator" hidesAccessoryWhenEditing="NO" indentationLevel="1" indentationWidth="0.0" reuseIdentifier="Cell" textLabel="OPF-VP-gc0" detailTextLabel="Fi3-ad-gHv" imageView="jSP-gT-O2A" rowHeight="62" style="IBUITableViewCellStyleSubtitle" id="heb-jr-2Pe">
                                 <rect key="frame" x="0.0" y="86" width="320" height="62"/>
                                 <autoresizingMask key="autoresizingMask"/>
                                 <tableViewCellContentView key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" tableViewCell="heb-jr-2Pe" id="hwF-iv-YwZ">
@@ -161,19 +161,23 @@
                                     <autoresizingMask key="autoresizingMask"/>
                                     <subviews>
                                         <label opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="left" text="Title" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" id="OPF-VP-gc0">
-                                            <rect key="frame" x="15" y="9" width="41" height="27"/>
+                                            <rect key="frame" x="91" y="9" width="41" height="27"/>
                                             <autoresizingMask key="autoresizingMask"/>
                                             <fontDescription key="fontDescription" type="system" pointSize="22"/>
                                             <color key="textColor" cocoaTouchSystemColor="darkTextColor"/>
                                             <nil key="highlightedColor"/>
                                         </label>
                                         <label opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="left" text="Detail" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" id="Fi3-ad-gHv">
-                                            <rect key="frame" x="15" y="36" width="37" height="17"/>
+                                            <rect key="frame" x="91" y="36" width="37" height="17"/>
                                             <autoresizingMask key="autoresizingMask"/>
                                             <fontDescription key="fontDescription" type="system" pointSize="14"/>
                                             <color key="textColor" cocoaTouchSystemColor="darkTextColor"/>
                                             <nil key="highlightedColor"/>
                                         </label>
+                                        <imageView opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="scaleToFill" image="camera_icon.jpeg" id="jSP-gT-O2A">
+                                            <rect key="frame" x="15" y="0.0" width="61" height="61"/>
+                                            <autoresizingMask key="autoresizingMask"/>
+                                        </imageView>
                                     </subviews>
                                 </tableViewCellContentView>
                                 <color key="tintColor" red="0.16780542640000001" green="0.1245308797" blue="0.51766304350000003" alpha="1" colorSpace="calibratedRGB"/>
@@ -184,7 +188,7 @@
                             <outlet property="delegate" destination="N93-MB-aoR" id="F1c-yz-PXW"/>
                         </connections>
                     </tableView>
-                    <navigationItem key="navigationItem" title="My List" id="OS5-bg-6sH">
+                    <navigationItem key="navigationItem" title="List" id="OS5-bg-6sH">
                         <barButtonItem key="leftBarButtonItem" id="uFO-hc-I0g">
                             <button key="customView" opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" id="bxV-xd-6CO">
                                 <rect key="frame" x="16" y="5" width="71" height="33"/>
@@ -192,7 +196,7 @@
                                 <fontDescription key="fontDescription" name="HelveticaNeue" family="Helvetica Neue" pointSize="17"/>
                                 <color key="tintColor" red="0.16780542640000001" green="0.1245308797" blue="0.51766304350000003" alpha="1" colorSpace="calibratedRGB"/>
                                 <inset key="contentEdgeInsets" minX="-35" minY="0.0" maxX="0.0" maxY="0.0"/>
-                                <state key="normal" title="Add">
+                                <state key="normal" title="&lt; Add">
                                     <color key="titleColor" red="0.16780542640000001" green="0.1245308797" blue="0.51766304350000003" alpha="1" colorSpace="calibratedRGB"/>
                                 </state>
                                 <connections>
@@ -254,9 +258,21 @@
                         <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
                         <subviews>
                             <imageView userInteractionEnabled="NO" contentMode="scaleToFill" horizontalHuggingPriority="251" verticalHuggingPriority="251" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="pIn-Ei-t10">
-                                <rect key="frame" x="0.0" y="64" width="320" height="480"/>
+                                <rect key="frame" x="0.0" y="64" width="320" height="388"/>
                                 <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                             </imageView>
+                            <button opaque="NO" contentMode="scaleToFill" fixedFrame="YES" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="86I-uD-FZd">
+                                <rect key="frame" x="71" y="450" width="179" height="30"/>
+                                <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
+                                <fontDescription key="fontDescription" type="system" pointSize="17"/>
+                                <state key="normal" title="Set As Cover Photo">
+                                    <color key="titleColor" red="0.16780542640000001" green="0.1245308797" blue="0.51766304350000003" alpha="1" colorSpace="calibratedRGB"/>
+                                    <color key="titleShadowColor" white="0.5" alpha="1" colorSpace="calibratedWhite"/>
+                                </state>
+                                <connections>
+                                    <action selector="setAsCoverPhoto:" destination="WSF-HC-kGS" eventType="touchUpInside" id="nP2-Fe-Hhm"/>
+                                </connections>
+                            </button>
                         </subviews>
                         <color key="backgroundColor" white="1" alpha="1" colorSpace="custom" customColorSpace="calibratedWhite"/>
                     </view>
@@ -287,22 +303,22 @@
                                 <rect key="frame" x="0.0" y="65" width="320" height="280"/>
                                 <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                                 <color key="backgroundColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
-                                <collectionViewFlowLayout key="collectionViewLayout" minimumLineSpacing="1" minimumInteritemSpacing="0.0" id="ruT-RR-i2l">
-                                    <size key="itemSize" width="78" height="84"/>
+                                <collectionViewFlowLayout key="collectionViewLayout" minimumLineSpacing="2" minimumInteritemSpacing="1" id="ruT-RR-i2l">
+                                    <size key="itemSize" width="105" height="120"/>
                                     <size key="headerReferenceSize" width="0.0" height="0.0"/>
                                     <size key="footerReferenceSize" width="0.0" height="0.0"/>
                                     <inset key="sectionInset" minX="0.0" minY="0.0" maxX="0.0" maxY="0.0"/>
                                 </collectionViewFlowLayout>
                                 <cells>
                                     <collectionViewCell opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" reuseIdentifier="Cell" id="RMD-cC-K1u">
-                                        <rect key="frame" x="0.0" y="64" width="78" height="84"/>
+                                        <rect key="frame" x="0.0" y="64" width="105" height="120"/>
                                         <autoresizingMask key="autoresizingMask"/>
                                         <view key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center">
-                                            <rect key="frame" x="0.0" y="0.0" width="78" height="84"/>
+                                            <rect key="frame" x="0.0" y="0.0" width="105" height="120"/>
                                             <autoresizingMask key="autoresizingMask"/>
                                             <subviews>
                                                 <imageView userInteractionEnabled="NO" tag="99" contentMode="scaleToFill" horizontalHuggingPriority="251" verticalHuggingPriority="251" image="camera_icon.jpeg" translatesAutoresizingMaskIntoConstraints="NO" id="ESe-y8-Vhk">
-                                                    <rect key="frame" x="2" y="2" width="74" height="80"/>
+                                                    <rect key="frame" x="2" y="2" width="101" height="116"/>
                                                     <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                                                 </imageView>
                                             </subviews>
@@ -321,10 +337,10 @@
                                     <outlet property="delegate" destination="pjn-z0-gj2" id="euU-Ms-Rsg"/>
                                 </connections>
                             </collectionView>
-                            <textView clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="scaleToFill" text="Add Notes Here..." translatesAutoresizingMaskIntoConstraints="NO" id="0Bb-Rk-XkP">
+                            <textView clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="0Bb-Rk-XkP">
                                 <rect key="frame" x="0.0" y="344" width="320" height="96"/>
                                 <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
-                                <color key="backgroundColor" red="1" green="0.55442954239999998" blue="0.21585540550000001" alpha="1" colorSpace="calibratedRGB"/>
+                                <color key="backgroundColor" red="1" green="0.5" blue="0.0" alpha="1" colorSpace="calibratedRGB"/>
                                 <constraints>
                                     <constraint firstAttribute="height" constant="96" id="Irh-8K-o4d"/>
                                 </constraints>
@@ -380,7 +396,7 @@
                     </view>
                     <extendedEdge key="edgesForExtendedLayout" top="YES"/>
                     <navigationItem key="navigationItem" title="Detail" id="afy-kn-coe">
-                        <barButtonItem key="leftBarButtonItem" title="My List" id="eeL-EU-Kx1">
+                        <barButtonItem key="leftBarButtonItem" title="&lt; My List" id="eeL-EU-Kx1">
                             <color key="tintColor" red="0.16780542640000001" green="0.1245308797" blue="0.51766304350000003" alpha="1" colorSpace="calibratedRGB"/>
                             <connections>
                                 <segue destination="N93-MB-aoR" kind="push" identifier="BackToMyTrips" id="OBK-XG-BU9"/>
@@ -440,7 +456,7 @@
         <simulatedScreenMetrics key="destination"/>
     </simulatedMetricsContainer>
     <inferredMetricsTieBreakers>
-        <segue reference="fOu-Qa-0VC"/>
-        <segue reference="lgW-Ff-KKi"/>
+        <segue reference="GA3-2b-ipm"/>
+        <segue reference="OBK-XG-BU9"/>
     </inferredMetricsTieBreakers>
 </document>

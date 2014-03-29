@@ -16,7 +16,7 @@ NSString *stmtSQL;
 const char *stmt;
 sqlite3_stmt *statement;
 
--(NSMutableArray *)loadTripPhotos:(NSString *) tripId
+-(NSMutableArray *)loadTripPhotos:(NSString *) entryId
 {
     //select photos from tripId
     NSMutableArray *tripPhotos = [[NSMutableArray alloc] init];
@@ -30,8 +30,8 @@ sqlite3_stmt *statement;
             if (sqlite3_open(dbpath, & tripDB) == SQLITE_OK)
             {
                 NSString *querySQL = [NSString stringWithFormat:
-                                      @"SELECT imagePath FROM TripPhotos WHERE TripId=\"%@\"",
-                                      tripId];
+                                      @"SELECT PhotoPath FROM EntryPhotos WHERE EntryId=\"%@\"",
+                                      entryId];
                 
                 const char *query_stmt = [querySQL UTF8String];
                 
@@ -44,7 +44,6 @@ sqlite3_stmt *statement;
                                                (const char *) sqlite3_column_text(
                                                                                   statement, 0)];
                         
-                        //NSLog(@"..db loadTriphotos - photoPath:%@", imagePath);
                         [tripPhotos addObject:imagePath];
                         
                     }
@@ -75,24 +74,22 @@ sqlite3_stmt *statement;
         if ([filemgr fileExistsAtPath: databasePath ] == NO) //first time to app - db doesn't exist
         {
             if (sqlite3_open(dbpath, & tripDB) == SQLITE_OK){
-                
                 char *errMsg;
-                //create the TripJournal table
+
                 const char *sql_stmt =
-                "CREATE TABLE IF NOT EXISTS TripJournal (ID INTEGER PRIMARY KEY AUTOINCREMENT, Place TEXT, Note TEXT, StartDate TEXT, EndDate TEXT, Latitude TEXT, Longitude TEXT)";
+                "CREATE TABLE IF NOT EXISTS Entry (ID INTEGER PRIMARY KEY AUTOINCREMENT, Place TEXT, Note TEXT, StartDate TEXT, EndDate TEXT, Latitude TEXT, Longitude TEXT, Address TEXT, PhotoPath TEXT, EntryDate TEXT)";
                 
                 
                 if (sqlite3_exec(tripDB, sql_stmt, NULL, NULL, &errMsg) == SQLITE_OK)
                 {
-                    //NSLog(@"...created table TRIPJournal");
-                    
-                    //create the TripJournal table
+                    NSLog(@"...created table Entry");
+
                     sql_stmt =
-                    "CREATE TABLE IF NOT EXISTS TripPhotos (ID INTEGER PRIMARY KEY AUTOINCREMENT, TripId Text, ImagePath Text)";
+                    "CREATE TABLE IF NOT EXISTS EntryPhotos (ID INTEGER PRIMARY KEY AUTOINCREMENT, EntryId Text, PhotoPath Text)";
                     
                     if (sqlite3_exec(tripDB, sql_stmt, NULL, NULL, &errMsg) == SQLITE_OK)
                     {
-                        NSLog(@"...created table TripPhotos");
+                        NSLog(@"...created table EntryPhotos");
                     }
                 }
             }
@@ -109,7 +106,7 @@ sqlite3_stmt *statement;
     }
 }
 
--(TripEntry *)saveData:(TripEntry *) tripEntry
+-(TripEntry *)saveData:(TripEntry *) entry
 {
     const char *dbpath = [self dbPath];
     @try
@@ -117,27 +114,31 @@ sqlite3_stmt *statement;
         if (sqlite3_open(dbpath, &tripDB) == SQLITE_OK)
         {
             NSString *insertSQL = [NSString stringWithFormat:
-                                   @"INSERT INTO TripJournal (Place, Note, StartDate, EndDate, Latitude, Longitude) VALUES (\"%@\", \"%@\", \"%@\", \"%@\", \"%@\", \"%@\")",
-                                   tripEntry.place, tripEntry.note, tripEntry.startDate, tripEntry.endDate, tripEntry.latitude,tripEntry.longitude];
+                                   @"INSERT INTO Entry (Place, Note, StartDate, EndDate, Latitude, Longitude, Address, PhotoPath, EntryDate) VALUES (\"%@\", \"%@\", \"%@\",\"%@\", \"%@\",\"%@\", \"%@\", \"%@\",\"%@\")",
+                                   entry.place, entry.note, entry.startDate, entry.endDate, entry.latitude, entry.longitude, entry.address, entry.photoPath, entry.entryDate];
+            
             
             const char *insert_stmt = [insertSQL UTF8String];
             sqlite3_prepare_v2(tripDB, insert_stmt, -1, &statement, NULL);
-            if (sqlite3_step(statement) == SQLITE_DONE)
+            int resultCode = sqlite3_step(statement);
+            NSLog(@"...resultCode for saveData:%d", resultCode);
+            if (resultCode == SQLITE_DONE)
             {
-                UIAlertView *alert = [[UIAlertView alloc] initWithTitle:@"Added trip" message:@""
+                UIAlertView *alert = [[UIAlertView alloc] initWithTitle:@"Added Entry" message:@""
                                                                delegate:nil cancelButtonTitle:@"OK" otherButtonTitles: nil];
                 [alert show];
                 
             }
             else
             {
-                UIAlertView *alert = [[UIAlertView alloc] initWithTitle:@"Unabled to add tripo" message:@""
+                NSLog(@"...bad resultCode-SQLstmt:%s", insert_stmt);
+                UIAlertView *alert = [[UIAlertView alloc] initWithTitle:@"Unabled To Add" message:@""
                                                                delegate:nil cancelButtonTitle:@"OK" otherButtonTitles: nil];
                 [alert show];
             }
             
             //tripEntry.tripId = [NSNumber numberWithLongLong:sqlite3_last_insert_rowid(tripDB)];
-            tripEntry.tripId = [NSString stringWithFormat:@"%lld", sqlite3_last_insert_rowid(tripDB)];
+            entry.entryId = [NSString stringWithFormat:@"%lld", sqlite3_last_insert_rowid(tripDB)];
             
             //NSLog(@"... DBHelper:saveData-%@:%@:%@", tripEntry.place, tripEntry.latitude, tripEntry.longitude);
             sqlite3_finalize(statement);
@@ -149,10 +150,10 @@ sqlite3_stmt *statement;
     @finally {
         sqlite3_close(tripDB);
     }
-    return tripEntry;
+    return entry;
 }
 
--(TripEntry *)editData:(TripEntry *) trip
+-(TripEntry *)editData:(TripEntry *) entry
 {
     const char *dbpath = [self dbPath];
     @try
@@ -160,7 +161,7 @@ sqlite3_stmt *statement;
         if (sqlite3_open(dbpath, &tripDB) == SQLITE_OK)
         {
             NSString *updateSQL = [NSString stringWithFormat:
-                                   @"Update TripJournal Set Place = \"%@\", Note = \"%@\", StartDate = \"%@\", EndDate = \"%@\", Latitude = \"%@\", Longitude = \"%@\" Where Id = %d", trip.place, trip.note, trip.startDate, trip.endDate, trip.latitude, trip.longitude, [trip.tripId intValue]];
+                                   @"Update Entry Set Place = \"%@\", Note = \"%@\", StartDate = \"%@\", EndDate = \"%@\", Latitude = \"%@\", Longitude = \"%@\", Address = \"%@\" Where Id = %d", entry.place, entry.note, entry.startDate, entry.endDate, entry.latitude, entry.longitude, entry.address, [entry.entryId intValue]];
             
             const char *update_stmt = [updateSQL UTF8String];
             sqlite3_prepare_v2(tripDB, update_stmt, -1, &statement, NULL);
@@ -179,8 +180,6 @@ sqlite3_stmt *statement;
                                                                delegate:nil cancelButtonTitle:@"OK" otherButtonTitles: nil];
                 [alert show];
             }
-            
-            //trip.tripId = [NSString stringWithFormat:@"%lld", sqlite3_last_insert_rowid(tripDB)];
 
             sqlite3_finalize(statement);
         }
@@ -191,7 +190,7 @@ sqlite3_stmt *statement;
     @finally {
         sqlite3_close(tripDB);
     }
-    return trip;
+    return entry;
 }
 
 -(NSMutableArray *)selectAllFromDB
@@ -207,30 +206,39 @@ sqlite3_stmt *statement;
         {
             if (sqlite3_open(dbpath, &tripDB) == SQLITE_OK)
             {
-                NSString *querySQL = [NSString stringWithFormat: @"SELECT * FROM TripJournal"];
+                NSString *querySQL = [NSString stringWithFormat: @"SELECT * FROM Entry"];
                 const char *query_stmt = [querySQL UTF8String];
                 
                 if (sqlite3_prepare_v2(tripDB,
                                        query_stmt, -1, &statement, NULL) == SQLITE_OK)
                 {
-                    TripEntry* trip;
+                    TripEntry* entry;
                     while (sqlite3_step(statement) == SQLITE_ROW)
                     {
-                        trip = [[TripEntry alloc] init];
+                        entry = [[TripEntry alloc] init];
                         //trip.tripId = [NSString stringWithFormat:@"%f", sqlite3_column_double(statement, 0)];
-                        NSNumber *tripID = [[NSNumber alloc] initWithLongLong:sqlite3_column_double(statement, 0)];
-                        trip.tripId = [tripID stringValue];
+                        NSNumber *EntryID = [[NSNumber alloc] initWithLongLong:sqlite3_column_double(statement, 0)];
+                        entry.entryId = [EntryID stringValue];
                         
-                        trip.place = [NSString stringWithUTF8String:(char *) sqlite3_column_text (statement, 1)];
-                        trip.note = [NSString stringWithUTF8String:(char *) sqlite3_column_text (statement, 2)];
-                        trip.startDate = [NSString stringWithUTF8String:(char *) sqlite3_column_text (statement, 3)];
-                        trip.endDate = [NSString stringWithUTF8String:(char *) sqlite3_column_text (statement, 4)];
-                        trip.latitude = [NSString stringWithUTF8String:(char *) sqlite3_column_text (statement, 5)];
-                        trip.longitude
+                        entry.place = [NSString stringWithUTF8String:(char *) sqlite3_column_text (statement, 1)];
+                        entry.note = [NSString stringWithUTF8String:(char *) sqlite3_column_text (statement, 2)];
+                        entry.startDate = [NSString stringWithUTF8String:(char *) sqlite3_column_text (statement, 3)];
+                        entry.endDate = [NSString stringWithUTF8String:(char *) sqlite3_column_text (statement, 4)];
+                        entry.latitude = [NSString stringWithUTF8String:(char *) sqlite3_column_text (statement, 5)];
+                        entry.longitude
                         = [NSString stringWithUTF8String:(char *) sqlite3_column_text (statement, 6)];
                         
-                        [tripsTable addObject:trip];
-                        trip = nil;
+                        entry.address
+                        = [NSString stringWithUTF8String:(char *) sqlite3_column_text (statement, 7)];
+                        
+                        entry.photoPath
+                        = [NSString stringWithUTF8String:(char *) sqlite3_column_text (statement, 8)];
+                        
+                        entry.entryDate
+                        = [NSString stringWithUTF8String:(char *) sqlite3_column_text (statement, 9)];
+                        
+                        [tripsTable addObject:entry];
+                        entry = nil;
                     } 
                     sqlite3_finalize(statement);
                 }
@@ -246,7 +254,7 @@ sqlite3_stmt *statement;
     return tripsTable;
 }
 
--(BOOL) deleteTrip:(NSString *) tripId
+-(BOOL) deleteTrip:(NSString *) entryId
 {
     BOOL success = FALSE;
     const char *dbpath = [self dbPath];
@@ -256,7 +264,7 @@ sqlite3_stmt *statement;
         if(sqlite3_open(dbpath, &tripDB) == SQLITE_OK)
         {
             stmtSQL = [NSString stringWithFormat:
-                       @"Delete From TripPhotos Where TripId = \"%@\"", tripId];
+                       @"Delete From EntryPhotos Where EntryId = \"%@\"", entryId];
             stmt = [stmtSQL UTF8String];
             sqlite3_prepare_v2(tripDB, stmt, -1, &statement, NULL);
             if (sqlite3_step(statement) == SQLITE_DONE)
@@ -269,16 +277,16 @@ sqlite3_stmt *statement;
             {
                 //delete from TripJournal
                 stmtSQL = [NSString stringWithFormat:
-                           @"Delete From TripJournal Where Id = %ld", (long)[tripId integerValue]];
+                           @"Delete From Entry Where Id = %ld", (long)[entryId integerValue]];
                 stmt = [stmtSQL UTF8String];
                 sqlite3_prepare_v2(tripDB, stmt, -1, &statement, NULL);
                 if (sqlite3_step(statement) == SQLITE_DONE)
                 {
-                    //NSLog(@"..DELETED from TripJournal where Id:%@", tripId);
+                    //NSLog(@"..DELETED from TripJournal where Id:%@", entryId);
                 }
                 else
                 {
-                    NSLog(@"..FAILED to delete from TripJournal where Id:%@", tripId);
+                    NSLog(@"..FAILED to delete from Entry where Id:%@", entryId);
                     success = FALSE;
                 }
                 sqlite3_finalize(statement);
@@ -287,7 +295,7 @@ sqlite3_stmt *statement;
     }
     @catch(NSException *ex)
     {
-        NSLog(@"Exception: Delete Trip:%@", ex.description);
+        NSLog(@"Exception: Delete Entry:%@", ex.description);
     }
     @finally
     {
@@ -296,7 +304,7 @@ sqlite3_stmt *statement;
     return success;
 }
 
-- (NSMutableArray *)deletePhotos:(NSMutableArray *) photosToDelete tripId:(NSString *)tripId tripPhotos:(NSMutableArray *) tripPhotos
+- (NSMutableArray *)deletePhotos:(NSMutableArray *) photosToDelete tripId:(NSString *)entryId tripPhotos:(NSMutableArray *) tripPhotos
 {
     const char *dbpath = [self dbPath];
     //NSString *docsDir = [self docsDirPath];
@@ -308,7 +316,7 @@ sqlite3_stmt *statement;
             if (sqlite3_open(dbpath, &tripDB) == SQLITE_OK)
             {
                 stmtSQL = [NSString stringWithFormat:
-                           @"Delete From TripPhotos Where TripId = \"%@\" and ImagePath = \"%@\"", tripId, photosToDelete[i]];
+                           @"Delete From EntryPhotos Where EntryId = \"%@\" and PhotoPath = \"%@\"", entryId, photosToDelete[i]];
                 
                 stmt = [stmtSQL UTF8String];
                 sqlite3_prepare_v2(tripDB, stmt, -1, &statement, NULL);
@@ -322,7 +330,7 @@ sqlite3_stmt *statement;
         }
     }
     @catch (NSException * ex) {
-        NSLog(@"Exception: deleteTripPhotos:%@", ex.description);
+        NSLog(@"Exception: deletePhotos:%@", ex.description);
     }
     @finally {
         sqlite3_close(tripDB);
@@ -330,7 +338,7 @@ sqlite3_stmt *statement;
     return tripPhotos;
 }
 
--(BOOL)saveSelectedPhotoToDB:(NSString *)imagePath tripId:(NSString *)tripId
+-(BOOL)saveSelectedPhotoToDB:(NSString *)photoPath tripId:(NSString *)entryId
 {
     const char *dbpath = [self dbPath];
     BOOL success = FALSE;
@@ -340,8 +348,8 @@ sqlite3_stmt *statement;
         if (sqlite3_open(dbpath, &tripDB) == SQLITE_OK)
         {
             stmtSQL = [NSString stringWithFormat:
-                         @"INSERT INTO TripPhotos (TripId, ImagePath) VALUES (\"%@\", \"%@\")",
-                         tripId, imagePath];
+                         @"INSERT INTO EntryPhotos (EntryId, PhotoPath) VALUES (\"%@\", \"%@\")",
+                         entryId, photoPath];
             
             stmt = [stmtSQL UTF8String];
             sqlite3_prepare_v2(tripDB, stmt, -1, &statement, NULL);
@@ -362,6 +370,48 @@ sqlite3_stmt *statement;
         sqlite3_close(tripDB);
     }
 
+    return success;
+}
+
+-(BOOL)setPhotoCover:(NSString *)photoPath entryId:(NSString *)entryId
+{
+    BOOL success = false;
+    const char *dbpath = [self dbPath];
+    
+    @try
+    {
+        if (sqlite3_open(dbpath, &tripDB) == SQLITE_OK)
+        {
+            NSString *updateSQL = [NSString stringWithFormat:
+                                   @"Update Entry Set PhotoPath = \"%@\" Where Id = %d", photoPath, [entryId intValue]];
+            
+            const char *update_stmt = [updateSQL UTF8String];
+            sqlite3_prepare_v2(tripDB, update_stmt, -1, &statement, NULL);
+            int resultCode = sqlite3_step(statement);
+            NSLog(@"...resultCode for edit entry:%d - stmt:%s", resultCode, update_stmt);
+            if (resultCode == SQLITE_DONE)
+            {
+                UIAlertView *alert = [[UIAlertView alloc] initWithTitle:@"Updated PhotoCover" message:@""
+                                                               delegate:nil cancelButtonTitle:@"OK" otherButtonTitles: nil];
+                [alert show];
+                
+            }
+            else
+            {
+                UIAlertView *alert = [[UIAlertView alloc] initWithTitle:@"Unable To Update PhotoCover" message:@""
+                                                               delegate:nil cancelButtonTitle:@"OK" otherButtonTitles: nil];
+                [alert show];
+            }
+            
+            sqlite3_finalize(statement);
+        }
+    }
+    @catch (NSException * ex) {
+        NSLog(@"Exception: setPhotoCover:%@", ex.description);
+    }
+    @finally {
+        sqlite3_close(tripDB);
+    }
     return success;
 }
 

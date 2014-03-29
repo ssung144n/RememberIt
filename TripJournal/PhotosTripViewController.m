@@ -21,6 +21,9 @@
     NSString *selectedPhoto;
     
     DBHelper *dbHelper;
+    
+    NSString *alertSetCoverPhotoTitle;
+    NSString *alertConfirmDelete;
 }
 @end
 
@@ -41,18 +44,13 @@
 	// Do any additionl setup after loading the view.
     
     dbHelper = [[DBHelper alloc] init];
-    tripPhotos = [dbHelper loadTripPhotos:self.selectedTrip.tripId];
+    tripPhotos = [dbHelper loadTripPhotos:self.selectedTrip.entryId];
     
     //self.tripName.text = self.selectedTrip.place;
     self.title = self.selectedTrip.place;
     
     //add note properties
     self.note.text = self.selectedTrip.note;
-    // For the border and rounded corners
-    //[self.note.layer setBorderColor:[[UIColor blackColor] CGColor]];
-    //[[self.note layer] setBorderWidth:4];
-    //[[self.note layer] setCornerRadius:10];
-    //[self.note setClipsToBounds: YES];
     [self.note setEditable:NO];
     //---
 
@@ -118,7 +116,7 @@
     //Highlight the cell selected to red
     UIView *bgColorView = [[UIView alloc] init];
     bgColorView.backgroundColor = [UIColor redColor];
-    bgColorView.layer.cornerRadius = 5;
+    bgColorView.layer.cornerRadius = 8;
     bgColorView.layer.masksToBounds = YES;
     [cell setSelectedBackgroundView:bgColorView];
     
@@ -173,12 +171,13 @@
     */
     else if([segue.identifier isEqualToString:@"ShowPhoto"]) {
         ShowPhotoViewController *vc = [segue destinationViewController];
-        [vc setPhotoName:selectedPhoto];
+        [vc setPhotoPath:selectedPhoto];
+        vc.entryId = self.selectedTrip.entryId;
         //NSLog(@"...prepareForSegue-ShowPhoto:%@", selectedPhoto);
     }
     else if([segue.identifier isEqualToString:@"ToEdit"]) {
         TripViewController *vc = [segue destinationViewController];
-        NSLog(@"..ToEdit segue-tripId:%@", self.selectedTrip.tripId);
+        NSLog(@"..ToEdit segue-tripId:%@", self.selectedTrip.entryId);
         [vc setSelectedTrip:self.selectedTrip];
     }
 }
@@ -187,9 +186,14 @@
 //when user confirms delete on trip, then delete and remove current controller
 - (void)alertView:(UIAlertView *)alertView clickedButtonAtIndex:(NSInteger)buttonIndex
 {
-    if(buttonIndex==0)
+    //if(alertView.title  buttonIndex==0)
+    if(buttonIndex == 0 && [alertView.title isEqualToString:alertSetCoverPhotoTitle])
     {
-        Boolean success = [dbHelper deleteTrip:self.selectedTrip.tripId];
+        [dbHelper setPhotoCover:selectedPhoto entryId:self.selectedTrip.entryId];
+    }
+    else if(buttonIndex == 0 && [alertView.title isEqualToString:alertConfirmDelete])
+    {
+        Boolean success = [dbHelper deleteTrip:self.selectedTrip.entryId];
         if(success)
             [self.navigationController popViewControllerAnimated:YES];
     }
@@ -216,8 +220,8 @@
 }
 
 - (IBAction)deleteEntry:(id)sender {
-    NSString * msg = [NSString stringWithFormat:@"Confirm delete: %@", self.selectedTrip.place];
-    UIAlertView *updateAlert = [[UIAlertView alloc] initWithTitle:msg message:@"" delegate: self cancelButtonTitle: @"YES"  otherButtonTitles:@"NO",nil];
+    alertConfirmDelete = [NSString stringWithFormat:@"Confirm delete: %@", self.selectedTrip.place];
+    UIAlertView *updateAlert = [[UIAlertView alloc] initWithTitle:alertConfirmDelete message:@"" delegate: self cancelButtonTitle: @"YES"  otherButtonTitles:@"NO",nil];
     
     [updateAlert show];
 }
@@ -227,7 +231,7 @@
 }
 
 - (IBAction)deletePhotos:(id)sender {
-    tripPhotos = [dbHelper deletePhotos:photosToDelete tripId:self.selectedTrip.tripId tripPhotos:tripPhotos];
+    tripPhotos = [dbHelper deletePhotos:photosToDelete tripId:self.selectedTrip.entryId tripPhotos:tripPhotos];
     [self.photoCollectionView reloadData];
 }
 
@@ -248,15 +252,25 @@ didFinishPickingMediaWithInfo:(NSDictionary *)info
         NSURL *imageUrl = info[UIImagePickerControllerReferenceURL];
 
         NSString *selectedImage = [imageUrl absoluteString];
-        //NSLog(@"...selectedImage: %@", selectedImage);
         
-        Boolean success = [dbHelper saveSelectedPhotoToDB:selectedImage tripId:self.selectedTrip.tripId];
+        Boolean success = [dbHelper saveSelectedPhotoToDB:selectedImage tripId:self.selectedTrip.entryId];
         if(success)
         {
+            [self confirmCoverPhoto];
+            
+            selectedPhoto = selectedImage;
             [tripPhotos addObject:selectedImage];
             [self. photoCollectionView reloadData];
         }
     }
+}
+
+-(void)confirmCoverPhoto
+{
+    alertSetCoverPhotoTitle = [NSString stringWithFormat:@"Set As Cover Photo?"];
+    UIAlertView *updateAlert = [[UIAlertView alloc] initWithTitle:alertSetCoverPhotoTitle message:@"" delegate: self cancelButtonTitle: @"YES"  otherButtonTitles:@"NO",nil];
+    
+    [updateAlert show];
 }
 
 -(void)image:(UIImage *)image finishedSavingWithError:(NSError *)error contextInfo:(void *)contextInfo

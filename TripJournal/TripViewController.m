@@ -62,8 +62,7 @@
     [self dismissTextViewKeyBoard];
     
     //check if edit entry
-    //NSLog(@"..viewDidLoad in TripView-tripId:%@", self.selectedTrip.tripId);
-    if(self.selectedTrip.tripId != nil)
+    if(self.selectedTrip.entryId != nil)
         [self setEntry];
 }
 
@@ -75,6 +74,7 @@
     self.startDate.text = self.selectedTrip.startDate;
     self.endDate.text = self.selectedTrip.endDate;
     self.note.text = self.selectedTrip.note;
+    self.address.text = self.selectedTrip.address;
     
     //add location - current location switch to off and reverse geo-location to address
     self.locSwitch.on = FALSE;
@@ -83,8 +83,11 @@
     self.address.enabled = TRUE;
     self.address.backgroundColor = [UIColor whiteColor];
     
-    CLLocation *loc = [[CLLocation alloc] initWithLatitude:[self.selectedTrip.latitude doubleValue] longitude:[self.selectedTrip.longitude doubleValue]];
-    [self reverseGeocode:loc];
+    if(self.selectedTrip.address.length < 1) //current location was used when saved
+    {
+        CLLocation *loc = [[CLLocation alloc] initWithLatitude:[self.selectedTrip.latitude doubleValue] longitude:[self.selectedTrip.longitude doubleValue]];
+        [self reverseGeocode:loc];
+    }
 }
 
 //dismiss the keyboard for textview
@@ -113,7 +116,7 @@
 }
 
 /*
- //Instead of calling delegate methods to be called automatically,calling when adding new trip with setLocation
+ //Calling only when adding new trip with setLocation
 -(void)locationManager:(CLLocationManager *)manager didUpdateLocations:(NSArray *)locations {
     self.location = locations.lastObject;
     self.latitude = [NSString stringWithFormat:@"%f", self.location.coordinate.latitude];
@@ -194,7 +197,7 @@
         
         if(result==NSOrderedDescending)
         {
-            UIAlertView *alert = [[UIAlertView alloc] initWithTitle:@"End date can't be less than start date" message:@""
+            UIAlertView *alert = [[UIAlertView alloc] initWithTitle:@"End Date can't be less than Start Date" message:@""
                                                            delegate:nil cancelButtonTitle:@"OK" otherButtonTitles: nil];
             [alert show];
             success = FALSE;
@@ -229,6 +232,17 @@
     return locationAllowed;
 }
 
+-(NSString *)currentDateTime
+{
+    NSDate *date = [[NSDate alloc] init];
+    
+    NSDateFormatter *dateFormatter = [[NSDateFormatter alloc] init];
+    [dateFormatter setDateFormat:@"mmm-dd-yyyy hh:mm"];
+    NSString *dateString = [dateFormatter stringFromDate:date];
+    
+    return dateString;
+}
+
 - (IBAction)saveData:(id)sender {
     
     if(![self validateEntry])
@@ -241,8 +255,17 @@
     trip.note = self.note.text;
     trip.startDate = self.startDate.text;
     trip.endDate = self.endDate.text;
-    if(self.selectedTrip.tripId.length > 0)
-        trip.tripId = self.selectedTrip.tripId;
+    trip.photoPath = @"";
+    trip.entryDate = [self currentDateTime];
+    
+    NSLog(@"..saving address:%@", self.address.text);
+    if(self.address.text.length > 0)
+        trip.address = self.address.text;
+    else
+        trip.address = @"";
+    
+    if(self.selectedTrip.entryId != nil)
+        trip.entryId = self.selectedTrip.entryId;
     
     //Use Forward-Geocoding to get Location if enter address
     if(self.address.text.length > 0 && haveLocationSrv)
@@ -275,7 +298,7 @@
                 trip.latitude = [NSString stringWithFormat: @"%f", placemark.location.coordinate.latitude];
                 trip.longitude = [NSString stringWithFormat: @"%f", placemark.location.coordinate.longitude];
                 //NSLog(@"...saveData - Address:%@ - %@:%@", _address.text, newTrip.latitude, newTrip.longitude);
-                if(self.selectedTrip.place.length > 0) //edit
+                if(self.selectedTrip.entryId != nil) //edit
                     trip = [dbHelper editData:trip];
                 else
                     trip = [dbHelper saveData:trip];
@@ -289,7 +312,7 @@
         trip.longitude = self.longitude;
         
         //NSLog(@"...saveData - Current - %@:%@", self.latitude, self.longitude);
-        if(self.selectedTrip.place.length > 0) //edit
+        if(self.selectedTrip.entryId != nil) //edit
             trip = [dbHelper editData:trip];
         else
             trip = [dbHelper saveData:trip];

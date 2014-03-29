@@ -8,7 +8,9 @@
 
 #import <UIKit/UIKit.h>
 #import "TripEntry.h"
+
 #import <MobileCoreServices/MobileCoreServices.h>
+#import <AssetsLibrary/ALAsset.h>
 
 @interface PhotosTripViewController : UIViewController <UIImagePickerControllerDelegate, UINavigationControllerDelegate, UIGestureRecognizerDelegate>
 
