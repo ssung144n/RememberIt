@@ -34,6 +34,7 @@ MKRoute *route;
 	// Do any additional setup after loading the view.
     self.tripMap.delegate = self;
     self.directionsStep.editable = false;
+    self.directionsStep.hidden = YES;
 }
 
 - (void)viewWillAppear:(BOOL)animated {
@@ -108,6 +109,7 @@ MKRoute *route;
         }
     }
     self.directionsStep.text = steps;
+    self.directionsStep.hidden = NO;
 }
 
 - (MKOverlayRenderer *)mapView:(MKMapView *)mapView rendererForOverlay:(id < MKOverlay >)overlay
