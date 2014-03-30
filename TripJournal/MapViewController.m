@@ -17,6 +17,7 @@
 @implementation MapViewController
 
 CLLocationCoordinate2D entryLoc;
+MKRoute *route;
 
 - (id)initWithNibName:(NSString *)nibNameOrNil bundle:(NSBundle *)nibBundleOrNil
 {
@@ -32,21 +33,16 @@ CLLocationCoordinate2D entryLoc;
     [super viewDidLoad];
 	// Do any additional setup after loading the view.
     self.tripMap.delegate = self;
+    self.directionsStep.editable = false;
 }
 
 - (void)viewWillAppear:(BOOL)animated {
-
-    //CLLocationCoordinate2D zoomLocation;
     
     entryLoc.latitude = [self.selectedTrip.latitude doubleValue];
     entryLoc.longitude = [self.selectedTrip.longitude doubleValue];
     
     MKCoordinateRegion region = MKCoordinateRegionMakeWithDistance(entryLoc, 300*METERS_PER_MILE, 300*METERS_PER_MILE);
     
-    //region.center.latitude = [self.selectedTrip.latitude doubleValue];
-    //region.center.longitude = [self.selectedTrip.longitude doubleValue];
-    
-    //region.span = MKCoordinateSpanMake(spanX, spanY);
     [self.tripMap setRegion:region animated:YES];
     
     // Add an annotation
@@ -63,13 +59,7 @@ CLLocationCoordinate2D entryLoc;
 }
 
 - (IBAction)getDirections:(id)sender {
-    NSLog(@"...getDirections");
-    
     self.tripMap.showsUserLocation = YES;
-    
-    //To do - calc distance bw 2 places and set an appropriate span
-    MKCoordinateRegion region = MKCoordinateRegionMakeWithDistance(entryLoc, 20000, 20000);
-    [self.tripMap setRegion:region animated:YES];
     
     MKDirectionsRequest *request = [[MKDirectionsRequest alloc] init];
     
@@ -81,6 +71,7 @@ CLLocationCoordinate2D entryLoc;
     
     request.destination = mapItem;
     request.requestsAlternateRoutes = NO;
+    
     MKDirections *directions = [[MKDirections alloc] initWithRequest:request];
     
     [directions calculateDirectionsWithCompletionHandler:
@@ -88,6 +79,7 @@ CLLocationCoordinate2D entryLoc;
          if (error) {
              // Handle error
          } else {
+             route = response.routes.lastObject;
              [self showRoute:response];
          }
      }];
@@ -95,6 +87,14 @@ CLLocationCoordinate2D entryLoc;
 
 -(void)showRoute:(MKDirectionsResponse *)response
 {
+    NSMutableString *steps = [[NSMutableString alloc] init];
+    
+    //To do - calc distance and set an appropriate span
+    int regionSpan = route.distance * 1.2;
+    NSLog(@"...showRoute-regionSpan:distance:regionSpan::%f,%d",route.distance, regionSpan);
+    MKCoordinateRegion region = MKCoordinateRegionMakeWithDistance(entryLoc, regionSpan, regionSpan);
+    [self.tripMap setRegion:region animated:YES];
+    
     for (MKRoute *route in response.routes)
     {
         [self.tripMap addOverlay:route.polyline level:MKOverlayLevelAboveRoads];
@@ -102,8 +102,12 @@ CLLocationCoordinate2D entryLoc;
         for (MKRouteStep *step in route.steps)
         {
             NSLog(@"%@", step.instructions);
+            [steps appendString:@"->"];
+            [steps appendString:step.instructions];
+            [steps appendString:@"\n"];
         }
     }
+    self.directionsStep.text = steps;
 }
 
 - (MKOverlayRenderer *)mapView:(MKMapView *)mapView rendererForOverlay:(id < MKOverlay >)overlay

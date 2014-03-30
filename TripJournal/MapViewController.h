@@ -16,6 +16,7 @@
 
 @property (weak, nonatomic) IBOutlet MKMapView *tripMap;
 @property (strong, nonatomic) MKMapItem *destination;
+@property (weak, nonatomic) IBOutlet UITextView *directionsStep;
 
 - (IBAction)getDirections:(id)sender;
 @end

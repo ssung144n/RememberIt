@@ -232,14 +232,13 @@
                                 <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                             </mapView>
                             <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="yWf-cb-aql">
-                                <rect key="frame" x="117" y="453" width="86" height="27"/>
+                                <rect key="frame" x="97" y="453" width="127" height="27"/>
                                 <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
                                 <constraints>
-                                    <constraint firstAttribute="height" constant="27" id="KN3-jv-Nls"/>
-                                    <constraint firstAttribute="width" constant="86" id="zIx-YE-VQ7"/>
+                                    <constraint firstAttribute="height" constant="27" id="BvU-fQ-ZIx"/>
                                 </constraints>
                                 <fontDescription key="fontDescription" type="system" pointSize="17"/>
-                                <state key="normal" title="Directions">
+                                <state key="normal" title="Get Directions">
                                     <color key="titleColor" red="0.16780542640000001" green="0.1245308797" blue="0.51766304350000003" alpha="1" colorSpace="calibratedRGB"/>
                                     <color key="titleShadowColor" white="0.5" alpha="1" colorSpace="calibratedWhite"/>
                                 </state>
@@ -247,21 +246,36 @@
                                     <action selector="getDirections:" destination="7Cy-Cc-MlF" eventType="touchUpInside" id="UUw-NS-C5a"/>
                                 </connections>
                             </button>
+                            <textView clipsSubviews="YES" multipleTouchEnabled="YES" alpha="0.49999999999999961" contentMode="scaleToFill" text="Directions" translatesAutoresizingMaskIntoConstraints="NO" id="MsU-eL-PL6">
+                                <rect key="frame" x="0.0" y="160" width="320" height="185"/>
+                                <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
+                                <color key="backgroundColor" red="1" green="1" blue="1" alpha="1" colorSpace="calibratedRGB"/>
+                                <constraints>
+                                    <constraint firstAttribute="height" constant="185" id="7Ys-JD-tcU"/>
+                                </constraints>
+                                <fontDescription key="fontDescription" type="system" pointSize="14"/>
+                                <textInputTraits key="textInputTraits" autocapitalizationType="sentences"/>
+                            </textView>
                         </subviews>
                         <color key="backgroundColor" white="1" alpha="1" colorSpace="custom" customColorSpace="calibratedWhite"/>
                         <constraints>
-                            <constraint firstItem="otZ-XX-8Cs" firstAttribute="top" secondItem="4to-Yj-SE6" secondAttribute="top" id="36K-9y-7dE"/>
-                            <constraint firstItem="yWf-cb-aql" firstAttribute="centerX" secondItem="4to-Yj-SE6" secondAttribute="centerX" id="3TV-GL-bzs"/>
-                            <constraint firstItem="otZ-XX-8Cs" firstAttribute="leading" secondItem="4to-Yj-SE6" secondAttribute="leading" id="G0e-2d-C71"/>
-                            <constraint firstItem="yWf-cb-aql" firstAttribute="top" secondItem="otZ-XX-8Cs" secondAttribute="bottom" constant="8" id="R96-wM-Ldn"/>
-                            <constraint firstAttribute="bottom" secondItem="yWf-cb-aql" secondAttribute="bottom" id="UyI-m9-e4a"/>
-                            <constraint firstItem="otZ-XX-8Cs" firstAttribute="centerX" secondItem="yWf-cb-aql" secondAttribute="centerX" id="WYW-CZ-Km4"/>
+                            <constraint firstAttribute="trailing" secondItem="yWf-cb-aql" secondAttribute="trailing" constant="96" id="1pY-SP-eAh"/>
+                            <constraint firstItem="yWf-cb-aql" firstAttribute="top" secondItem="otZ-XX-8Cs" secondAttribute="bottom" constant="8" symbolic="YES" id="1yH-oz-9lz"/>
+                            <constraint firstItem="otZ-XX-8Cs" firstAttribute="top" secondItem="4to-Yj-SE6" secondAttribute="top" id="Jqn-yz-smS"/>
+                            <constraint firstItem="otZ-XX-8Cs" firstAttribute="centerX" secondItem="yWf-cb-aql" secondAttribute="centerX" id="UJN-JG-SvA"/>
+                            <constraint firstItem="MsU-eL-PL6" firstAttribute="leading" secondItem="otZ-XX-8Cs" secondAttribute="leading" id="VYn-AO-rw8"/>
+                            <constraint firstItem="otZ-XX-8Cs" firstAttribute="leading" secondItem="4to-Yj-SE6" secondAttribute="leading" id="ZCB-Ub-FDe"/>
+                            <constraint firstAttribute="bottom" secondItem="yWf-cb-aql" secondAttribute="bottom" id="Zld-WI-0gH"/>
+                            <constraint firstItem="MsU-eL-PL6" firstAttribute="trailing" secondItem="otZ-XX-8Cs" secondAttribute="trailing" id="bOe-qz-Oze"/>
+                            <constraint firstItem="MsU-eL-PL6" firstAttribute="top" secondItem="fiJ-UP-2no" secondAttribute="bottom" constant="96" id="h0F-SI-QD1"/>
+                            <constraint firstItem="yWf-cb-aql" firstAttribute="leading" secondItem="4to-Yj-SE6" secondAttribute="leading" constant="97" id="x4j-7l-moA"/>
                         </constraints>
                     </view>
                     <navigationItem key="navigationItem" title="Map" id="b92-ne-vFe"/>
                     <simulatedNavigationBarMetrics key="simulatedTopBarMetrics" prompted="NO"/>
                     <nil key="simulatedBottomBarMetrics"/>
                     <connections>
+                        <outlet property="directionsStep" destination="MsU-eL-PL6" id="Nb7-BV-mHm"/>
                         <outlet property="tripMap" destination="otZ-XX-8Cs" id="c3L-Zh-Dsp"/>
                     </connections>
                 </viewController>
@@ -497,7 +511,7 @@
         <simulatedScreenMetrics key="destination"/>
     </simulatedMetricsContainer>
     <inferredMetricsTieBreakers>
-        <segue reference="lgW-Ff-KKi"/>
+        <segue reference="GA3-2b-ipm"/>
         <segue reference="OBK-XG-BU9"/>
     </inferredMetricsTieBreakers>
 </document>
