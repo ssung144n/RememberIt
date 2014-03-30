@@ -10,10 +10,12 @@
 #import <MapKit/MapKit.h>
 #import "TripEntry.h"
 
-@interface MapViewController : UIViewController
+@interface MapViewController : UIViewController  <MKMapViewDelegate>
 
 @property (strong, nonatomic) TripEntry *selectedTrip;
 
 @property (weak, nonatomic) IBOutlet MKMapView *tripMap;
+@property (strong, nonatomic) MKMapItem *destination;
 
+- (IBAction)getDirections:(id)sender;
 @end
