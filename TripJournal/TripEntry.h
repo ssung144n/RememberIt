@@ -16,8 +16,11 @@
 @property (nonatomic,strong) NSString *endDate;
 @property (nonatomic,strong) NSString *latitude;
 @property (nonatomic,strong) NSString *longitude;
+@property (nonatomic,strong) NSString *address;
+@property (nonatomic,strong) NSString *photoPath;
+@property (nonatomic,strong) NSString *entryDate;
 
-@property (nonatomic,strong) NSString *tripId;
+@property (nonatomic,strong) NSString *entryId;
 
 @end
 

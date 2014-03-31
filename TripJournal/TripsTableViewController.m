@@ -12,6 +12,8 @@
 #import "TripViewController.h"
 #import "DBHelper.h"
 
+#import <AssetsLibrary/ALAsset.h>
+
 @interface TripsTableViewController ()
 {
     NSMutableArray *tripsTable;
@@ -89,16 +91,26 @@
     
     tripDates = [NSString stringWithFormat:@"%@%@%@", trip.startDate, @"-", trip.endDate];
     cell.detailTextLabel.text = tripDates;
-    
-    /*
-    if( [indexPath row] % 2){
-        cell.backgroundColor=[UIColor whiteColor];
+    if(trip.photoPath.length > 0)
+    {
+        NSLog(@"..TripsTable..trip.photoPath:%@", trip.photoPath);
+        
+        __block UIImage *photo = nil;
+        NSURL* aURL = [NSURL URLWithString:trip.photoPath];
+        ALAssetsLibrary *library = [[ALAssetsLibrary alloc] init];
+        [library assetForURL:aURL resultBlock:^(ALAsset *asset)
+         {
+             photo = [UIImage imageWithCGImage:[asset thumbnail] scale:1.0 orientation:UIImageOrientationUp];
+             NSLog(@"..TripsTable..photoLibAsset-photo:%@", photo.description);
+             cell.imageView.image = photo;
+         }
+                failureBlock:^(NSError *error)
+         {
+             // error handling
+             NSLog(@"...Error: Photo doesn't exist");
+         }];
+
     }
-    else{
-        UIColor * color = [UIColor colorWithRed:255/255.0f green:167/255.0f blue:3/255.0f alpha:1.0f];
-        cell.backgroundColor = color;
-    }
-    */
     return cell;
 }
 
@@ -135,7 +147,7 @@
     if (editingStyle == UITableViewCellEditingStyleDelete)
     {
         selectedTrip = tripsTable[indexPath.row];
-        BOOL success = [dbHelper deleteTrip:selectedTrip.tripId];
+        BOOL success = [dbHelper deleteTrip:selectedTrip.entryId];
         if(success)
         {
             [tripsTable removeObjectAtIndex:indexPath.row];

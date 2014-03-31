@@ -11,7 +11,7 @@
 #import "DBHelper.h"
 #import "TripEntry.h"
 
-//#import <AddressBookUI/AddressBookUI.h>
+#import <AddressBookUI/AddressBookUI.h>
 
 @interface TripViewController ()
 {
@@ -50,9 +50,73 @@
     [self.locationManager startUpdatingLocation];
     self.locationManager.delegate = self;
     self.location = [[CLLocation alloc] init];
+    
+    //text view note properties
+    //UIColor * color = [UIColor colorWithRed:255/255.0f green:254/255.0f blue:253/255.0f alpha:1.0f];
+    [self.note.layer setBorderColor: [[UIColor whiteColor] CGColor]];
+    [[self.note layer] setBorderWidth:2.3];
+    [[self.note layer] setCornerRadius:10];
+    [self.note setClipsToBounds: YES];
+    [self.note setEditable:YES];
+    //method to dismiss virtual keyboard on textview
+    [self dismissTextViewKeyBoard];
+    
+    //check if edit entry
+    if(self.selectedTrip.entryId != nil)
+        [self setEntry];
 }
+
+-(void)setEntry
+{
+    self.navigationTitle.title = @"Edit";
+    
+    self.place.text = self.selectedTrip.place;
+    self.startDate.text = self.selectedTrip.startDate;
+    self.endDate.text = self.selectedTrip.endDate;
+    self.note.text = self.selectedTrip.note;
+    self.address.text = self.selectedTrip.address;
+    
+    //add location - current location switch to off and reverse geo-location to address
+    self.locSwitch.on = FALSE;
+    self.locLabel.text = @"Off";
+    self.locLabel.textColor = [UIColor redColor];
+    self.address.enabled = TRUE;
+    self.address.backgroundColor = [UIColor whiteColor];
+    
+    if(self.selectedTrip.address.length < 1) //current location was used when saved
+    {
+        CLLocation *loc = [[CLLocation alloc] initWithLatitude:[self.selectedTrip.latitude doubleValue] longitude:[self.selectedTrip.longitude doubleValue]];
+        [self reverseGeocode:loc];
+    }
+}
+
+//dismiss the keyboard for textview
+-(void)dismissTextViewKeyBoard
+{
+    CGRect screenRect = [[UIScreen mainScreen] bounds];
+    CGFloat screenWidth = screenRect.size.width;
+    CGFloat screenHeight = screenRect.size.height;
+    
+    //view to catch  tap
+    UIView *view = [[UIView alloc] init];
+    
+    //leave the navigation bar alone
+    view.frame = CGRectMake(0, 60, screenWidth, screenHeight-60);
+    
+    UITapGestureRecognizer *tap = [[UITapGestureRecognizer alloc] initWithTarget:self
+                                                                          action:@selector(dismissKeyboard)];
+    [view addGestureRecognizer:tap];
+    [self.view addSubview:view];
+    [self.view sendSubviewToBack:view];
+}
+
+-(void)dismissKeyboard {
+    if([self.note isFirstResponder])
+        [self.note resignFirstResponder];
+}
+
 /*
- //Instead of calling delegate methods to be called automatically,calling when adding new trip with setLocation
+ //Calling only when adding new trip with setLocation
 -(void)locationManager:(CLLocationManager *)manager didUpdateLocations:(NSArray *)locations {
     self.location = locations.lastObject;
     self.latitude = [NSString stringWithFormat:@"%f", self.location.coordinate.latitude];
@@ -133,7 +197,7 @@
         
         if(result==NSOrderedDescending)
         {
-            UIAlertView *alert = [[UIAlertView alloc] initWithTitle:@"End date can't be less than start date" message:@""
+            UIAlertView *alert = [[UIAlertView alloc] initWithTitle:@"End Date can't be less than Start Date" message:@""
                                                            delegate:nil cancelButtonTitle:@"OK" otherButtonTitles: nil];
             [alert show];
             success = FALSE;
@@ -168,18 +232,40 @@
     return locationAllowed;
 }
 
+-(NSString *)currentDateTime
+{
+    NSDate *date = [[NSDate alloc] init];
+    
+    NSDateFormatter *dateFormatter = [[NSDateFormatter alloc] init];
+    [dateFormatter setDateFormat:@"mmm-dd-yyyy hh:mm"];
+    NSString *dateString = [dateFormatter stringFromDate:date];
+    
+    return dateString;
+}
+
 - (IBAction)saveData:(id)sender {
     
     if(![self validateEntry])
         return;
     
     __block BOOL success=TRUE;
-    __block TripEntry *newTrip = [[TripEntry alloc] init]; //need write access to var
+    __block TripEntry *trip = [[TripEntry alloc] init]; //need write access to var in block
     
-    newTrip.place =self.place.text;
-    newTrip.note = self.note.text;
-    newTrip.startDate = self.startDate.text;
-    newTrip.endDate = self.endDate.text;
+    trip.place =self.place.text;
+    trip.note = self.note.text;
+    trip.startDate = self.startDate.text;
+    trip.endDate = self.endDate.text;
+    trip.photoPath = @"";
+    trip.entryDate = [self currentDateTime];
+    
+    NSLog(@"..saving address:%@", self.address.text);
+    if(self.address.text.length > 0)
+        trip.address = self.address.text;
+    else
+        trip.address = @"";
+    
+    if(self.selectedTrip.entryId != nil)
+        trip.entryId = self.selectedTrip.entryId;
     
     //Use Forward-Geocoding to get Location if enter address
     if(self.address.text.length > 0 && haveLocationSrv)
@@ -209,21 +295,27 @@
             else {
                 CLPlacemark *placemark = [placemarks lastObject];
 
-                newTrip.latitude = [NSString stringWithFormat: @"%f", placemark.location.coordinate.latitude];
-                newTrip.longitude = [NSString stringWithFormat: @"%f", placemark.location.coordinate.longitude];
+                trip.latitude = [NSString stringWithFormat: @"%f", placemark.location.coordinate.latitude];
+                trip.longitude = [NSString stringWithFormat: @"%f", placemark.location.coordinate.longitude];
                 //NSLog(@"...saveData - Address:%@ - %@:%@", _address.text, newTrip.latitude, newTrip.longitude);
-                newTrip = [dbHelper saveData:newTrip];
+                if(self.selectedTrip.entryId != nil) //edit
+                    trip = [dbHelper editData:trip];
+                else
+                    trip = [dbHelper saveData:trip];
             }
         }];
     }
     else //get current user location
     {
         [self setLocation];
-        newTrip.latitude = self.latitude;
-        newTrip.longitude = self.longitude;
+        trip.latitude = self.latitude;
+        trip.longitude = self.longitude;
         
         //NSLog(@"...saveData - Current - %@:%@", self.latitude, self.longitude);
-        newTrip = [dbHelper saveData:newTrip];
+        if(self.selectedTrip.entryId != nil) //edit
+            trip = [dbHelper editData:trip];
+        else
+            trip = [dbHelper saveData:trip];
     }
     
     if(success)
@@ -234,6 +326,19 @@
         self.endDate.text = @"";
         self.address.text = @"";
     }
+}
+
+- (void)reverseGeocode:(CLLocation *)location {
+    CLGeocoder *geocoder = [[CLGeocoder alloc] init];
+    [geocoder reverseGeocodeLocation:location completionHandler:^(NSArray *placemarks, NSError *error) {
+        NSLog(@"Finding address");
+        if (error) {
+            NSLog(@"Error %@", error.description);
+        } else {
+            CLPlacemark *placemark = [placemarks lastObject];
+            self.address.text = [NSString stringWithFormat:@"%@", ABCreateStringWithAddressDictionary(placemark.addressDictionary, NO)];
+        }
+    }];
 }
 
 - (IBAction)returnedRemoveKB:(id)sender {
@@ -256,7 +361,6 @@
 - (IBAction)enterEndDate:(id)sender {
     if([_endDate isFirstResponder]){
         UIDatePicker *picker = (UIDatePicker*)_endDate.inputView;
-        //_endDate.text = [NSString stringWithFormat:@"%@",picker.date];
         
         NSDateFormatter *df = [[NSDateFormatter alloc]init];
         df.dateStyle = NSDateFormatterMediumStyle;

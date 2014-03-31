@@ -13,7 +13,9 @@
 @interface DBHelper : NSObject
 
 //properties for TripViewController - Add Trip
--(TripEntry *)saveData:(TripEntry *) tripEntry;
+-(TripEntry *)saveData:(TripEntry *) entry;
+-(TripEntry *)editData:(TripEntry *) entry;
+
 -(void) createDB;
 
 //properties for TripsTableViewController - My Trips
@@ -24,5 +26,6 @@
 -(BOOL) deleteTrip:(NSString *) tripId;
 - (NSMutableArray *)deletePhotos:(NSMutableArray *) photosToDelete tripId:(NSString *)tripId tripPhotos:(NSMutableArray *) tripPhotos;
 -(BOOL)saveSelectedPhotoToDB:(NSString *)imagePath tripId:(NSString *)tripId;
+-(BOOL)setPhotoCover:(NSString *)photoPath entryId:(NSString *)entryId;
 
 @end

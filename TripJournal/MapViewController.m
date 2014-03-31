@@ -16,6 +16,9 @@
 
 @implementation MapViewController
 
+CLLocationCoordinate2D entryLoc;
+MKRoute *route;
+
 - (id)initWithNibName:(NSString *)nibNameOrNil bundle:(NSBundle *)nibBundleOrNil
 {
     self = [super initWithNibName:nibNameOrNil bundle:nibBundleOrNil];
@@ -29,28 +32,23 @@
 {
     [super viewDidLoad];
 	// Do any additional setup after loading the view.
-    //self.tripMap.showsUserLocation = YES;
-    //NSLog(@"... MapViewController:viewDidLoad-%@:%@:%@", self.selectedTrip.place, self.selectedTrip.latitude, self.selectedTrip.latitude);
+    self.tripMap.delegate = self;
+    self.directionsStep.editable = false;
+    self.directionsStep.hidden = YES;
 }
 
 - (void)viewWillAppear:(BOOL)animated {
-
-    CLLocationCoordinate2D zoomLocation;
     
-    zoomLocation.latitude = [self.selectedTrip.latitude doubleValue];
-    zoomLocation.longitude = [self.selectedTrip.longitude doubleValue];
+    entryLoc.latitude = [self.selectedTrip.latitude doubleValue];
+    entryLoc.longitude = [self.selectedTrip.longitude doubleValue];
     
-    MKCoordinateRegion region = MKCoordinateRegionMakeWithDistance(zoomLocation, 300*METERS_PER_MILE, 300*METERS_PER_MILE);
+    MKCoordinateRegion region = MKCoordinateRegionMakeWithDistance(entryLoc, 300*METERS_PER_MILE, 300*METERS_PER_MILE);
     
-    //region.center.latitude = [self.selectedTrip.latitude doubleValue];
-    //region.center.longitude = [self.selectedTrip.longitude doubleValue];
-    
-    //region.span = MKCoordinateSpanMake(spanX, spanY);
     [self.tripMap setRegion:region animated:YES];
     
     // Add an annotation
     MKPointAnnotation *annotationPoint = [[MKPointAnnotation alloc] init];
-    annotationPoint.coordinate = zoomLocation;
+    annotationPoint.coordinate = entryLoc;
     annotationPoint.title = self.selectedTrip.place;
     [self.tripMap addAnnotation:annotationPoint];
 }
@@ -59,6 +57,67 @@
 {
     [super didReceiveMemoryWarning];
     // Dispose of any resources that can be recreated.
+}
+
+- (IBAction)getDirections:(id)sender {
+    self.tripMap.showsUserLocation = YES;
+    
+    MKDirectionsRequest *request = [[MKDirectionsRequest alloc] init];
+    
+    request.source = [MKMapItem mapItemForCurrentLocation];
+    
+    MKPlacemark *place = [[MKPlacemark alloc] initWithCoordinate:entryLoc addressDictionary:nil];
+    
+    MKMapItem *mapItem = [[MKMapItem alloc]initWithPlacemark:place];
+    
+    request.destination = mapItem;
+    request.requestsAlternateRoutes = NO;
+    
+    MKDirections *directions = [[MKDirections alloc] initWithRequest:request];
+    
+    [directions calculateDirectionsWithCompletionHandler:
+     ^(MKDirectionsResponse *response, NSError *error) {
+         if (error) {
+             // Handle error
+         } else {
+             route = response.routes.lastObject;
+             [self showRoute:response];
+         }
+     }];
+}
+
+-(void)showRoute:(MKDirectionsResponse *)response
+{
+    NSMutableString *steps = [[NSMutableString alloc] init];
+    
+    //To do - calc distance and set an appropriate span
+    int regionSpan = route.distance * 1.2;
+    NSLog(@"...showRoute-regionSpan:distance:regionSpan::%f,%d",route.distance, regionSpan);
+    MKCoordinateRegion region = MKCoordinateRegionMakeWithDistance(entryLoc, regionSpan, regionSpan);
+    [self.tripMap setRegion:region animated:YES];
+    
+    for (MKRoute *route in response.routes)
+    {
+        [self.tripMap addOverlay:route.polyline level:MKOverlayLevelAboveRoads];
+        
+        for (MKRouteStep *step in route.steps)
+        {
+            NSLog(@"%@", step.instructions);
+            [steps appendString:@"->"];
+            [steps appendString:step.instructions];
+            [steps appendString:@"\n"];
+        }
+    }
+    self.directionsStep.text = steps;
+    self.directionsStep.hidden = NO;
+}
+
+- (MKOverlayRenderer *)mapView:(MKMapView *)mapView rendererForOverlay:(id < MKOverlay >)overlay
+{
+    MKPolylineRenderer *renderer = [[MKPolylineRenderer alloc] initWithOverlay:overlay];
+    renderer.strokeColor = [UIColor blueColor];
+    renderer.lineWidth = 5.0;
+    return renderer;
 }
 
 @end

@@ -10,6 +10,7 @@
 #import "TripsTableViewController.h"
 #import "MapViewController.h"
 #import "ShowPhotoViewController.h"
+#import "TripViewController.h"
 
 #import "DBHelper.h"
 
@@ -20,6 +21,9 @@
     NSString *selectedPhoto;
     
     DBHelper *dbHelper;
+    
+    NSString *alertSetCoverPhotoTitle;
+    NSString *alertConfirmDelete;
 }
 @end
 
@@ -40,25 +44,47 @@
 	// Do any additionl setup after loading the view.
     
     dbHelper = [[DBHelper alloc] init];
-    tripPhotos = [dbHelper loadTripPhotos:self.selectedTrip.tripId];
+    tripPhotos = [dbHelper loadTripPhotos:self.selectedTrip.entryId];
     
-    self.tripName.text = self.selectedTrip.place;
-    self.tripNote.text = self.selectedTrip.note;
+    //self.tripName.text = self.selectedTrip.place;
+    self.title = self.selectedTrip.place;
+    
+    //add note properties
+    self.note.text = self.selectedTrip.note;
+    [self.note setEditable:NO];
+    //---
 
     photosToDelete = [NSMutableArray array];
     
     self.photoCollectionView.allowsMultipleSelection = TRUE;
+    //self.photoCollectionView.layer.borderColor = [UIColor blackColor].CGColor;
+    //self.photoCollectionView.layer.borderWidth = 3.0f;
     
     UILongPressGestureRecognizer *lpgr = [[UILongPressGestureRecognizer alloc]
        initWithTarget:self action:@selector(longPressHandler:)];
     lpgr.minimumPressDuration = 1.0; //seconds
     lpgr.delegate = self;
     [self.photoCollectionView addGestureRecognizer:lpgr];
-    
 }
+
+ - (void)longPressHandler:(UILongPressGestureRecognizer *)lpgr {
+     
+     if (lpgr.state == UIGestureRecognizerStateBegan) {
+         //UIGestureRecognizerStateBegan, UIGestureRecognizerStateEnded
+         
+         CGPoint p = [lpgr locationInView:self.photoCollectionView];
+         
+         NSIndexPath *indexPath = [self.photoCollectionView indexPathForItemAtPoint:p];
+         if (indexPath != nil) {
+             selectedPhoto = [tripPhotos objectAtIndex:indexPath.row];
+             [self performSegueWithIdentifier:@"ShowPhoto" sender:self];
+         }
+     }
+ }
 
 - (UIEdgeInsets)collectionView:(UICollectionView*)collectionView layout:(UICollectionViewLayout *)collectionViewLayout insetForSectionAtIndex:(NSInteger)section {
     return UIEdgeInsetsMake(-55, 0, 0, 0); // top, left, bottom, right
+    //return UIEdgeInsetsMake(0, 0, 0, 0);
 }
 
 - (CGFloat)collectionView:(UICollectionView *)collectionView layout:(UICollectionViewLayout*)collectionViewLayout minimumLineSpacingForSectionAtIndex:(NSInteger)section
@@ -66,10 +92,6 @@
     return 1;
 }
 
-- (void)viewWillAppear:(BOOL)animated {
-    
-    self.tripSegControls.selectedSegmentIndex =  UISegmentedControlNoSegment;
-}
 
 - (void)didReceiveMemoryWarning
 {
@@ -83,21 +105,6 @@
     return tripPhotos.count;
 }
 
-- (void)longPressHandler:(UILongPressGestureRecognizer *)gr {
-
-    if (gr.state == UIGestureRecognizerStateBegan) {
-        //UIGestureRecognizerStateBegan, UIGestureRecognizerStateEnded
-        
-        CGPoint p = [gr locationInView:self.photoCollectionView];
-        
-        NSIndexPath *indexPath = [self.photoCollectionView indexPathForItemAtPoint:p];
-        if (indexPath != nil) {
-            selectedPhoto = [tripPhotos objectAtIndex:indexPath.row];
-            [self performSegueWithIdentifier:@"ShowPhoto" sender:self];
-        }
-    }
-}
-
 - (UICollectionViewCell *)collectionView:(UICollectionView *)collectionView cellForItemAtIndexPath:(NSIndexPath *)indexPath
 {
     //referencing the attributes of our cell
@@ -109,7 +116,7 @@
     //Highlight the cell selected to red
     UIView *bgColorView = [[UIView alloc] init];
     bgColorView.backgroundColor = [UIColor redColor];
-    bgColorView.layer.cornerRadius = 5;
+    bgColorView.layer.cornerRadius = 8;
     bgColorView.layer.masksToBounds = YES;
     [cell setSelectedBackgroundView:bgColorView];
     
@@ -156,14 +163,22 @@
         MapViewController *vc = [segue destinationViewController];
         [vc setSelectedTrip: self.selectedTrip];
     }
+    /*
     else if([segue.identifier isEqualToString:@"BackToMyTrips"]) {
         TripsTableViewController *vc = [segue destinationViewController];
         [vc setTripId: self.selectedTrip.tripId];
     }
+    */
     else if([segue.identifier isEqualToString:@"ShowPhoto"]) {
         ShowPhotoViewController *vc = [segue destinationViewController];
-        [vc setPhotoName:selectedPhoto];
+        [vc setPhotoPath:selectedPhoto];
+        vc.entryId = self.selectedTrip.entryId;
         //NSLog(@"...prepareForSegue-ShowPhoto:%@", selectedPhoto);
+    }
+    else if([segue.identifier isEqualToString:@"ToEdit"]) {
+        TripViewController *vc = [segue destinationViewController];
+        NSLog(@"..ToEdit segue-tripId:%@", self.selectedTrip.entryId);
+        [vc setSelectedTrip:self.selectedTrip];
     }
 }
 
@@ -171,9 +186,14 @@
 //when user confirms delete on trip, then delete and remove current controller
 - (void)alertView:(UIAlertView *)alertView clickedButtonAtIndex:(NSInteger)buttonIndex
 {
-    if(buttonIndex==0)
+    //if(alertView.title  buttonIndex==0)
+    if(buttonIndex == 0 && [alertView.title isEqualToString:alertSetCoverPhotoTitle])
     {
-        Boolean success = [dbHelper deleteTrip:self.selectedTrip.tripId];
+        [dbHelper setPhotoCover:selectedPhoto entryId:self.selectedTrip.entryId];
+    }
+    else if(buttonIndex == 0 && [alertView.title isEqualToString:alertConfirmDelete])
+    {
+        Boolean success = [dbHelper deleteTrip:self.selectedTrip.entryId];
         if(success)
             [self.navigationController popViewControllerAnimated:YES];
     }
@@ -200,8 +220,8 @@
 }
 
 - (IBAction)deleteEntry:(id)sender {
-    NSString * msg = [NSString stringWithFormat:@"Confirm delete: %@", self.selectedTrip.place];
-    UIAlertView *updateAlert = [[UIAlertView alloc] initWithTitle:msg message:@"" delegate: self cancelButtonTitle: @"YES"  otherButtonTitles:@"NO",nil];
+    alertConfirmDelete = [NSString stringWithFormat:@"Confirm delete: %@", self.selectedTrip.place];
+    UIAlertView *updateAlert = [[UIAlertView alloc] initWithTitle:alertConfirmDelete message:@"" delegate: self cancelButtonTitle: @"YES"  otherButtonTitles:@"NO",nil];
     
     [updateAlert show];
 }
@@ -211,9 +231,12 @@
 }
 
 - (IBAction)deletePhotos:(id)sender {
-    tripPhotos = [dbHelper deletePhotos:photosToDelete tripId:self.selectedTrip.tripId tripPhotos:tripPhotos];
+    tripPhotos = [dbHelper deletePhotos:photosToDelete tripId:self.selectedTrip.entryId tripPhotos:tripPhotos];
     [self.photoCollectionView reloadData];
-    self.tripSegControls.selectedSegmentIndex =  UISegmentedControlNoSegment;
+}
+
+- (IBAction)editEntry:(id)sender {
+    [self performSegueWithIdentifier:@"ToEdit" sender:self];
 }
 
 #pragma mark UIImagePickerControllerDelegate
@@ -229,15 +252,25 @@ didFinishPickingMediaWithInfo:(NSDictionary *)info
         NSURL *imageUrl = info[UIImagePickerControllerReferenceURL];
 
         NSString *selectedImage = [imageUrl absoluteString];
-        //NSLog(@"...selectedImage: %@", selectedImage);
         
-        Boolean success = [dbHelper saveSelectedPhotoToDB:selectedImage tripId:self.selectedTrip.tripId];
+        Boolean success = [dbHelper saveSelectedPhotoToDB:selectedImage tripId:self.selectedTrip.entryId];
         if(success)
         {
+            [self confirmCoverPhoto];
+            
+            selectedPhoto = selectedImage;
             [tripPhotos addObject:selectedImage];
             [self. photoCollectionView reloadData];
         }
     }
+}
+
+-(void)confirmCoverPhoto
+{
+    alertSetCoverPhotoTitle = [NSString stringWithFormat:@"Set As Cover Photo?"];
+    UIAlertView *updateAlert = [[UIAlertView alloc] initWithTitle:alertSetCoverPhotoTitle message:@"" delegate: self cancelButtonTitle: @"YES"  otherButtonTitles:@"NO",nil];
+    
+    [updateAlert show];
 }
 
 -(void)image:(UIImage *)image finishedSavingWithError:(NSError *)error contextInfo:(void *)contextInfo

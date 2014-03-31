@@ -7,6 +7,7 @@
 //
 
 #import "ShowPhotoViewController.h"
+#import "DBHelper.h"
 
 @interface ShowPhotoViewController ()
 
@@ -28,7 +29,7 @@
     [super viewDidLoad];
 	// Do any additional setup after loading the view.
 
-    NSURL* aURL = [NSURL URLWithString:self.photoName];
+    NSURL* aURL = [NSURL URLWithString:self.photoPath];
     
     ALAssetsLibrary *library = [[ALAssetsLibrary alloc] init];
     [library assetForURL:aURL resultBlock:^(ALAsset *asset)
@@ -36,7 +37,6 @@
          UIImage  *copyOfOriginalImage = [UIImage imageWithCGImage:[[asset defaultRepresentation] fullScreenImage] scale:1.0 orientation:UIImageOrientationUp];
          
          self.photoImageView.image = copyOfOriginalImage;
-         //NSLog(@"...ShowPhotoView:%@", self.photoName);
      }
             failureBlock:^(NSError *error)
      {
@@ -54,5 +54,10 @@
 
 - (IBAction)done:(id)sender {
     [self dismissViewControllerAnimated:YES completion:NULL];
+}
+
+- (IBAction)setAsCoverPhoto:(id)sender {
+    DBHelper *dbHelper = [[DBHelper alloc] init];
+    [dbHelper setPhotoCover:self.photoPath entryId:self.entryId];
 }
 @end
