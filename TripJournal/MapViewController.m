@@ -35,12 +35,13 @@ MKRoute *route;
     self.tripMap.delegate = self;
     self.directionsStep.editable = false;
     self.directionsStep.hidden = YES;
+    
+    //set saved location
+    entryLoc.latitude = [self.selectedTrip.latitude doubleValue];
+    entryLoc.longitude = [self.selectedTrip.longitude doubleValue];
 }
 
 - (void)viewWillAppear:(BOOL)animated {
-    
-    entryLoc.latitude = [self.selectedTrip.latitude doubleValue];
-    entryLoc.longitude = [self.selectedTrip.longitude doubleValue];
     
     MKCoordinateRegion region = MKCoordinateRegionMakeWithDistance(entryLoc, 300*METERS_PER_MILE, 300*METERS_PER_MILE);
     
@@ -59,11 +60,31 @@ MKRoute *route;
     // Dispose of any resources that can be recreated.
 }
 
+- (void)useMapApp
+{
+    CLLocationCoordinate2D coordinate = CLLocationCoordinate2DMake(entryLoc.latitude, entryLoc.longitude);
+    
+    MKPlacemark *placemark = [[MKPlacemark alloc] initWithCoordinate:coordinate addressDictionary:nil];
+    MKMapItem *mapItem = [[MKMapItem alloc] initWithPlacemark:placemark];
+    [mapItem setName:self.selectedTrip.place];
+    
+    // Set the directions mode to "Driving"
+    NSDictionary *launchOptions = @{MKLaunchOptionsDirectionsModeKey : MKLaunchOptionsDirectionsModeDriving};
+    // Get the "Current User Location" MKMapItem
+    MKMapItem *currentLocationMapItem = [MKMapItem mapItemForCurrentLocation];
+    // Pass the current location and destination map items to the Maps app
+    // Set the direction mode in the launchOptions dictionary
+    [MKMapItem openMapsWithItems:@[currentLocationMapItem, mapItem]
+                   launchOptions:launchOptions];
+}
+
 - (IBAction)getDirections:(id)sender {
     self.tripMap.showsUserLocation = YES;
+    //use default map app for iOS (moves away from RememberIt)
+    [self useMapApp];
     
+    /*
     MKDirectionsRequest *request = [[MKDirectionsRequest alloc] init];
-    
     request.source = [MKMapItem mapItemForCurrentLocation];
     
     MKPlacemark *place = [[MKPlacemark alloc] initWithCoordinate:entryLoc addressDictionary:nil];
@@ -84,6 +105,7 @@ MKRoute *route;
              [self showRoute:response];
          }
      }];
+     */
 }
 
 -(void)showRoute:(MKDirectionsResponse *)response
