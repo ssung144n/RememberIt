@@ -246,7 +246,7 @@
                                     <action selector="getDirections:" destination="7Cy-Cc-MlF" eventType="touchUpInside" id="UUw-NS-C5a"/>
                                 </connections>
                             </button>
-                            <textView clipsSubviews="YES" multipleTouchEnabled="YES" alpha="0.49999999999999961" contentMode="scaleToFill" text="Directions" translatesAutoresizingMaskIntoConstraints="NO" id="MsU-eL-PL6">
+                            <textView clipsSubviews="YES" multipleTouchEnabled="YES" alpha="0.49999999999999961" contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="MsU-eL-PL6">
                                 <rect key="frame" x="0.0" y="160" width="320" height="185"/>
                                 <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
                                 <color key="backgroundColor" red="1" green="1" blue="1" alpha="1" colorSpace="calibratedRGB"/>
