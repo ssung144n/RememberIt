@@ -10,6 +10,9 @@
 		ED025ABF18D94F3E008614BB /* orangeGd1.png in Resources */ = {isa = PBXBuildFile; fileRef = ED025ABE18D94F3E008614BB /* orangeGd1.png */; };
 		ED4B6F9E18DCF8B4009D622B /* marker44by44.png in Resources */ = {isa = PBXBuildFile; fileRef = ED4B6F9D18DCF8B4009D622B /* marker44by44.png */; };
 		ED4B6FA018DCFAE1009D622B /* deletePhotos.png in Resources */ = {isa = PBXBuildFile; fileRef = ED4B6F9F18DCFAE1009D622B /* deletePhotos.png */; };
+		ED53EA6F18EB783100733A4A /* EntryViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = ED53EA6E18EB783100733A4A /* EntryViewController.m */; };
+		ED53EA7218EE1F9600733A4A /* EntryViewTableCell.m in Sources */ = {isa = PBXBuildFile; fileRef = ED53EA7118EE1F9600733A4A /* EntryViewTableCell.m */; };
+		ED53EA7B18F4A18A00733A4A /* MapHelper.m in Sources */ = {isa = PBXBuildFile; fileRef = ED53EA7A18F4A18A00733A4A /* MapHelper.m */; };
 		ED54C22D18E3845B00BD5AF1 /* edit_icon.png in Resources */ = {isa = PBXBuildFile; fileRef = ED54C22C18E3845B00BD5AF1 /* edit_icon.png */; };
 		ED57F95F1891DA9300CFF1D5 /* libsqlite3.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = ED57F95E1891DA9300CFF1D5 /* libsqlite3.dylib */; };
 		ED57F96518972BB500CFF1D5 /* TripsTableViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = ED57F96418972BB500CFF1D5 /* TripsTableViewController.m */; };
@@ -56,6 +59,12 @@
 		ED025ABE18D94F3E008614BB /* orangeGd1.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = orangeGd1.png; sourceTree = "<group>"; };
 		ED4B6F9D18DCF8B4009D622B /* marker44by44.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = marker44by44.png; sourceTree = "<group>"; };
 		ED4B6F9F18DCFAE1009D622B /* deletePhotos.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = deletePhotos.png; sourceTree = "<group>"; };
+		ED53EA6D18EB783100733A4A /* EntryViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = EntryViewController.h; sourceTree = "<group>"; };
+		ED53EA6E18EB783100733A4A /* EntryViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = EntryViewController.m; sourceTree = "<group>"; };
+		ED53EA7018EE1F9600733A4A /* EntryViewTableCell.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = EntryViewTableCell.h; sourceTree = "<group>"; };
+		ED53EA7118EE1F9600733A4A /* EntryViewTableCell.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = EntryViewTableCell.m; sourceTree = "<group>"; };
+		ED53EA7918F4A18A00733A4A /* MapHelper.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = MapHelper.h; sourceTree = "<group>"; };
+		ED53EA7A18F4A18A00733A4A /* MapHelper.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = MapHelper.m; sourceTree = "<group>"; };
 		ED54C22C18E3845B00BD5AF1 /* edit_icon.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = edit_icon.png; sourceTree = "<group>"; };
 		ED57F95E1891DA9300CFF1D5 /* libsqlite3.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = libsqlite3.dylib; path = usr/lib/libsqlite3.dylib; sourceTree = SDKROOT; };
 		ED57F96318972BB500CFF1D5 /* TripsTableViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = TripsTableViewController.h; sourceTree = "<group>"; };
@@ -181,6 +190,10 @@
 			isa = PBXGroup;
 			children = (
 				ED71E2DD188E72F000276ABE /* Trip.storyboard */,
+				ED53EA7018EE1F9600733A4A /* EntryViewTableCell.h */,
+				ED53EA7118EE1F9600733A4A /* EntryViewTableCell.m */,
+				ED53EA6D18EB783100733A4A /* EntryViewController.h */,
+				ED53EA6E18EB783100733A4A /* EntryViewController.m */,
 				EDF4053618BC2EE7007D18AB /* MapViewController.h */,
 				EDF4053718BC2EE7007D18AB /* MapViewController.m */,
 				ED65627618B13D870023CDE2 /* PhotosTripViewController.h */,
@@ -193,6 +206,8 @@
 				ED71E2B1188E729400276ABE /* Supporting Files */,
 				ED71E2DF188E784900276ABE /* TripViewController.h */,
 				ED71E2E0188E784900276ABE /* TripViewController.m */,
+				ED53EA7918F4A18A00733A4A /* MapHelper.h */,
+				ED53EA7A18F4A18A00733A4A /* MapHelper.m */,
 				ED57F9661897350100CFF1D5 /* TripEntry.h */,
 				ED57F9671897350100CFF1D5 /* TripEntry.m */,
 				ED696FDC18C2C87300B37508 /* DBHelper.h */,
@@ -340,6 +355,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				ED53EA7218EE1F9600733A4A /* EntryViewTableCell.m in Sources */,
 				ED71E2BB188E729400276ABE /* sssAppDelegate.m in Sources */,
 				EDD7753618D57E1700255634 /* ShowPhotoViewController.m in Sources */,
 				EDF4053818BC2EE7007D18AB /* MapViewController.m in Sources */,
@@ -347,6 +363,8 @@
 				ED57F9681897350100CFF1D5 /* TripEntry.m in Sources */,
 				ED65627818B13D870023CDE2 /* PhotosTripViewController.m in Sources */,
 				ED57F96518972BB500CFF1D5 /* TripsTableViewController.m in Sources */,
+				ED53EA7B18F4A18A00733A4A /* MapHelper.m in Sources */,
+				ED53EA6F18EB783100733A4A /* EntryViewController.m in Sources */,
 				ED71E2B7188E729400276ABE /* main.m in Sources */,
 				ED696FDE18C2C87300B37508 /* DBHelper.m in Sources */,
 			);

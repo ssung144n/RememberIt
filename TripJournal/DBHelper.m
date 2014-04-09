@@ -10,11 +10,56 @@
 
 @implementation DBHelper
 
-sqlite3 *tripDB;
-NSString *DBFILE = @"trips.db";
+sqlite3 *rememberItDB;
+NSString *DBFILE = @"rememberIt.db";
 NSString *stmtSQL;
 const char *stmt;
 sqlite3_stmt *statement;
+
+-(NSMutableArray *)getListForEntryId:(NSString *) entryId selectStm:(NSString *)selectStm
+{
+    NSMutableArray *entryItemList = [[NSMutableArray alloc] init];
+    const char *dbpath = [self dbPath];
+    NSString *databasePath = [self databasePath];
+    
+    @try{
+        NSFileManager *filemgr = [NSFileManager defaultManager];
+        if ([filemgr fileExistsAtPath:databasePath])
+        {
+            if (sqlite3_open(dbpath, &rememberItDB) == SQLITE_OK)
+            {
+                NSString *querySQL = [NSString stringWithFormat:
+                                      selectStm, entryId];
+                
+                const char *query_stmt = [querySQL UTF8String];
+                
+                if (sqlite3_prepare_v2(rememberItDB, query_stmt, -1, &statement, NULL) == SQLITE_OK)
+                {
+                    while (sqlite3_step(statement) == SQLITE_ROW)
+                    {
+                        NSString *entryInfo = [[NSString alloc]
+                                               initWithUTF8String:
+                                               (const char *) sqlite3_column_text(
+                                                                                  statement, 0)];
+                        
+                        [entryItemList addObject:entryInfo];
+                        
+                    }
+                    //NSLog(@"..db loadTriphotos - tripPhotos.count:%lu", (unsigned long)tripPhotos.count);
+                    sqlite3_finalize(statement);
+                }
+            }
+        }//db exists
+    }
+    @catch (NSException * ex) {
+        NSLog(@"Exception:%@", selectStm);
+    }
+    @finally {
+        sqlite3_close(rememberItDB);
+    }
+    
+    return entryItemList;
+}
 
 -(NSMutableArray *)loadTripPhotos:(NSString *) entryId
 {
@@ -27,7 +72,7 @@ sqlite3_stmt *statement;
         NSFileManager *filemgr = [NSFileManager defaultManager];
         if ([filemgr fileExistsAtPath:databasePath])
         {
-            if (sqlite3_open(dbpath, & tripDB) == SQLITE_OK)
+            if (sqlite3_open(dbpath, &rememberItDB) == SQLITE_OK)
             {
                 NSString *querySQL = [NSString stringWithFormat:
                                       @"SELECT PhotoPath FROM EntryPhotos WHERE EntryId=\"%@\"",
@@ -35,7 +80,7 @@ sqlite3_stmt *statement;
                 
                 const char *query_stmt = [querySQL UTF8String];
                 
-                if (sqlite3_prepare_v2(tripDB, query_stmt, -1, &statement, NULL) == SQLITE_OK)
+                if (sqlite3_prepare_v2(rememberItDB, query_stmt, -1, &statement, NULL) == SQLITE_OK)
                 {
                     while (sqlite3_step(statement) == SQLITE_ROW)
                     {
@@ -57,7 +102,7 @@ sqlite3_stmt *statement;
         NSLog(@"Exception: Select from TripPhotos");
     }
     @finally {
-        sqlite3_close(tripDB);
+        sqlite3_close(rememberItDB);
     }
     
     return tripPhotos;
@@ -73,23 +118,31 @@ sqlite3_stmt *statement;
     {
         if ([filemgr fileExistsAtPath: databasePath ] == NO) //first time to app - db doesn't exist
         {
-            if (sqlite3_open(dbpath, & tripDB) == SQLITE_OK){
+            if (sqlite3_open(dbpath, &rememberItDB) == SQLITE_OK){
                 char *errMsg;
 
                 const char *sql_stmt =
                 "CREATE TABLE IF NOT EXISTS Entry (ID INTEGER PRIMARY KEY AUTOINCREMENT, Place TEXT, Note TEXT, StartDate TEXT, EndDate TEXT, Latitude TEXT, Longitude TEXT, Address TEXT, PhotoPath TEXT, EntryDate TEXT)";
                 
                 
-                if (sqlite3_exec(tripDB, sql_stmt, NULL, NULL, &errMsg) == SQLITE_OK)
+                if (sqlite3_exec(rememberItDB, sql_stmt, NULL, NULL, &errMsg) == SQLITE_OK)
                 {
                     NSLog(@"...created table Entry");
 
                     sql_stmt =
                     "CREATE TABLE IF NOT EXISTS EntryPhotos (ID INTEGER PRIMARY KEY AUTOINCREMENT, EntryId Text, PhotoPath Text)";
                     
-                    if (sqlite3_exec(tripDB, sql_stmt, NULL, NULL, &errMsg) == SQLITE_OK)
+                    if (sqlite3_exec(rememberItDB, sql_stmt, NULL, NULL, &errMsg) == SQLITE_OK)
                     {
                         NSLog(@"...created table EntryPhotos");
+                    }
+                    
+                    sql_stmt =
+                    "CREATE TABLE IF NOT EXISTS EntryListItems (ID INTEGER PRIMARY KEY AUTOINCREMENT, EntryId Text, ListItem Text, ListItemSwitch Integer)";
+                    
+                    if (sqlite3_exec(rememberItDB, sql_stmt, NULL, NULL, &errMsg) == SQLITE_OK)
+                    {
+                        NSLog(@"...created table EntryListItems");
                     }
                 }
             }
@@ -102,7 +155,7 @@ sqlite3_stmt *statement;
         NSLog(@"Exception: createDB:%@", ex.description);
     }
     @finally {
-        sqlite3_close(tripDB);
+        sqlite3_close(rememberItDB);
     }
 }
 
@@ -111,7 +164,7 @@ sqlite3_stmt *statement;
     const char *dbpath = [self dbPath];
     @try
     {
-        if (sqlite3_open(dbpath, &tripDB) == SQLITE_OK)
+        if (sqlite3_open(dbpath, &rememberItDB) == SQLITE_OK)
         {
             NSString *insertSQL = [NSString stringWithFormat:
                                    @"INSERT INTO Entry (Place, Note, StartDate, EndDate, Latitude, Longitude, Address, PhotoPath, EntryDate) VALUES (\"%@\", \"%@\", \"%@\",\"%@\", \"%@\",\"%@\", \"%@\", \"%@\",\"%@\")",
@@ -119,7 +172,7 @@ sqlite3_stmt *statement;
             
             
             const char *insert_stmt = [insertSQL UTF8String];
-            sqlite3_prepare_v2(tripDB, insert_stmt, -1, &statement, NULL);
+            sqlite3_prepare_v2(rememberItDB, insert_stmt, -1, &statement, NULL);
             int resultCode = sqlite3_step(statement);
             NSLog(@"...resultCode for saveData:%d", resultCode);
             if (resultCode == SQLITE_DONE)
@@ -138,7 +191,7 @@ sqlite3_stmt *statement;
             }
             
             //tripEntry.tripId = [NSNumber numberWithLongLong:sqlite3_last_insert_rowid(tripDB)];
-            entry.entryId = [NSString stringWithFormat:@"%lld", sqlite3_last_insert_rowid(tripDB)];
+            entry.entryId = [NSString stringWithFormat:@"%lld", sqlite3_last_insert_rowid(rememberItDB)];
             
             //NSLog(@"... DBHelper:saveData-%@:%@:%@", tripEntry.place, tripEntry.latitude, tripEntry.longitude);
             sqlite3_finalize(statement);
@@ -148,7 +201,7 @@ sqlite3_stmt *statement;
         NSLog(@"Exception: saveData:%@", ex.description);
     }
     @finally {
-        sqlite3_close(tripDB);
+        sqlite3_close(rememberItDB);
     }
     return entry;
 }
@@ -158,13 +211,13 @@ sqlite3_stmt *statement;
     const char *dbpath = [self dbPath];
     @try
     {
-        if (sqlite3_open(dbpath, &tripDB) == SQLITE_OK)
+        if (sqlite3_open(dbpath, &rememberItDB) == SQLITE_OK)
         {
             NSString *updateSQL = [NSString stringWithFormat:
                                    @"Update Entry Set Place = \"%@\", Note = \"%@\", StartDate = \"%@\", EndDate = \"%@\", Latitude = \"%@\", Longitude = \"%@\", Address = \"%@\" Where Id = %d", entry.place, entry.note, entry.startDate, entry.endDate, entry.latitude, entry.longitude, entry.address, [entry.entryId intValue]];
             
             const char *update_stmt = [updateSQL UTF8String];
-            sqlite3_prepare_v2(tripDB, update_stmt, -1, &statement, NULL);
+            sqlite3_prepare_v2(rememberItDB, update_stmt, -1, &statement, NULL);
             int resultCode = sqlite3_step(statement);
             NSLog(@"...resultCode for edit entry:%d - stmt:%s", resultCode, update_stmt);
             if (resultCode == SQLITE_DONE)
@@ -188,7 +241,7 @@ sqlite3_stmt *statement;
         NSLog(@"Exception: editData:%@", ex.description);
     }
     @finally {
-        sqlite3_close(tripDB);
+        sqlite3_close(rememberItDB);
     }
     return entry;
 }
@@ -204,12 +257,12 @@ sqlite3_stmt *statement;
         NSFileManager *filemgr = [NSFileManager defaultManager];
         if ([filemgr fileExistsAtPath: databasePath])
         {
-            if (sqlite3_open(dbpath, &tripDB) == SQLITE_OK)
+            if (sqlite3_open(dbpath, &rememberItDB) == SQLITE_OK)
             {
                 NSString *querySQL = [NSString stringWithFormat: @"SELECT * FROM Entry"];
                 const char *query_stmt = [querySQL UTF8String];
                 
-                if (sqlite3_prepare_v2(tripDB,
+                if (sqlite3_prepare_v2(rememberItDB,
                                        query_stmt, -1, &statement, NULL) == SQLITE_OK)
                 {
                     TripEntry* entry;
@@ -249,7 +302,7 @@ sqlite3_stmt *statement;
         NSLog(@"Exception: selectAllFromDB:%@", ex.description);
     }
     @finally {
-        sqlite3_close(tripDB);
+        sqlite3_close(rememberItDB);
     }
     return tripsTable;
 }
@@ -261,12 +314,12 @@ sqlite3_stmt *statement;
 
     @try
     {
-        if(sqlite3_open(dbpath, &tripDB) == SQLITE_OK)
+        if(sqlite3_open(dbpath, &rememberItDB) == SQLITE_OK)
         {
             stmtSQL = [NSString stringWithFormat:
                        @"Delete From EntryPhotos Where EntryId = \"%@\"", entryId];
             stmt = [stmtSQL UTF8String];
-            sqlite3_prepare_v2(tripDB, stmt, -1, &statement, NULL);
+            sqlite3_prepare_v2(rememberItDB, stmt, -1, &statement, NULL);
             if (sqlite3_step(statement) == SQLITE_DONE)
             {
                 //NSLog(@"..deleted from TripPhotos where TripId:%@", tripId);
@@ -279,7 +332,7 @@ sqlite3_stmt *statement;
                 stmtSQL = [NSString stringWithFormat:
                            @"Delete From Entry Where Id = %ld", (long)[entryId integerValue]];
                 stmt = [stmtSQL UTF8String];
-                sqlite3_prepare_v2(tripDB, stmt, -1, &statement, NULL);
+                sqlite3_prepare_v2(rememberItDB, stmt, -1, &statement, NULL);
                 if (sqlite3_step(statement) == SQLITE_DONE)
                 {
                     //NSLog(@"..DELETED from TripJournal where Id:%@", entryId);
@@ -299,7 +352,7 @@ sqlite3_stmt *statement;
     }
     @finally
     {
-        sqlite3_close(tripDB);
+        sqlite3_close(rememberItDB);
     }
     return success;
 }
@@ -313,13 +366,13 @@ sqlite3_stmt *statement;
     {
         for (int i = 0; i<photosToDelete.count; i++)
         {
-            if (sqlite3_open(dbpath, &tripDB) == SQLITE_OK)
+            if (sqlite3_open(dbpath, &rememberItDB) == SQLITE_OK)
             {
                 stmtSQL = [NSString stringWithFormat:
                            @"Delete From EntryPhotos Where EntryId = \"%@\" and PhotoPath = \"%@\"", entryId, photosToDelete[i]];
                 
                 stmt = [stmtSQL UTF8String];
-                sqlite3_prepare_v2(tripDB, stmt, -1, &statement, NULL);
+                sqlite3_prepare_v2(rememberItDB, stmt, -1, &statement, NULL);
                 if (sqlite3_step(statement) == SQLITE_DONE)
                 {
                     //NSLog(@"..Deleted Photo: %@", photosToDelete[i]);
@@ -333,7 +386,7 @@ sqlite3_stmt *statement;
         NSLog(@"Exception: deletePhotos:%@", ex.description);
     }
     @finally {
-        sqlite3_close(tripDB);
+        sqlite3_close(rememberItDB);
     }
     return tripPhotos;
 }
@@ -345,20 +398,20 @@ sqlite3_stmt *statement;
     
     @try
     {
-        if (sqlite3_open(dbpath, &tripDB) == SQLITE_OK)
+        if (sqlite3_open(dbpath, &rememberItDB) == SQLITE_OK)
         {
             stmtSQL = [NSString stringWithFormat:
                          @"INSERT INTO EntryPhotos (EntryId, PhotoPath) VALUES (\"%@\", \"%@\")",
                          entryId, photoPath];
             
             stmt = [stmtSQL UTF8String];
-            sqlite3_prepare_v2(tripDB, stmt, -1, &statement, NULL);
+            sqlite3_prepare_v2(rememberItDB, stmt, -1, &statement, NULL);
             
             int result = sqlite3_step(statement);
             if (result == SQLITE_OK || result == SQLITE_DONE)
                 success = TRUE;
             else
-                NSLog(@"...result of saveSelectedPhotoToDB - %d:%s", result, sqlite3_errmsg(tripDB));
+                NSLog(@"...result of saveSelectedPhotoToDB - %d:%s", result, sqlite3_errmsg(rememberItDB));
 
             sqlite3_finalize(statement);
         }
@@ -367,7 +420,7 @@ sqlite3_stmt *statement;
         NSLog(@"Exception: saveSelectedPhotoToDB:%@", ex.description);
     }
     @finally {
-        sqlite3_close(tripDB);
+        sqlite3_close(rememberItDB);
     }
 
     return success;
@@ -380,13 +433,13 @@ sqlite3_stmt *statement;
     
     @try
     {
-        if (sqlite3_open(dbpath, &tripDB) == SQLITE_OK)
+        if (sqlite3_open(dbpath, &rememberItDB) == SQLITE_OK)
         {
             NSString *updateSQL = [NSString stringWithFormat:
                                    @"Update Entry Set PhotoPath = \"%@\" Where Id = %d", photoPath, [entryId intValue]];
             
             const char *update_stmt = [updateSQL UTF8String];
-            sqlite3_prepare_v2(tripDB, update_stmt, -1, &statement, NULL);
+            sqlite3_prepare_v2(rememberItDB, update_stmt, -1, &statement, NULL);
             int resultCode = sqlite3_step(statement);
             NSLog(@"...resultCode for edit entry:%d - stmt:%s", resultCode, update_stmt);
             if (resultCode == SQLITE_DONE)
@@ -410,7 +463,7 @@ sqlite3_stmt *statement;
         NSLog(@"Exception: setPhotoCover:%@", ex.description);
     }
     @finally {
-        sqlite3_close(tripDB);
+        sqlite3_close(rememberItDB);
     }
     return success;
 }

@@ -93,7 +93,7 @@
     cell.detailTextLabel.text = tripDates;
     if(trip.photoPath.length > 0)
     {
-        NSLog(@"..TripsTable..trip.photoPath:%@", trip.photoPath);
+        //NSLog(@"..TripsTable..trip.photoPath:%@", trip.photoPath);
         
         __block UIImage *photo = nil;
         NSURL* aURL = [NSURL URLWithString:trip.photoPath];
@@ -101,7 +101,7 @@
         [library assetForURL:aURL resultBlock:^(ALAsset *asset)
          {
              photo = [UIImage imageWithCGImage:[asset thumbnail] scale:1.0 orientation:UIImageOrientationUp];
-             NSLog(@"..TripsTable..photoLibAsset-photo:%@", photo.description);
+             //NSLog(@"..TripsTable..photoLibAsset-photo:%@", photo.description);
              cell.imageView.image = photo;
          }
                 failureBlock:^(NSError *error)
@@ -136,7 +136,7 @@
     else if ([segue.identifier isEqualToString:@"ToAddTrip"])
     {
         //TripViewController *vc = [segue destinationViewController];
-        NSLog(@"..ToAddTrip:TripsTableViewController");
+        //NSLog(@"..ToAddTrip:TripsTableViewController");
     }
 }
 
