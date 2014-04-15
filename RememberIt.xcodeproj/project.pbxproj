@@ -32,7 +32,6 @@
 		ED71E2D2188E729400276ABE /* InfoPlist.strings in Resources */ = {isa = PBXBuildFile; fileRef = ED71E2D0188E729400276ABE /* InfoPlist.strings */; };
 		ED71E2D4188E729400276ABE /* TripJournalTests.m in Sources */ = {isa = PBXBuildFile; fileRef = ED71E2D3188E729400276ABE /* TripJournalTests.m */; };
 		ED71E2DE188E72F000276ABE /* Trip.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = ED71E2DD188E72F000276ABE /* Trip.storyboard */; };
-		ED71E2E1188E784900276ABE /* TripViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = ED71E2E0188E784900276ABE /* TripViewController.m */; };
 		ED71E2E4188E7A1500276ABE /* camera_icon.jpeg in Resources */ = {isa = PBXBuildFile; fileRef = ED71E2E3188E7A1500276ABE /* camera_icon.jpeg */; };
 		ED7EED5518989A1C004C9BDB /* CoreLocation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = ED7EED5418989A1C004C9BDB /* CoreLocation.framework */; };
 		EDA1D1FE18E4C8DE00CF1A26 /* AddressBookUI.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = EDA1D1FD18E4C8DE00CF1A26 /* AddressBookUI.framework */; };
@@ -92,8 +91,6 @@
 		ED71E2D1188E729400276ABE /* en */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = en; path = en.lproj/InfoPlist.strings; sourceTree = "<group>"; };
 		ED71E2D3188E729400276ABE /* TripJournalTests.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = TripJournalTests.m; sourceTree = "<group>"; };
 		ED71E2DD188E72F000276ABE /* Trip.storyboard */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.storyboard; name = Trip.storyboard; path = ../Trip.storyboard; sourceTree = "<group>"; };
-		ED71E2DF188E784900276ABE /* TripViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = TripViewController.h; sourceTree = "<group>"; };
-		ED71E2E0188E784900276ABE /* TripViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = TripViewController.m; sourceTree = "<group>"; };
 		ED71E2E3188E7A1500276ABE /* camera_icon.jpeg */ = {isa = PBXFileReference; lastKnownFileType = image.jpeg; path = camera_icon.jpeg; sourceTree = "<group>"; };
 		ED7EED5418989A1C004C9BDB /* CoreLocation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreLocation.framework; path = System/Library/Frameworks/CoreLocation.framework; sourceTree = SDKROOT; };
 		EDA1D1FD18E4C8DE00CF1A26 /* AddressBookUI.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = AddressBookUI.framework; path = System/Library/Frameworks/AddressBookUI.framework; sourceTree = SDKROOT; };
@@ -204,8 +201,6 @@
 				ED71E2BA188E729400276ABE /* sssAppDelegate.m */,
 				ED71E2BF188E729400276ABE /* Images.xcassets */,
 				ED71E2B1188E729400276ABE /* Supporting Files */,
-				ED71E2DF188E784900276ABE /* TripViewController.h */,
-				ED71E2E0188E784900276ABE /* TripViewController.m */,
 				ED53EA7918F4A18A00733A4A /* MapHelper.h */,
 				ED53EA7A18F4A18A00733A4A /* MapHelper.m */,
 				ED57F9661897350100CFF1D5 /* TripEntry.h */,
@@ -359,7 +354,6 @@
 				ED71E2BB188E729400276ABE /* sssAppDelegate.m in Sources */,
 				EDD7753618D57E1700255634 /* ShowPhotoViewController.m in Sources */,
 				EDF4053818BC2EE7007D18AB /* MapViewController.m in Sources */,
-				ED71E2E1188E784900276ABE /* TripViewController.m in Sources */,
 				ED57F9681897350100CFF1D5 /* TripEntry.m in Sources */,
 				ED65627818B13D870023CDE2 /* PhotosTripViewController.m in Sources */,
 				ED57F96518972BB500CFF1D5 /* TripsTableViewController.m in Sources */,

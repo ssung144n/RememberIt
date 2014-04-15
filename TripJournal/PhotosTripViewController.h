@@ -20,13 +20,11 @@
 @property (strong, nonatomic) IBOutlet UICollectionView *photoCollectionView;
 @property (strong, nonatomic) IBOutlet UINavigationItem *navigationTitle;
 
-@property (strong, nonatomic) IBOutlet UILabel *tripName;
-
-@property (weak, nonatomic) IBOutlet UITextView *note;
+//@property (strong, nonatomic) IBOutlet UILabel *tripName;
 
 - (IBAction)selectPhotos:(id)sender;
 
-- (IBAction)deleteEntry:(id)sender;
+//- (IBAction)deleteEntry:(id)sender;
 - (IBAction)showMap:(id)sender;
 - (IBAction)deletePhotos:(id)sender;
 - (IBAction)editEntry:(id)sender;

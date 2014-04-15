@@ -9,15 +9,15 @@
 #import "MapViewController.h"
 
 @interface MapViewController ()
-
-#define METERS_PER_MILE 1609.344
-
+{
+    #define RANGE 15000
+    MapHelper *mapHelper;
+}
 @end
 
 @implementation MapViewController
 
 CLLocationCoordinate2D entryLoc;
-MKRoute *route;
 
 - (id)initWithNibName:(NSString *)nibNameOrNil bundle:(NSBundle *)nibBundleOrNil
 {
@@ -32,33 +32,100 @@ MKRoute *route;
 {
     [super viewDidLoad];
 	// Do any additional setup after loading the view.
+    mapHelper = [[MapHelper alloc] initWithMap:self.tripMap];
     self.tripMap.delegate = self;
-    self.directionsStep.editable = false;
-    self.directionsStep.hidden = YES;
     
     //set saved location
-    entryLoc.latitude = [self.selectedTrip.latitude doubleValue];
-    entryLoc.longitude = [self.selectedTrip.longitude doubleValue];
+    mapHelper.latitude = self.selectedTrip.latitude;
+    mapHelper.longitude = self.selectedTrip.longitude;
+    
+    //[mapHelper addLongPressGesture];
+    [mapHelper placeAnnotationforMap];
+    
+    UILongPressGestureRecognizer *lpgr = [[UILongPressGestureRecognizer alloc]
+                                          initWithTarget:self action:@selector(handleLongPress:)];
+    lpgr.minimumPressDuration = 1.5;
+    [self.tripMap addGestureRecognizer:lpgr];
 }
 
+- (void)handleLongPress:(UIGestureRecognizer *)gestureRecognizer
+{
+    if (gestureRecognizer.state != UIGestureRecognizerStateBegan)
+        return;
+    
+    CGPoint touchPoint = [gestureRecognizer locationInView:self.tripMap];
+    entryLoc = [self.tripMap convertPoint:touchPoint toCoordinateFromView:self.tripMap];
+    
+    NSMutableArray * annotationsToRemove = [ self.tripMap.annotations mutableCopy ] ;
+    [ annotationsToRemove removeObject:self.tripMap.userLocation ] ;
+    [ self.tripMap removeAnnotations:annotationsToRemove ] ;
+    
+    MKPointAnnotation *annotationPoint = [[MKPointAnnotation alloc] init];
+    annotationPoint.coordinate = entryLoc;
+    [self.tripMap addAnnotation:annotationPoint];
+    
+    self.selectedTrip.latitude = [NSString stringWithFormat:@"%f", entryLoc.latitude];
+    self.selectedTrip.longitude = [NSString stringWithFormat:@"%f", entryLoc.longitude];
+    
+    mapHelper.latitude = self.selectedTrip.latitude;
+    mapHelper.longitude = self.selectedTrip.longitude;
+    
+    NSLog(@"..MapViewController:handleLongPress:lat:%@, lon:%@", self.selectedTrip.latitude, self.selectedTrip.longitude);
+}
+
+/*
 - (void)viewWillAppear:(BOOL)animated {
     
-    MKCoordinateRegion region = MKCoordinateRegionMakeWithDistance(entryLoc, 300*METERS_PER_MILE, 300*METERS_PER_MILE);
-    
+    MKCoordinateRegion region = MKCoordinateRegionMakeWithDistance(entryLoc, RANGE, RANGE);
     [self.tripMap setRegion:region animated:YES];
     
     // Add an annotation
     MKPointAnnotation *annotationPoint = [[MKPointAnnotation alloc] init];
     annotationPoint.coordinate = entryLoc;
-    annotationPoint.title = self.selectedTrip.place;
     [self.tripMap addAnnotation:annotationPoint];
 }
-
+*/
 - (void)didReceiveMemoryWarning
 {
     [super didReceiveMemoryWarning];
     // Dispose of any resources that can be recreated.
 }
+
+/*
+-(void)confirmUpdatedLocation
+{
+    NSString *alertTitle = [NSString stringWithFormat:@"Save to new location?"];
+    UIAlertView *updateAlert = [[UIAlertView alloc] initWithTitle:alertTitle message:@"" delegate: self cancelButtonTitle: @"YES"  otherButtonTitles:@"NO",nil];
+    
+    [updateAlert show];
+}
+
+//when user confirms on updated location
+- (void)alertView:(UIAlertView *)alertView clickedButtonAtIndex:(NSInteger)buttonIndex
+{
+    if(buttonIndex == 0) //confirm yes on alertView
+    {
+        self.selectedTrip.latitude = [NSString stringWithFormat:@"%f", entryLoc.latitude];
+        self.selectedTrip.longitude = [NSString stringWithFormat:@"%f", entryLoc.longitude];
+        
+        NSLog(@"...MapViewController:alertView confirm: lat:%@, lon:%@", self.selectedTrip.latitude, self.selectedTrip.longitude);
+    }
+    else{
+        NSMutableArray * annotationsToRemove = [ self.tripMap.annotations mutableCopy ] ;
+        [ annotationsToRemove removeObject:self.tripMap.userLocation ] ;
+        [ self.tripMap removeAnnotations:annotationsToRemove ] ;
+        
+        MKPointAnnotation *annotationPoint = [[MKPointAnnotation alloc] init];
+        entryLoc.latitude = [self.selectedTrip.latitude doubleValue];
+        entryLoc.longitude = [self.selectedTrip.longitude doubleValue];
+
+        annotationPoint.coordinate = entryLoc;
+        annotationPoint.title = self.selectedTrip.place;
+        [self.tripMap addAnnotation:annotationPoint];
+    }
+}
+
+*/
 
 - (void)useMapApp
 {
@@ -82,64 +149,7 @@ MKRoute *route;
     self.tripMap.showsUserLocation = YES;
     //use default map app for iOS (moves away from RememberIt)
     [self useMapApp];
-    
-    /*
-    MKDirectionsRequest *request = [[MKDirectionsRequest alloc] init];
-    request.source = [MKMapItem mapItemForCurrentLocation];
-    
-    MKPlacemark *place = [[MKPlacemark alloc] initWithCoordinate:entryLoc addressDictionary:nil];
-    
-    MKMapItem *mapItem = [[MKMapItem alloc]initWithPlacemark:place];
-    
-    request.destination = mapItem;
-    request.requestsAlternateRoutes = NO;
-    
-    MKDirections *directions = [[MKDirections alloc] initWithRequest:request];
-    
-    [directions calculateDirectionsWithCompletionHandler:
-     ^(MKDirectionsResponse *response, NSError *error) {
-         if (error) {
-             // Handle error
-         } else {
-             route = response.routes.lastObject;
-             [self showRoute:response];
-         }
-     }];
-     */
 }
 
--(void)showRoute:(MKDirectionsResponse *)response
-{
-    NSMutableString *steps = [[NSMutableString alloc] init];
-    
-    //To do - calc distance and set an appropriate span
-    int regionSpan = route.distance * 1.2;
-    NSLog(@"...showRoute-regionSpan:distance:regionSpan::%f,%d",route.distance, regionSpan);
-    MKCoordinateRegion region = MKCoordinateRegionMakeWithDistance(entryLoc, regionSpan, regionSpan);
-    [self.tripMap setRegion:region animated:YES];
-    
-    for (MKRoute *route in response.routes)
-    {
-        [self.tripMap addOverlay:route.polyline level:MKOverlayLevelAboveRoads];
-        
-        for (MKRouteStep *step in route.steps)
-        {
-            NSLog(@"%@", step.instructions);
-            [steps appendString:@"->"];
-            [steps appendString:step.instructions];
-            [steps appendString:@"\n"];
-        }
-    }
-    self.directionsStep.text = steps;
-    self.directionsStep.hidden = NO;
-}
-
-- (MKOverlayRenderer *)mapView:(MKMapView *)mapView rendererForOverlay:(id < MKOverlay >)overlay
-{
-    MKPolylineRenderer *renderer = [[MKPolylineRenderer alloc] initWithOverlay:overlay];
-    renderer.strokeColor = [UIColor blueColor];
-    renderer.lineWidth = 5.0;
-    return renderer;
-}
 
 @end

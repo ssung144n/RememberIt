@@ -9,8 +9,13 @@
 #import <Foundation/Foundation.h>
 #import <CoreLocation/CoreLocation.h>
 #import <MapKit/MapKit.h>
-
-@interface MapHelper : NSObject <CLLocationManagerDelegate, MKMapViewDelegate>
+/*
+@protocol MapHelperDelegate
+@optional
+- (void)longPressEvent:(id)sender;
+@end
+*/
+@interface MapHelper : NSObject <CLLocationManagerDelegate, MKMapViewDelegate, UIGestureRecognizerDelegate>
 
 @property (strong, nonatomic) CLLocationManager *locationManager;
 @property (strong, nonatomic) CLLocation *location;
@@ -18,9 +23,16 @@
 @property (strong, nonatomic) NSString *latitude;
 @property (strong, nonatomic) NSString *longitude;
 
-@property (strong, nonatomic) MKMapItem *destination;
+//@property (strong, nonatomic) MKMapItem *destination;
+-(id)initWithMap:(MKMapView *) myMapView;
 
--(void) setLocationInfo;
--(void)placeAnnotationforMap:(MKMapView *)mapView;
+-(void)setCurrentLocationInfo;
+-(void)placeAnnotationforMap;
+
+-(BOOL)haveLocationServices;
+//-(void)setCoordinateInfo:(NSString*)latitude longitude:(NSString*)longitude;
+//-(void)addLongPressGesture;
+
+//@property (nonatomic, strong) id delegate;
 
 @end

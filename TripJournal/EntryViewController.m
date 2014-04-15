@@ -11,10 +11,16 @@
 #import "TripEntry.h"
 #import "MapHelper.h"
 #import "MapViewController.h"
+#import "DBHelper.h"
+#import "TripsTableViewController.h"
 
 #import <MobileCoreServices/MobileCoreServices.h>
+#import <AssetsLibrary/ALAsset.h>
 
 @interface EntryViewController ()
+
+#define SCROLLUP 65
+#define ROWTOSCROLL 2
 
 @end
 
@@ -23,7 +29,9 @@
 NSMutableArray *entryListItems;
 NSMutableArray *entryListItemsSwitch;
 NSString * selectedImage;
-MapHelper *myMapHelper;
+MapHelper *mapHelper;
+DBHelper *dbHelper;
+BOOL isEdit = false;
 
 - (id)initWithNibName:(NSString *)nibNameOrNil bundle:(NSBundle *)nibBundleOrNil
 {
@@ -34,21 +42,50 @@ MapHelper *myMapHelper;
     return self;
 }
 
+//may need viewWillAppear to reset the map location
 - (void)viewDidLoad
 {
     [super viewDidLoad];
     // Do any additional setup after loading the view.
     
+    dbHelper = [[DBHelper alloc] init];
     entryListItems = [[NSMutableArray alloc] init];
     entryListItemsSwitch = [[NSMutableArray alloc] init];
-    [self newEntryListItemRecord];
+    //mapHelper = [[MapHelper alloc] initWithMap:self.mapView];
+    
+    //check if editing
+    if(self.selectedTrip && self.selectedTrip.entryId)
+    {
+        isEdit = true;
+        [self setEditEntry];
+        //NSArray *entryItems = [dbHelper getListForEntryId:self.selectedTrip.entryId];
 
+        NSMutableArray *returnList = [dbHelper selectFromTbl:@"EntryListItems" colNames:[[NSArray alloc] initWithObjects:@"ListItem", @"ListItemSwitch", nil] whereCols:[[NSArray alloc] initWithObjects:@"EntryId", nil] whereColValues:[[NSArray alloc] initWithObjects:self.selectedTrip.entryId, nil]];
+        if(returnList)
+        {
+            for(int i=0;i<returnList.count;i++)
+            {
+                NSArray *listItemRow = returnList[i];
+                [entryListItems addObject:listItemRow[0]];
+                [entryListItemsSwitch addObject:listItemRow[1]];
+            }
+        }
+    }
+    else
+    {
+        isEdit = false;
+        [self newEntryListItemRecord]; //insert first list item row
+        selectedImage = @"";
+    }
+    
+    //[self setLocationMapInfo];
+    
     [self.note.layer setBorderColor: [[UIColor whiteColor] CGColor]];
     [[self.note layer] setBorderWidth:2.3];
     [[self.note layer] setCornerRadius:10];
     [self.note setClipsToBounds: YES];
     
-    //method to dismiss virtual keyboard on textview
+    //dismiss virtual keyboard on textview
     [self dismissKeyBoardRecognizer];
 
     //set listTbl for editing from start
@@ -57,16 +94,53 @@ MapHelper *myMapHelper;
     
     self.entryDate.text = [self currentDateTime];
     
-    [self validateCamera];
+    self.name.layer.borderWidth = 2.0f;
+    [[self.name layer] setCornerRadius:10];
     
-    myMapHelper = [[MapHelper alloc] init];
-    [myMapHelper setLocationInfo];
-    [myMapHelper placeAnnotationforMap:self.mapView];
+    [self validateCamera];
+}
+
+-(void)viewWillAppear:(BOOL)animated {
+    
+    [super viewWillAppear:animated];
+    
+    NSLog(@"..viewWillAppear:lat:%@, lon:%@", self.selectedTrip.latitude, self.selectedTrip.longitude);
+    mapHelper = [[MapHelper alloc] initWithMap:self.mapView];
     self.mapView.delegate = self;
-    /*
-     self.address1.enabled = false;
-     self.address2.enabled = false;
-     */
+    [self setLocationMapInfo];
+}
+
+-(void)setEditEntry
+{
+    self.navigationItem.title = @"Edit";
+    //set entry fields
+    self.name.text = self.selectedTrip.place;
+    self.note.text = self.selectedTrip.note;
+    
+    //set photo
+    [self setEntryCoverPhoto];
+}
+
+-(void)setEntryCoverPhoto
+{
+    if(self.selectedTrip.photoPath.length > 0)
+    {
+        //NSLog(@"..TripsTable..trip.photoPath:%@", trip.photoPath);
+        __block UIImage *photo = nil;
+        NSURL* aURL = [NSURL URLWithString:self.selectedTrip.photoPath];
+        selectedImage = self.selectedTrip.photoPath;
+        ALAssetsLibrary *library = [[ALAssetsLibrary alloc] init];
+        [library assetForURL:aURL resultBlock:^(ALAsset *asset)
+         {
+             photo = [UIImage imageWithCGImage:[asset thumbnail] scale:1.0 orientation:UIImageOrientationUp];
+             self.buttonPhoto.imageView.image = photo;
+         }
+         failureBlock:^(NSError *error)
+         {
+             // error handling
+             NSLog(@"...Error: Photo doesn't exist");
+         }];
+    }
 }
 
 -(void)newEntryListItemRecord
@@ -79,6 +153,24 @@ MapHelper *myMapHelper;
 {
     [super didReceiveMemoryWarning];
     // Dispose of any resources that can be recreated.
+}
+
+-(void)setLocationMapInfo
+{
+    if([mapHelper haveLocationServices])
+    {
+        if(self.selectedTrip.latitude && self.selectedTrip.longitude)
+        {
+            mapHelper.latitude = self.selectedTrip.latitude;
+            mapHelper.longitude = self.selectedTrip.longitude;
+        }
+        else
+            [mapHelper setCurrentLocationInfo];
+        
+        [mapHelper placeAnnotationforMap];
+
+        self.mapView.delegate = self; //for touch event annotation/segue - didSelectAnnotationView - implementation
+    }
 }
 
 -(void) validateCamera
@@ -135,13 +227,6 @@ MapHelper *myMapHelper;
         [self.note resignFirstResponder];
     else if([self.name isFirstResponder])
         [self.name resignFirstResponder];
-    
-    /*
-    else if([self.address1 isFirstResponder])
-        [self.address1 resignFirstResponder];
-    else if([self.address2 isFirstResponder])
-        [self.address2 resignFirstResponder];
-     */
 }
 
 - (NSString *)tableView:(UITableView *)tableView titleForHeaderInSection:(NSInteger)section
@@ -162,16 +247,12 @@ MapHelper *myMapHelper;
 
 - (NSInteger)tableView:(UITableView *)tableView numberOfRowsInSection:(NSInteger)section
 {
-    int rows = (int)[entryListItems count];
-    
-    NSLog(@"..numberOfRowsInSection:%d", rows);
-    return rows;
+    return (int)[entryListItems count];
 }
 
 - (UITableViewCell *)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath
 {
     int rowNum = (int)indexPath.row;
-    //NSLog(@"..cellForRowAtIndexPath:%d", rowNum);
     
     static NSString *CellIdentifier = @"ListCell";
     EntryViewTableCell *cell = [tableView dequeueReusableCellWithIdentifier:CellIdentifier forIndexPath:indexPath];
@@ -184,9 +265,12 @@ MapHelper *myMapHelper;
     
     cell.listItem.text = entryListItems[rowNum];
     
-    NSNumber *switchOnOff = entryListItemsSwitch[rowNum];
+    NSNumber *switchOnOff = [NSNumber numberWithInteger: [entryListItemsSwitch[rowNum] integerValue]];
     if([switchOnOff isEqualToNumber:[NSNumber numberWithBool:false]])
+    {
         cell.listItem.backgroundColor = [UIColor lightGrayColor]; //default is whitecolore
+        cell.listItemSwitch.on = false;
+    }
     
     //[cell.listItem addTarget:self action:@selector(listItemChanged:) forControlEvents:UIControlEventEditingDidEndOnExit];
     
@@ -197,6 +281,7 @@ MapHelper *myMapHelper;
 
 //http://www.codigator.com/tutorials/ios-uitableview-tutorial-custom-cell-and-delegates/
 //protocol delegate in custom tablecell for controlEvent for textField
+
 - (void)textFieldChangedCell:(id)sender {
     NSIndexPath *indexpath = [self.listTbl indexPathForCell:sender];
     int row = (int)indexpath.row;
@@ -204,10 +289,7 @@ MapHelper *myMapHelper;
     EntryViewTableCell *selectedCell = (EntryViewTableCell *)sender;
     NSString *txtValue = selectedCell.listItem.text;
     
-    NSLog(@"...textFieldChangedCell:row:%@:%d", txtValue, row);
-    
     entryListItems[row] = txtValue;
-    entryListItemsSwitch[row] = [NSNumber numberWithBool:selectedCell.listItemSwitch.on];
 }
 
 //protocol delegate in custom tablecell to move up view so keyboard doesn't block last list entry item
@@ -217,14 +299,13 @@ MapHelper *myMapHelper;
     //calculate where cursor is (y height) and size of keyboard, and adjust view frame accordingly...
     NSIndexPath *indexpath = [self.listTbl indexPathForCell:sender];
     int row = (int)indexpath.row;
-    if(row > 2)
+    if(row > ROWTOSCROLL)
     {
         CGRect frame = self.view.frame;
         int origY = frame.origin.y;
-        frame.origin.y = origY-65;
+        frame.origin.y = origY-SCROLLUP;
         
         [self.view setFrame:frame];
-        //NSLog(@"...textFIeldEditingBeginCell:origY:y - %d:%f", origY, frame.origin.y);
     }
 }
 
@@ -234,14 +315,13 @@ MapHelper *myMapHelper;
 {
     NSIndexPath *indexpath = [self.listTbl indexPathForCell:sender];
     int row = (int)indexpath.row;
-    if(row > 2)
+    if(row > ROWTOSCROLL)
     {
         CGRect frame = self.view.frame;
         int origY = frame.origin.y;
-        frame.origin.y = origY+65;
+        frame.origin.y = origY+SCROLLUP;
         
         [self.view setFrame:frame];
-        //NSLog(@"...textFIeldEditingEndCell:origY:y - %d:%f", origY, frame.origin.y);
     }
 }
 //protocol delegate
@@ -254,6 +334,8 @@ MapHelper *myMapHelper;
 
     BOOL switchOn = selectedCell.listItemSwitch.on;
     entryListItemsSwitch[row] = [NSNumber numberWithBool:switchOn];
+    
+    //NSLog(@"...switchToggleCell:row:%d:textValue:%@, switchVal:%@", row, selectedCell.listItem.text, entryListItemsSwitch[row]);
     
     if(!switchOn)
         selectedCell.listItem.backgroundColor = [UIColor lightGrayColor];
@@ -276,14 +358,10 @@ MapHelper *myMapHelper;
 }
 */
 
-/*
-- (void)tableView: (UITableView *)tableView didSelectRowAtIndexPath: (NSIndexPath *)indexPath {
-}
-*/
 
 - (UITableViewCellEditingStyle)tableView:(UITableView *)aTableView editingStyleForRowAtIndexPath:(NSIndexPath *)indexPath
 {
-    NSLog(@"..editingStyleForRowAtIndexPath:%ld", (long)indexPath.row);
+    //NSLog(@"..editingStyleForRowAtIndexPath:%ld", (long)indexPath.row);
     if (indexPath.row+1 == ([entryListItems count])) //if last row, insert style
         return UITableViewCellEditingStyleInsert;
     else
@@ -303,22 +381,18 @@ MapHelper *myMapHelper;
         [self.listTbl deleteRowsAtIndexPaths:@[indexPath] withRowAnimation:UITableViewRowAnimationAutomatic];
 
         // Delete the row from the data source
-        //
         //[tableView deleteRowsAtIndexPaths:@[indexPath] withRowAnimation:UITableViewRowAnimationFade];
     }
     else if (editingStyle == UITableViewCellEditingStyleInsert)
     {
         // Add the row from the data source
         [self newEntryListItemRecord];
-
-        NSLog(@"...commitEditingStyle-Insert:#entryListItems: %d", entryListItems.count);
               
         [self.listTbl reloadData];
         
         //scroll down to last entry
         NSIndexPath* ipath = [NSIndexPath indexPathForRow: entryListItems.count-1 inSection: 0];
         [self.listTbl scrollToRowAtIndexPath: ipath atScrollPosition: UITableViewScrollPositionBottom animated: YES];
-        
     }
 }
 
@@ -340,57 +414,8 @@ MapHelper *myMapHelper;
 }
 
 //------------- location ------------------------
-/*
-- (IBAction)locSwitchToggle:(id)sender {
-    if(self.locSwitch.on) {
-        self.address1.enabled = FALSE;
-        self.address1.text = @"Address";
-        
-        self.address2.enabled = FALSE;
-        self.address2.text = @"City, State or Zipcode";
-    }
-    
-    else {
-        self.address1.enabled = TRUE;
-        self.address2.enabled = TRUE;
 
-    }
-}
-
-- (IBAction)address1EditBegin:(id)sender {
-    
-    int yMove = 150;
-    UITextField *textfield= (UITextField*)sender;
-    if([textfield.text isEqualToString:@"Address"] || [textfield.text isEqualToString:@"City, State or Zipcode"])
-        textfield.text = @"";
-    
-    if(textfield == self.address2)
-        yMove = 170;
-    
-    CGRect frame = self.view.frame;
-    int origY = frame.origin.y;
-    frame.origin.y = origY-yMove;
-    
-    [self.view setFrame:frame];
-}
-
-
-- (IBAction)address1EditEnd:(id)sender {
-    
-    int yMove = 150;
-    UITextField *textfield= (UITextField*)sender;
-    if(textfield == self.address2)
-        yMove = 170;
-    
-    CGRect frame = self.view.frame;
-    int origY = frame.origin.y;
-    frame.origin.y = origY+yMove;
-    
-    [self.view setFrame:frame];
-    
-}
-*/
-
+//MKMapView delegate - when selecting annotation-----------------
 - (void)mapView:(MKMapView *)mapView didSelectAnnotationView:(MKAnnotationView *)view {
     [self performSegueWithIdentifier:@"ToMapFromEntry" sender:self];
 }
@@ -400,18 +425,17 @@ MapHelper *myMapHelper;
     if([segue.identifier isEqualToString:@"ToMapFromEntry"]) {
         MapViewController *vc = [segue destinationViewController];
         
-        TripEntry *entry = [[TripEntry alloc] init];
-        self.selectedTrip = entry;
+        if(!(self.selectedTrip && self.selectedTrip.entryId))
+        {
+            self.selectedTrip = [[TripEntry alloc] init];
+        }
         
-        self.selectedTrip.latitude = myMapHelper.latitude; //why null?
-        self.selectedTrip.longitude = myMapHelper.longitude;
-
-        //NSLog(@"..prepareForSegue:lat/long: %@/%@", self.selectedTrip.latitude, myMapHelper.latitude);
-        
-        self.selectedTrip.place = @"Current Loc";
+        self.selectedTrip.latitude = mapHelper.latitude;
+        self.selectedTrip.longitude = mapHelper.longitude;
         
         [vc setSelectedTrip: self.selectedTrip];
     }
+
 }
 
 //---------------- camera -----------------------
@@ -426,22 +450,12 @@ MapHelper *myMapHelper;
     
     [self presentViewController:picker animated:YES completion:NULL];
 }
-/*
- - (IBAction)selectPhotoPicked:(id)sender {
- UIImagePickerController *picker = [[UIImagePickerController alloc] init];
- picker.delegate = self;
- picker.allowsEditing = YES;
- picker.sourceType = UIImagePickerControllerSourceTypePhotoLibrary;
- 
- [self presentViewController:picker animated:YES completion:NULL];
- }
- */
 
 - (void)imagePickerController:(UIImagePickerController *)picker didFinishPickingMediaWithInfo:(NSDictionary *)info {
     
     UIImage *chosenImage = info[UIImagePickerControllerEditedImage];
     self.buttonPhoto.imageView.image = chosenImage;
-    NSLog(@"..didFinishPickingMedia...:%@", chosenImage.description);
+    //NSLog(@"..didFinishPickingMedia...:%@", chosenImage.description);
     
     NSString *mediaType = info[UIImagePickerControllerMediaType];
     if ([mediaType isEqualToString:(NSString *)kUTTypeImage]) {
@@ -451,13 +465,6 @@ MapHelper *myMapHelper;
         NSLog(@"..didFinishPickingMedia...:%@", selectedImage);
     }
     [picker dismissViewControllerAnimated:YES completion:NULL];
-    
-        //later save photo
-        /*
-         Boolean success = [dbHelper saveSelectedPhotoToDB:selectedImage tripId:self.selectedTrip.entryId];
-         selectedPhoto = selectedImage;
-         [tripPhotos addObject:selectedImage];
-         */
 }
 
 - (void)imagePickerControllerDidCancel:(UIImagePickerController *)picker {
@@ -466,17 +473,59 @@ MapHelper *myMapHelper;
     
 }
 
+-(BOOL)validateForSave
+{
+    if(!self.name.text.length)
+    {
+        UIAlertView *alert = [[UIAlertView alloc] initWithTitle:@"Name is required" message:@""
+                                                       delegate:nil cancelButtonTitle:@"OK" otherButtonTitles: nil];
+        [alert show];
+        return false;
+    }
+    else
+        return  true;
+}
+
 - (IBAction)saveButtonClick:(id)sender {
-    TripEntry *trip = [[TripEntry alloc] init];
-    trip.place = self.name.text;
-    trip.note = self.note.text;
-    trip.startDate = @"";
-    trip.endDate = @"";
-    trip.endDate = self.entryDate.text;
-    trip.photoPath = selectedImage;
     
-    NSLog(@"..saving entry:name, note, photoPath, list items count:%@:%@:%@,%d", trip.place, trip.note, trip.photoPath, entryListItems.count);
+    if(![self validateForSave])
+        return;
     
-    //need new table for entry list item and if complete or not
+    TripEntry *entry = [[TripEntry alloc] init];
+    entry.place = self.name.text;
+    entry.note = self.note.text;
+
+    entry.entryDate = self.entryDate.text;
+    entry.photoPath = selectedImage;
+    entry.latitude = mapHelper.latitude;
+    entry.longitude = mapHelper.longitude;
+    entry.entryId = self.selectedTrip.entryId;
+    
+    entry = [dbHelper saveEntry:entry];
+    
+    if(entry.entryId && entry.entryId.length)
+    {
+        if(isEdit)
+        {
+            [dbHelper deleteFromTbl:@"EntryListItems" whereCol:@"EntryId" whereValues:[[NSArray alloc] initWithObjects:entry.entryId, nil] andCol:nil andValue:nil];
+            
+            if(selectedImage.length > 0)
+            {
+                //check if photo path already in this entry
+                NSArray *returnList = [dbHelper selectFromTbl:@"EntryPhotos"  colNames:[[NSArray alloc] initWithObjects:@"PhotoPath", nil]  whereCols:[[NSArray alloc] initWithObjects:@"EntryId", @"PhotoPath", nil] whereColValues:[[NSArray alloc] initWithObjects:entry.entryId, selectedImage, nil] ];
+                NSLog(@"...returnList - checking if photo exists:%lu", (unsigned long)returnList.count);
+                if(returnList.count == 0)
+                {
+                    [dbHelper insertIntoTbl:@"EntryPhotos" colNames:[[NSArray alloc] initWithObjects:@"EntryId", @"PhotoPath", nil] colValues:[[NSArray alloc] initWithObjects:entry.entryId, selectedImage, nil]];
+                }
+            }
+        }
+        else if(!isEdit && selectedImage.length > 0) //set photoCover
+            [dbHelper insertIntoTbl:@"EntryPhotos" colNames:[[NSArray alloc] initWithObjects:@"EntryId", @"PhotoPath", nil] colValues:[[NSArray alloc] initWithObjects:entry.entryId, selectedImage, nil]];
+        
+        [dbHelper saveEntryListItems:entry.entryId listItems:entryListItems listItemsSwitch:entryListItemsSwitch];
+    }
+    else
+        NSLog(@"..saveEntry returned with empty entryId");
 }
 @end

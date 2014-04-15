@@ -10,7 +10,7 @@
 #import "TripsTableViewController.h"
 #import "MapViewController.h"
 #import "ShowPhotoViewController.h"
-#import "TripViewController.h"
+#import "EntryViewController.h"
 
 #import "DBHelper.h"
 
@@ -21,9 +21,6 @@
     NSString *selectedPhoto;
     
     DBHelper *dbHelper;
-    
-    NSString *alertSetCoverPhotoTitle;
-    NSString *alertConfirmDelete;
 }
 @end
 
@@ -44,15 +41,24 @@
 	// Do any additionl setup after loading the view.
     
     dbHelper = [[DBHelper alloc] init];
-    tripPhotos = [dbHelper loadTripPhotos:self.selectedTrip.entryId];
+    //tripPhotos = [dbHelper loadTripPhotos:self.selectedTrip.entryId];
     
-    //self.tripName.text = self.selectedTrip.place;
+    NSArray *returnList = [dbHelper selectFromTbl:@"EntryPhotos" colNames:[[NSArray alloc] initWithObjects:@"PhotoPath", nil]  whereCols:[[NSArray alloc] initWithObjects:@"EntryId", nil] whereColValues:[[NSArray alloc] initWithObjects:self.selectedTrip.entryId, nil] ];
+    
+    if(returnList)
+    {
+       // NSLog(@"...returnList from selectFromTbl: %lu", (unsigned long)returnList.count);
+        tripPhotos = [[NSMutableArray alloc] init];
+        
+        for(int i=0;i<returnList.count;i++)
+        {
+            NSArray *returnRow = returnList[i];
+            //NSLog(@"..photo:%@ - rowCount:%lu", returnRow[0], (unsigned long)returnRow.count);
+            [tripPhotos addObject:returnRow [0]];
+        }
+    }
+    
     self.title = self.selectedTrip.place;
-    
-    //add note properties
-    self.note.text = self.selectedTrip.note;
-    [self.note setEditable:NO];
-    //---
 
     photosToDelete = [NSMutableArray array];
     
@@ -163,21 +169,15 @@
         MapViewController *vc = [segue destinationViewController];
         [vc setSelectedTrip: self.selectedTrip];
     }
-    /*
-    else if([segue.identifier isEqualToString:@"BackToMyTrips"]) {
-        TripsTableViewController *vc = [segue destinationViewController];
-        [vc setTripId: self.selectedTrip.tripId];
-    }
-    */
     else if([segue.identifier isEqualToString:@"ShowPhoto"]) {
         ShowPhotoViewController *vc = [segue destinationViewController];
+        
+        [vc setSelectedTrip: self.selectedTrip];
         [vc setPhotoPath:selectedPhoto];
-        vc.entryId = self.selectedTrip.entryId;
-        //NSLog(@"...prepareForSegue-ShowPhoto:%@", selectedPhoto);
     }
     else if([segue.identifier isEqualToString:@"ToEdit"]) {
-        TripViewController *vc = [segue destinationViewController];
-        NSLog(@"..ToEdit segue-tripId:%@", self.selectedTrip.entryId);
+        EntryViewController *vc = [segue destinationViewController];
+        //NSLog(@"..ToEditEntry segue-tripId:%@", self.selectedTrip.place);
         [vc setSelectedTrip:self.selectedTrip];
     }
 }
@@ -186,16 +186,11 @@
 //when user confirms delete on trip, then delete and remove current controller
 - (void)alertView:(UIAlertView *)alertView clickedButtonAtIndex:(NSInteger)buttonIndex
 {
-    //if(alertView.title  buttonIndex==0)
-    if(buttonIndex == 0 && [alertView.title isEqualToString:alertSetCoverPhotoTitle])
+    //if(buttonIndex == 0 && [alertView.title isEqualToString:alertSetCoverPhotoTitle])
+    if(buttonIndex == 0) //confirm yes on alertView
     {
-        [dbHelper setPhotoCover:selectedPhoto entryId:self.selectedTrip.entryId];
-    }
-    else if(buttonIndex == 0 && [alertView.title isEqualToString:alertConfirmDelete])
-    {
-        Boolean success = [dbHelper deleteTrip:self.selectedTrip.entryId];
-        if(success)
-            [self.navigationController popViewControllerAnimated:YES];
+        [dbHelper updateTbl:@"Entry" colNames:[[NSArray alloc] initWithObjects:@"PhotoPath", nil]  colValues:[[NSArray alloc] initWithObjects:selectedPhoto, nil]  whereCol:@"Id" whereValue:self.selectedTrip.entryId];
+        self.selectedTrip.photoPath = selectedPhoto;
     }
 }
 
@@ -214,25 +209,41 @@
         //UIColor * color = [UIColor colorWithRed:255/255.0f green:74/255.0f blue:5/255.0f alpha:1.0f];
         //imagePicker.navigationBar.barTintColor = color;
         
-        [self presentViewController:imagePicker
-                           animated:YES completion:nil];
+        [self presentViewController:imagePicker animated:YES completion:nil];
     }
 }
-
+/*
 - (IBAction)deleteEntry:(id)sender {
     alertConfirmDelete = [NSString stringWithFormat:@"Confirm delete: %@", self.selectedTrip.place];
     UIAlertView *updateAlert = [[UIAlertView alloc] initWithTitle:alertConfirmDelete message:@"" delegate: self cancelButtonTitle: @"YES"  otherButtonTitles:@"NO",nil];
     
     [updateAlert show];
 }
+*/
 
+//since added segues from IB, is button action event even necessary?
 - (IBAction)showMap:(id)sender {
     [self performSegueWithIdentifier:@"ToMap" sender:self];
 }
 
 - (IBAction)deletePhotos:(id)sender {
-    tripPhotos = [dbHelper deletePhotos:photosToDelete tripId:self.selectedTrip.entryId tripPhotos:tripPhotos];
-    [self.photoCollectionView reloadData];
+    //tripPhotos = [dbHelper deletePhotos:photosToDelete tripId:self.selectedTrip.entryId tripPhotos:tripPhotos];
+    BOOL success = [dbHelper deleteFromTbl:@"EntryPhotos" whereCol:@"PhotoPath" whereValues:photosToDelete andCol:@"EntryId" andValue:self.selectedTrip.entryId];
+    
+    if(success)
+    {
+        if([photosToDelete containsObject:selectedPhoto])
+        {
+            [dbHelper updateTbl:@"Entry" colNames:[[NSArray alloc] initWithObjects:@"PhotoPath", nil] colValues:[[NSArray alloc] initWithObjects:@"", nil] whereCol:@"Id" whereValue:self.selectedTrip.entryId];
+            self.selectedTrip.photoPath = @"";
+        }
+        for (int i = 0; i<photosToDelete.count; i++)
+        {
+            [tripPhotos removeObject:photosToDelete[i]];
+        }
+        
+        [self.photoCollectionView reloadData];
+    }
 }
 
 - (IBAction)editEntry:(id)sender {
@@ -241,8 +252,7 @@
 
 #pragma mark UIImagePickerControllerDelegate
 
--(void)imagePickerController:(UIImagePickerController *)picker
-didFinishPickingMediaWithInfo:(NSDictionary *)info
+-(void)imagePickerController:(UIImagePickerController *)picker didFinishPickingMediaWithInfo:(NSDictionary *)info
 {
     NSString *mediaType = info[UIImagePickerControllerMediaType];
     
@@ -251,15 +261,17 @@ didFinishPickingMediaWithInfo:(NSDictionary *)info
     if ([mediaType isEqualToString:(NSString *)kUTTypeImage]) {
         NSURL *imageUrl = info[UIImagePickerControllerReferenceURL];
 
-        NSString *selectedImage = [imageUrl absoluteString];
+        selectedPhoto = [imageUrl absoluteString];
         
-        Boolean success = [dbHelper saveSelectedPhotoToDB:selectedImage tripId:self.selectedTrip.entryId];
-        if(success)
+        //Boolean success = [dbHelper saveSelectedPhotoToDB:selectedImage tripId:self.selectedTrip.entryId];
+        NSString *insertRowId = [dbHelper insertIntoTbl:@"EntryPhotos" colNames:[[NSArray alloc] initWithObjects:@"EntryId", @"PhotoPath", nil] colValues:[[NSArray alloc] initWithObjects:self.selectedTrip.entryId, selectedPhoto, nil]];
+        
+        NSLog(@"..didFinishPicking...insertRowId:%@", insertRowId);
+        if(insertRowId)
         {
             [self confirmCoverPhoto];
             
-            selectedPhoto = selectedImage;
-            [tripPhotos addObject:selectedImage];
+            [tripPhotos addObject:selectedPhoto];
             [self. photoCollectionView reloadData];
         }
     }
@@ -267,7 +279,7 @@ didFinishPickingMediaWithInfo:(NSDictionary *)info
 
 -(void)confirmCoverPhoto
 {
-    alertSetCoverPhotoTitle = [NSString stringWithFormat:@"Set As Cover Photo?"];
+    NSString *alertSetCoverPhotoTitle = [NSString stringWithFormat:@"Set As Cover Photo?"];
     UIAlertView *updateAlert = [[UIAlertView alloc] initWithTitle:alertSetCoverPhotoTitle message:@"" delegate: self cancelButtonTitle: @"YES"  otherButtonTitles:@"NO",nil];
     
     [updateAlert show];

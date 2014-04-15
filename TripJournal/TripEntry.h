@@ -22,5 +22,8 @@
 
 @property (nonatomic,strong) NSString *entryId;
 
+//construtor
+-(id)initWithValues:(NSArray *) entryValues;
+
 @end
 

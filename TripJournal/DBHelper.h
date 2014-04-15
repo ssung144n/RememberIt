@@ -12,20 +12,19 @@
 
 @interface DBHelper : NSObject
 
-//properties for TripViewController - Add Trip
--(TripEntry *)saveData:(TripEntry *) entry;
--(TripEntry *)editData:(TripEntry *) entry;
+
+-(TripEntry *)saveEntry:(TripEntry *) entry;
 
 -(void) createDB;
 
-//properties for TripsTableViewController - My Trips
--(NSMutableArray *)selectAllFromDB;
+-(BOOL)saveEntryListItems:(NSString *)entryId listItems:(NSArray *)listItems listItemsSwitch:(NSArray *)listItemSwitch;
 
-//properties for PhotosTripViewController
--(NSMutableArray *)loadTripPhotos:(NSString *) tripId;
--(BOOL) deleteTrip:(NSString *) tripId;
-- (NSMutableArray *)deletePhotos:(NSMutableArray *) photosToDelete tripId:(NSString *)tripId tripPhotos:(NSMutableArray *) tripPhotos;
--(BOOL)saveSelectedPhotoToDB:(NSString *)imagePath tripId:(NSString *)tripId;
--(BOOL)setPhotoCover:(NSString *)photoPath entryId:(NSString *)entryId;
+-(NSString *) insertIntoTbl:(NSString *)tblName colNames:(NSArray *)colNames colValues:(NSArray *)colValues;
+
+-(BOOL) deleteFromTbl:(NSString *)tblName whereCol:(NSString *)whereCol whereValues:(NSArray *)whereValues andCol:(NSString *)andCol andValue:(NSString *)andValue;
+
+-(NSMutableArray *) selectFromTbl:(NSString *)tblName colNames:(NSArray *)colNames whereCols:(NSArray *)whereCols whereColValues:(NSArray *)whereColValues;
+
+-(BOOL)updateTbl:(NSString *)tblName colNames:(NSArray *)colNames colValues:(NSArray *)colValues whereCol:(NSString *)whereCol whereValue:(NSString *)whereValue;
 
 @end

@@ -9,7 +9,7 @@
 #import "TripsTableViewController.h"
 #import "TripEntry.h"
 #import "PhotosTripViewController.h"
-#import "TripViewController.h"
+#import "EntryViewController.h"
 #import "DBHelper.h"
 
 #import <AssetsLibrary/ALAsset.h>
@@ -33,22 +33,33 @@
     return self;
 }
 
--(void)viewWillAppear:(BOOL)animated {
-    
-    //[super viewWillAppear:animated];
-    
-    tripsTable = dbHelper.selectAllFromDB;
-    
-    [self.tableView reloadData];
-}
-
 - (void)viewDidLoad
 {
     [super viewDidLoad];
     
     dbHelper = [[DBHelper alloc] init];
-    tripsTable = dbHelper.selectAllFromDB;
+    
+    NSArray *returnList= [dbHelper selectFromTbl:@"Entry" colNames:[[NSArray alloc] initWithObjects:@"Id", @"Place", @"Note", @"StartDate", @"EndDate", @"Latitude", @"Longitude", @"Address", @"PhotoPath", @"EntryDate", nil] whereCols:nil whereColValues:nil];
+    
+    tripsTable = [[NSMutableArray alloc] initWithCapacity:returnList.count];
+    for(int i=0;i<returnList.count;i++)
+    {
+        NSArray *returnRow = returnList[i];
+        //NSLog(@"..entryRow id:%@, place:%@", returnRow[0], returnRow[1] );
+        //TripEntry *entry = [TripEntry returnEntry:returnRow];
+        TripEntry *entry = [[TripEntry alloc] initWithValues:returnRow];
+        if(entry)
+        {
+            [tripsTable addObject:entry];
+            //NSLog(@"..entry id:%@, place:%@", entry.entryId, entry.place);
+        }
+        else
+            NSLog(@"..entry is nil");
+        
+        entry = nil;
 
+    }
+    
     // Uncomment the following line to preserve selection between presentations.
     // self.clearsSelectionOnViewWillAppear = NO;
  
@@ -88,13 +99,10 @@
     TripEntry * trip = [tripsTable objectAtIndex:rowCount];
     cell.textLabel.text = trip.place;
     NSString *tripDates;
-    
-    tripDates = [NSString stringWithFormat:@"%@%@%@", trip.startDate, @"-", trip.endDate];
+    tripDates = [NSString stringWithFormat:@"%@", trip.entryDate];
     cell.detailTextLabel.text = tripDates;
     if(trip.photoPath.length > 0)
     {
-        //NSLog(@"..TripsTable..trip.photoPath:%@", trip.photoPath);
-        
         __block UIImage *photo = nil;
         NSURL* aURL = [NSURL URLWithString:trip.photoPath];
         ALAssetsLibrary *library = [[ALAssetsLibrary alloc] init];
@@ -118,8 +126,6 @@
 {
     selectedTrip = tripsTable[indexPath.row];
     
-    //NSLog(@"...didSelectRowAtIndex -  %@:%@:%@:%@", selectedTrip.tripId, selectedTrip.place, selectedTrip.latitude, selectedTrip.longitude);
-    
     [self performSegueWithIdentifier:@"tripsToPhotos" sender:self];
 }
 
@@ -127,17 +133,15 @@
     //this tells us where we are going
     if ([segue.identifier isEqualToString:@"tripsToPhotos"]) {
         PhotosTripViewController *vc = [segue destinationViewController];
-        
-        //this will tell the information controller what trip we have selected
         [vc setSelectedTrip:selectedTrip];
-        
-        //NSLog(@"..tripsToPhotos:TripsTableViewController - tripId:place: %@:%@", selectedTrip.tripId, selectedTrip.place);
     }
-    else if ([segue.identifier isEqualToString:@"ToAddTrip"])
-    {
-        //TripViewController *vc = [segue destinationViewController];
-        //NSLog(@"..ToAddTrip:TripsTableViewController");
+    //net setting selected trip = so will be nil
+    /*
+    else if ([segue.identifier isEqualToString:@"ToEntry"]) {
+        EntryViewController *vc = [segue destinationViewController];
+        [vc setSelectedTrip:nil];
     }
+     */
 }
 
 
@@ -147,13 +151,23 @@
     if (editingStyle == UITableViewCellEditingStyleDelete)
     {
         selectedTrip = tripsTable[indexPath.row];
-        BOOL success = [dbHelper deleteTrip:selectedTrip.entryId];
+        BOOL success = [dbHelper deleteFromTbl:@"EntryPhotos" whereCol:@"EntryId" whereValues:[[NSArray alloc] initWithObjects:selectedTrip.entryId, nil] andCol:nil andValue:nil];
+        
+        //BOOL success = [dbHelper deleteFromTbl:selectedTrip.entryId colName:@"EntryId" tblName:@"EntryPhotos"];
+        if(success)
+            success = [dbHelper deleteFromTbl:@"EntryListItems" whereCol:@"EntryId" whereValues:[[NSArray alloc] initWithObjects:selectedTrip.entryId, nil] andCol:nil andValue:nil];
+            //success = [dbHelper deleteFromTbl:selectedTrip.entryId colName:@"EntryId" tblName:@"EntryListItems"];
+        if(success)
+            success = [dbHelper deleteFromTbl:@"Entry" whereCol:@"Id" whereValues:[[NSArray alloc] initWithObjects:selectedTrip.entryId, nil] andCol:nil andValue:nil];
+            //success = [dbHelper deleteFromTbl:selectedTrip.entryId colName:@"Id" tblName:@"Entry"];
+        
         if(success)
         {
             [tripsTable removeObjectAtIndex:indexPath.row];
             // Delete the row from the data source
             [tableView deleteRowsAtIndexPaths:@[indexPath] withRowAnimation:UITableViewRowAnimationAutomatic];
         }
+        
     }
 }
 

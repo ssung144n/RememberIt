@@ -10,10 +10,13 @@
 #import <MobileCoreServices/MobileCoreServices.h>
 #import <AssetsLibrary/AssetsLibrary.h>
 
+#import "TripEntry.h"
+
 @interface ShowPhotoViewController : UIViewController
 
 @property (weak, nonatomic) NSString *photoPath;
-@property (weak, nonatomic) NSString *entryId;
+//@property (weak, nonatomic) NSString *entryId;
+@property (strong, nonatomic) TripEntry *selectedTrip;
 
 @property (weak, nonatomic) IBOutlet UIImageView *photoImageView;
 

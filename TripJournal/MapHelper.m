@@ -10,8 +10,47 @@
 
 @implementation MapHelper
 
-//Set CoreLocation info and set this class as the delegate to receive the updates
--(void)setLocationInfo
+#define RANGE 5000
+CLLocationCoordinate2D entryLoc;
+MKMapView *mapView;
+
+-(id)initWithMap:(MKMapView *) myMapView
+{
+    if (self = [super init])
+    {
+		mapView = myMapView;
+    }
+    return self;
+}
+
+/*
+-(void)addLongPressGesture
+{
+    UILongPressGestureRecognizer *lpgr = [[UILongPressGestureRecognizer alloc]
+                                          initWithTarget:self action:@selector(handleLongPress:)];
+    lpgr.minimumPressDuration = 1.5;
+    [mapView addGestureRecognizer:lpgr];
+    
+    //[self.delegate longPressEvent:self]; //To Be Implemented To Return Updated Lat/Long
+}
+
+- (void)handleLongPress:(UIGestureRecognizer *)gestureRecognizer
+{
+    if (gestureRecognizer.state != UIGestureRecognizerStateBegan)
+        return;
+    
+    CGPoint touchPoint = [gestureRecognizer locationInView:mapView];
+    entryLoc = [mapView convertPoint:touchPoint toCoordinateFromView:mapView];
+    
+    self.latitude = [NSString stringWithFormat:@"%f", entryLoc.latitude];
+    self.longitude = [NSString stringWithFormat:@"%f", entryLoc.longitude];
+    
+    [self addAnnotationToMap];
+}
+*/
+
+//Set Location info and set this class as the delegate to receive the updates
+-(void)setCurrentLocationInfo
 {
     //check for location service
     if(![self haveLocationServices])
@@ -24,12 +63,10 @@
     self.locationManager.delegate = self;
     self.location = [[CLLocation alloc] init];
     
-    //get location
+    //get current location
     self.location = self.locationManager.location;
     self.latitude = [NSString stringWithFormat:@"%f", self.location.coordinate.latitude];
     self.longitude = [NSString stringWithFormat:@"%f", self.location.coordinate.longitude];
-    
-    NSLog(@"...setlocation:lat:lat - %@:%@", self.latitude, self.longitude);
 }
 
 -(BOOL)haveLocationServices
@@ -47,22 +84,36 @@
     return locationAllowed;
 }
 
--(void)placeAnnotationforMap:(MKMapView *)mapView
+-(void)addAnnotationToMap
 {
+    NSMutableArray * annotationsToRemove = [ mapView.annotations mutableCopy ] ;
+    [ annotationsToRemove removeObject:mapView.userLocation ] ;
+    [ mapView removeAnnotations:annotationsToRemove ] ;
     
-    CLLocationCoordinate2D entryLoc;
-    //set saved location
+    //NSLog(@"..MapHelper:addAnnotationToMap: lat:%f, long:%f", entryLoc.latitude, entryLoc.longitude);
+    MKPointAnnotation *annotationPoint = [[MKPointAnnotation alloc] init];
+    annotationPoint.coordinate = entryLoc;
+    [mapView addAnnotation:annotationPoint];
+}
+
+-(void)placeAnnotationforMap
+{
     entryLoc.latitude = [self.latitude doubleValue];
     entryLoc.longitude = [self.longitude doubleValue];
     
-    MKCoordinateRegion region = MKCoordinateRegionMakeWithDistance(entryLoc, 5000, 5000);
-    
+    //NSLog(@"..MapHelper:placeAnnotationForMap: lat:%f, long:%f", entryLoc.latitude, entryLoc.longitude);
+    MKCoordinateRegion region = MKCoordinateRegionMakeWithDistance(entryLoc, RANGE, RANGE);
     [mapView setRegion:region animated:YES];
     
+    //[self addAnnotationToMap];
+    
+    //remove any previous map annotation except current location before placing new pin
+    NSMutableArray * annotationsToRemove = [ mapView.annotations mutableCopy ] ;
+    [ annotationsToRemove removeObject:mapView.userLocation ] ;
+    [ mapView removeAnnotations:annotationsToRemove ] ;
     // Add an annotation
     MKPointAnnotation *annotationPoint = [[MKPointAnnotation alloc] init];
     annotationPoint.coordinate = entryLoc;
-    annotationPoint.title = @"Current Loc";
     [mapView addAnnotation:annotationPoint];
 }
 

@@ -25,23 +25,10 @@
 
 @property (strong, nonatomic) TripEntry *selectedTrip;
 
-/*
-@property (weak, nonatomic) IBOutlet UITextField *address1;
-@property (weak, nonatomic) IBOutlet UITextField *address2;
-@property (weak, nonatomic) IBOutlet UIView *currentLocView;
-@property (weak, nonatomic) IBOutlet UISwitch *locSwitch;
-*/
-
 @property (weak, nonatomic) IBOutlet UIButton *buttonPhoto;
 @property (weak, nonatomic) IBOutlet MKMapView *mapView;
 
 - (IBAction)removeKB:(id)sender;
-
-/*
-- (IBAction)locSwitchToggle:(id)sender;
-- (IBAction)address1EditBegin:(id)sender;
-- (IBAction)address1EditEnd:(id)sender;
- */
 
 - (IBAction)buttonPhotoPick:(id)sender;
 

@@ -16,97 +16,6 @@ NSString *stmtSQL;
 const char *stmt;
 sqlite3_stmt *statement;
 
--(NSMutableArray *)getListForEntryId:(NSString *) entryId selectStm:(NSString *)selectStm
-{
-    NSMutableArray *entryItemList = [[NSMutableArray alloc] init];
-    const char *dbpath = [self dbPath];
-    NSString *databasePath = [self databasePath];
-    
-    @try{
-        NSFileManager *filemgr = [NSFileManager defaultManager];
-        if ([filemgr fileExistsAtPath:databasePath])
-        {
-            if (sqlite3_open(dbpath, &rememberItDB) == SQLITE_OK)
-            {
-                NSString *querySQL = [NSString stringWithFormat:
-                                      selectStm, entryId];
-                
-                const char *query_stmt = [querySQL UTF8String];
-                
-                if (sqlite3_prepare_v2(rememberItDB, query_stmt, -1, &statement, NULL) == SQLITE_OK)
-                {
-                    while (sqlite3_step(statement) == SQLITE_ROW)
-                    {
-                        NSString *entryInfo = [[NSString alloc]
-                                               initWithUTF8String:
-                                               (const char *) sqlite3_column_text(
-                                                                                  statement, 0)];
-                        
-                        [entryItemList addObject:entryInfo];
-                        
-                    }
-                    //NSLog(@"..db loadTriphotos - tripPhotos.count:%lu", (unsigned long)tripPhotos.count);
-                    sqlite3_finalize(statement);
-                }
-            }
-        }//db exists
-    }
-    @catch (NSException * ex) {
-        NSLog(@"Exception:%@", selectStm);
-    }
-    @finally {
-        sqlite3_close(rememberItDB);
-    }
-    
-    return entryItemList;
-}
-
--(NSMutableArray *)loadTripPhotos:(NSString *) entryId
-{
-    //select photos from tripId
-    NSMutableArray *tripPhotos = [[NSMutableArray alloc] init];
-    const char *dbpath = [self dbPath];
-    NSString *databasePath = [self databasePath];
-    
-    @try{
-        NSFileManager *filemgr = [NSFileManager defaultManager];
-        if ([filemgr fileExistsAtPath:databasePath])
-        {
-            if (sqlite3_open(dbpath, &rememberItDB) == SQLITE_OK)
-            {
-                NSString *querySQL = [NSString stringWithFormat:
-                                      @"SELECT PhotoPath FROM EntryPhotos WHERE EntryId=\"%@\"",
-                                      entryId];
-                
-                const char *query_stmt = [querySQL UTF8String];
-                
-                if (sqlite3_prepare_v2(rememberItDB, query_stmt, -1, &statement, NULL) == SQLITE_OK)
-                {
-                    while (sqlite3_step(statement) == SQLITE_ROW)
-                    {
-                        NSString *imagePath = [[NSString alloc]
-                                               initWithUTF8String:
-                                               (const char *) sqlite3_column_text(
-                                                                                  statement, 0)];
-                        
-                        [tripPhotos addObject:imagePath];
-                        
-                    }
-                    //NSLog(@"..db loadTriphotos - tripPhotos.count:%lu", (unsigned long)tripPhotos.count);
-                    sqlite3_finalize(statement);
-                }
-            }
-        }//db exists
-    }
-    @catch (NSException * ex) {
-        NSLog(@"Exception: Select from TripPhotos");
-    }
-    @finally {
-        sqlite3_close(rememberItDB);
-    }
-    
-    return tripPhotos;
-}
 
 -(void)createDB
 {
@@ -159,46 +68,59 @@ sqlite3_stmt *statement;
     }
 }
 
--(TripEntry *)saveData:(TripEntry *) entry
+
+-(TripEntry *)saveEntry:(TripEntry *) entry
 {
     const char *dbpath = [self dbPath];
+    
+    if(entry.entryId && entry.entryId.length)
+    {
+        stmtSQL = [NSString stringWithFormat:
+                               @"Update Entry Set Place = \"%@\", Note = \"%@\", StartDate = \"%@\", EndDate = \"%@\", Latitude = \"%@\", Longitude = \"%@\", Address = \"%@\", PhotoPath = \"%@\" Where Id = %d", entry.place, entry.note, entry.startDate, entry.endDate, entry.latitude, entry.longitude, entry.address, entry.photoPath, [entry.entryId intValue]];
+    
+    
+    }
+    else
+    {
+        stmtSQL = [NSString stringWithFormat:
+                   @"INSERT INTO Entry (Place, Note, StartDate, EndDate, Latitude, Longitude, Address, PhotoPath, EntryDate) VALUES (\"%@\", \"%@\", \"%@\",\"%@\", \"%@\",\"%@\", \"%@\", \"%@\",\"%@\")",
+                   entry.place, entry.note, entry.startDate, entry.endDate, entry.latitude, entry.longitude, entry.address, entry.photoPath, entry.entryDate];
+    }
+    
     @try
     {
         if (sqlite3_open(dbpath, &rememberItDB) == SQLITE_OK)
         {
-            NSString *insertSQL = [NSString stringWithFormat:
-                                   @"INSERT INTO Entry (Place, Note, StartDate, EndDate, Latitude, Longitude, Address, PhotoPath, EntryDate) VALUES (\"%@\", \"%@\", \"%@\",\"%@\", \"%@\",\"%@\", \"%@\", \"%@\",\"%@\")",
-                                   entry.place, entry.note, entry.startDate, entry.endDate, entry.latitude, entry.longitude, entry.address, entry.photoPath, entry.entryDate];
-            
-            
-            const char *insert_stmt = [insertSQL UTF8String];
-            sqlite3_prepare_v2(rememberItDB, insert_stmt, -1, &statement, NULL);
+            NSLog(@"..saveData:%@", stmtSQL);
+
+            const char *sql_stmt = [stmtSQL UTF8String];
+            sqlite3_prepare_v2(rememberItDB, sql_stmt, -1, &statement, NULL);
             int resultCode = sqlite3_step(statement);
             NSLog(@"...resultCode for saveData:%d", resultCode);
             if (resultCode == SQLITE_DONE)
             {
-                UIAlertView *alert = [[UIAlertView alloc] initWithTitle:@"Added Entry" message:@""
+                UIAlertView *alert = [[UIAlertView alloc] initWithTitle:@"Saved Entry" message:@""
                                                                delegate:nil cancelButtonTitle:@"OK" otherButtonTitles: nil];
                 [alert show];
                 
             }
             else
             {
-                NSLog(@"...bad resultCode-SQLstmt:%s", insert_stmt);
-                UIAlertView *alert = [[UIAlertView alloc] initWithTitle:@"Unabled To Add" message:@""
+                NSLog(@"...bad resultCode-SQLstmt:%s", sql_stmt);
+                UIAlertView *alert = [[UIAlertView alloc] initWithTitle:@"Unabled To Save" message:@""
                                                                delegate:nil cancelButtonTitle:@"OK" otherButtonTitles: nil];
                 [alert show];
             }
             
             //tripEntry.tripId = [NSNumber numberWithLongLong:sqlite3_last_insert_rowid(tripDB)];
-            entry.entryId = [NSString stringWithFormat:@"%lld", sqlite3_last_insert_rowid(rememberItDB)];
+            if(!(entry.entryId && entry.entryId.length))
+                entry.entryId = [NSString stringWithFormat:@"%lld", sqlite3_last_insert_rowid(rememberItDB)];
             
-            //NSLog(@"... DBHelper:saveData-%@:%@:%@", tripEntry.place, tripEntry.latitude, tripEntry.longitude);
             sqlite3_finalize(statement);
         }
     }
     @catch (NSException * ex) {
-        NSLog(@"Exception: saveData:%@", ex.description);
+        NSLog(@"Exception: saveEntry:%@", ex.description);
     }
     @finally {
         sqlite3_close(rememberItDB);
@@ -206,204 +128,211 @@ sqlite3_stmt *statement;
     return entry;
 }
 
--(TripEntry *)editData:(TripEntry *) entry
+
+//generic insert into table
+-(NSString *) insertIntoTbl:(NSString *)tblName colNames:(NSArray *)colNames colValues:(NSArray *)colValues
 {
+    NSString *insertRowId;
+    
     const char *dbpath = [self dbPath];
-    @try
+    
+    NSMutableString *myStmt = [NSMutableString stringWithFormat:@"Insert Into %@ (", tblName];
+    
+    for(int i=0;i<colNames.count;i++)
     {
-        if (sqlite3_open(dbpath, &rememberItDB) == SQLITE_OK)
-        {
-            NSString *updateSQL = [NSString stringWithFormat:
-                                   @"Update Entry Set Place = \"%@\", Note = \"%@\", StartDate = \"%@\", EndDate = \"%@\", Latitude = \"%@\", Longitude = \"%@\", Address = \"%@\" Where Id = %d", entry.place, entry.note, entry.startDate, entry.endDate, entry.latitude, entry.longitude, entry.address, [entry.entryId intValue]];
-            
-            const char *update_stmt = [updateSQL UTF8String];
-            sqlite3_prepare_v2(rememberItDB, update_stmt, -1, &statement, NULL);
-            int resultCode = sqlite3_step(statement);
-            NSLog(@"...resultCode for edit entry:%d - stmt:%s", resultCode, update_stmt);
-            if (resultCode == SQLITE_DONE)
-            {
-                UIAlertView *alert = [[UIAlertView alloc] initWithTitle:@"Updated Entry" message:@""
-                                                               delegate:nil cancelButtonTitle:@"OK" otherButtonTitles: nil];
-                [alert show];
-                
-            }
-            else
-            {
-                UIAlertView *alert = [[UIAlertView alloc] initWithTitle:@"Unable To Update Entry" message:@""
-                                                               delegate:nil cancelButtonTitle:@"OK" otherButtonTitles: nil];
-                [alert show];
-            }
-
-            sqlite3_finalize(statement);
-        }
+        if(i+1 == colNames.count)
+            [myStmt appendString: [NSString stringWithFormat:@"%@)", colNames[i]] ];
+        else
+            [myStmt appendString: [NSString stringWithFormat:@"%@ , ", colNames[i]] ];
     }
-    @catch (NSException * ex) {
-        NSLog(@"Exception: editData:%@", ex.description);
-    }
-    @finally {
-        sqlite3_close(rememberItDB);
-    }
-    return entry;
-}
-
--(NSMutableArray *)selectAllFromDB
-{
-    NSMutableArray *tripsTable = [[NSMutableArray alloc] initWithCapacity:10];
     
-    const char *dbpath = [self dbPath];
-    NSString *databasePath = [self databasePath];
+    [myStmt appendString: [NSString stringWithFormat:@" Values ("] ];
     
-    @try{
-        NSFileManager *filemgr = [NSFileManager defaultManager];
-        if ([filemgr fileExistsAtPath: databasePath])
-        {
-            if (sqlite3_open(dbpath, &rememberItDB) == SQLITE_OK)
-            {
-                NSString *querySQL = [NSString stringWithFormat: @"SELECT * FROM Entry"];
-                const char *query_stmt = [querySQL UTF8String];
-                
-                if (sqlite3_prepare_v2(rememberItDB,
-                                       query_stmt, -1, &statement, NULL) == SQLITE_OK)
-                {
-                    TripEntry* entry;
-                    while (sqlite3_step(statement) == SQLITE_ROW)
-                    {
-                        entry = [[TripEntry alloc] init];
-                        //trip.tripId = [NSString stringWithFormat:@"%f", sqlite3_column_double(statement, 0)];
-                        NSNumber *EntryID = [[NSNumber alloc] initWithLongLong:sqlite3_column_double(statement, 0)];
-                        entry.entryId = [EntryID stringValue];
-                        
-                        entry.place = [NSString stringWithUTF8String:(char *) sqlite3_column_text (statement, 1)];
-                        entry.note = [NSString stringWithUTF8String:(char *) sqlite3_column_text (statement, 2)];
-                        entry.startDate = [NSString stringWithUTF8String:(char *) sqlite3_column_text (statement, 3)];
-                        entry.endDate = [NSString stringWithUTF8String:(char *) sqlite3_column_text (statement, 4)];
-                        entry.latitude = [NSString stringWithUTF8String:(char *) sqlite3_column_text (statement, 5)];
-                        entry.longitude
-                        = [NSString stringWithUTF8String:(char *) sqlite3_column_text (statement, 6)];
-                        
-                        entry.address
-                        = [NSString stringWithUTF8String:(char *) sqlite3_column_text (statement, 7)];
-                        
-                        entry.photoPath
-                        = [NSString stringWithUTF8String:(char *) sqlite3_column_text (statement, 8)];
-                        
-                        entry.entryDate
-                        = [NSString stringWithUTF8String:(char *) sqlite3_column_text (statement, 9)];
-                        
-                        [tripsTable addObject:entry];
-                        entry = nil;
-                    } 
-                    sqlite3_finalize(statement);
-                }
-            }
-        }
+    for(int i=0;i<colValues.count;i++)
+    {
+        if(i+1 == colValues.count)
+            [myStmt appendString: [NSString stringWithFormat:@"\"%@\")", colValues[i] ]];
+        else
+            [myStmt appendString: [NSString stringWithFormat:@"\"%@\", ", colValues[i] ]];
     }
-    @catch (NSException * ex) {
-        NSLog(@"Exception: selectAllFromDB:%@", ex.description);
-    }
-    @finally {
-        sqlite3_close(rememberItDB);
-    }
-    return tripsTable;
-}
-
--(BOOL) deleteTrip:(NSString *) entryId
-{
-    BOOL success = FALSE;
-    const char *dbpath = [self dbPath];
-
+    
+    stmtSQL = [NSMutableString stringWithString:myStmt];
+    
+    NSLog(@"...insertIntoTbl:%@", stmtSQL);
+    
     @try
     {
         if(sqlite3_open(dbpath, &rememberItDB) == SQLITE_OK)
         {
-            stmtSQL = [NSString stringWithFormat:
-                       @"Delete From EntryPhotos Where EntryId = \"%@\"", entryId];
             stmt = [stmtSQL UTF8String];
             sqlite3_prepare_v2(rememberItDB, stmt, -1, &statement, NULL);
+            NSLog(@"..resultCode: %d", sqlite3_step(statement));
+            
             if (sqlite3_step(statement) == SQLITE_DONE)
             {
-                //NSLog(@"..deleted from TripPhotos where TripId:%@", tripId);
-                success = TRUE;
+                
             }
+            insertRowId = [NSString stringWithFormat:@"%lld", sqlite3_last_insert_rowid(rememberItDB)];
+            NSLog(@"...insert return rowid:%@", insertRowId);
+            
             sqlite3_finalize(statement);
-            if(success)
-            {
-                //delete from TripJournal
-                stmtSQL = [NSString stringWithFormat:
-                           @"Delete From Entry Where Id = %ld", (long)[entryId integerValue]];
-                stmt = [stmtSQL UTF8String];
-                sqlite3_prepare_v2(rememberItDB, stmt, -1, &statement, NULL);
-                if (sqlite3_step(statement) == SQLITE_DONE)
-                {
-                    //NSLog(@"..DELETED from TripJournal where Id:%@", entryId);
-                }
-                else
-                {
-                    NSLog(@"..FAILED to delete from Entry where Id:%@", entryId);
-                    success = FALSE;
-                }
-                sqlite3_finalize(statement);
-            }
         }
     }
     @catch(NSException *ex)
     {
-        NSLog(@"Exception: Delete Entry:%@", ex.description);
+        NSLog(@"Exception: Insert Into tbl:%@, error:%@", tblName, ex.description);
     }
     @finally
     {
         sqlite3_close(rememberItDB);
     }
-    return success;
+    
+    return insertRowId;
 }
 
-- (NSMutableArray *)deletePhotos:(NSMutableArray *) photosToDelete tripId:(NSString *)entryId tripPhotos:(NSMutableArray *) tripPhotos
+//generic select from table
+-(NSMutableArray *) selectFromTbl:(NSString *)tblName colNames:(NSArray *)colNames whereCols:(NSArray *)whereCols whereColValues:(NSArray *)whereColValues
 {
+    NSMutableArray *returnRow, *returnList;
     const char *dbpath = [self dbPath];
-    //NSString *docsDir = [self docsDirPath];
+    
+    NSMutableString *myStmt = [NSMutableString stringWithFormat:@"Select "];
+    
+    for(int i=0;i<colNames.count;i++)
+    {
+        if(i+1 == colNames.count)
+            [myStmt appendString: [NSString stringWithFormat:@"%@", colNames[i]] ];
+        else
+            [myStmt appendString: [NSString stringWithFormat:@"%@ ,", colNames[i]] ];
+    }
+    
+    [myStmt appendString: [NSString stringWithFormat:@" From %@", tblName] ];
+    
+    if(whereCols)
+    {
+        [myStmt appendString: [NSString stringWithFormat:@" Where "] ];
+        for(int i=0;i<whereCols.count;i++)
+        {
+            if(i+1 == whereCols.count)
+                [myStmt appendString: [NSString stringWithFormat:@"%@ = \"%@\"" , whereCols[i], whereColValues[i] ]];
+            else
+                [myStmt appendString: [NSString stringWithFormat:@"%@ = \"%@\" And ", whereCols[i], whereColValues[i] ]];
+        }
+    }
+    
+    stmtSQL = [NSMutableString stringWithString:myStmt];
+    
+    NSLog(@"...selectFromTbl:%@", stmtSQL);
     
     @try
     {
-        for (int i = 0; i<photosToDelete.count; i++)
+        returnList = [[NSMutableArray alloc] init];
+        
+        if(sqlite3_open(dbpath, &rememberItDB) == SQLITE_OK)
         {
-            if (sqlite3_open(dbpath, &rememberItDB) == SQLITE_OK)
+            stmt = [stmtSQL UTF8String];
+            sqlite3_prepare_v2(rememberItDB, stmt, -1, &statement, NULL);
+            while (sqlite3_step(statement) == SQLITE_ROW)
             {
-                stmtSQL = [NSString stringWithFormat:
-                           @"Delete From EntryPhotos Where EntryId = \"%@\" and PhotoPath = \"%@\"", entryId, photosToDelete[i]];
+                returnRow = [[NSMutableArray alloc] init];
                 
-                stmt = [stmtSQL UTF8String];
-                sqlite3_prepare_v2(rememberItDB, stmt, -1, &statement, NULL);
-                if (sqlite3_step(statement) == SQLITE_DONE)
-                {
-                    //NSLog(@"..Deleted Photo: %@", photosToDelete[i]);
-                }
-                sqlite3_finalize(statement);
-                [tripPhotos removeObject:photosToDelete[i]];
+                for(int i=0;i<colNames.count;i++)
+                    [returnRow addObject:[NSString stringWithUTF8String:(char *) sqlite3_column_text (statement, i)]];
+                
+                [returnList addObject:returnRow];
+                returnRow = nil;
             }
+            sqlite3_finalize(statement);
         }
     }
-    @catch (NSException * ex) {
-        NSLog(@"Exception: deletePhotos:%@", ex.description);
+    @catch(NSException *ex)
+    {
+        NSLog(@"Exception: Select From tbl:%@, error:%@", tblName, ex.description);
     }
-    @finally {
+    @finally
+    {
         sqlite3_close(rememberItDB);
     }
-    return tripPhotos;
+    
+    return returnList;
 }
 
--(BOOL)saveSelectedPhotoToDB:(NSString *)photoPath tripId:(NSString *)entryId
+//generic delete
+-(BOOL) deleteFromTbl:(NSString *)tblName whereCol:(NSString *)whereCol whereValues:(NSArray *)whereValues andCol:(NSString *)andCol andValue:(NSString *)andValue
+{
+    BOOL success = false;
+    const char *dbpath = [self dbPath];
+    
+    NSMutableString *myStmt = [NSMutableString stringWithFormat:@"Delete From %@ Where %@ In (",tblName, whereCol];
+    
+    for(int i=0;i<whereValues.count;i++)
+    {
+        if(i+1 == whereValues.count)
+            [myStmt appendString: [NSString stringWithFormat:@"\"%@\")", whereValues[i]] ];
+        else
+            [myStmt appendString: [NSString stringWithFormat:@"\"%@\" ,", whereValues[i]] ];
+        
+            //[myStmt appendString: [NSString stringWithFormat:@"%@ ,", (long)[colValues[i]] integerValue] ];
+    }
+    if(andCol)
+        [myStmt appendString: [NSString stringWithFormat:@" And %@ = %@", andCol, andValue] ];
+    
+    stmtSQL = [NSMutableString stringWithString:myStmt];
+    NSLog(@"..deleteFromTbl:%@", stmtSQL);
+    
+    @try
+    {
+        if(sqlite3_open(dbpath, &rememberItDB) == SQLITE_OK)
+        {
+            stmt = [stmtSQL UTF8String];
+            sqlite3_prepare_v2(rememberItDB, stmt, -1, &statement, NULL);
+            if (sqlite3_step(statement) == SQLITE_DONE)
+            {
+                success = true;
+            }
+            sqlite3_finalize(statement);
+        }
+    }
+    @catch(NSException *ex)
+    {
+        NSLog(@"Exception: Delete From tbl:%@, error:%@", tblName, ex.description);
+    }
+    @finally
+    {
+        sqlite3_close(rememberItDB);
+    }
+    
+    return success;
+}
+
+-(BOOL)saveEntryListItems:(NSString *)entryId listItems:(NSArray *)listItems listItemsSwitch:(NSArray *)listItemsSwitch
 {
     const char *dbpath = [self dbPath];
     BOOL success = FALSE;
+    NSString *listItemAppend;
+
+    NSMutableString *myStmt = [NSMutableString stringWithFormat:
+                               @"INSERT INTO EntryListItems (EntryId, ListItem, ListItemSwitch) VALUES "];
+    
+    for(int i=0;i<listItems.count;i++)
+    {
+        NSLog(@"...saveEntryListItems:switchVal:%@", listItemsSwitch[i]);
+        
+        if(i+1 == listItems.count)
+            listItemAppend = [NSString stringWithFormat:@"(\"%@\" , \"%@\" , %@)", entryId, listItems[i], listItemsSwitch[i]];
+        else
+            listItemAppend = [NSString stringWithFormat:@"(\"%@\" , \"%@\" , %@),", entryId, listItems[i], listItemsSwitch[i]];
+        
+        [myStmt appendString:listItemAppend];
+    }
+    
+    stmtSQL = [NSMutableString stringWithString:myStmt];
+    NSLog(@"...saveEntryListItems: %@", stmtSQL);
     
     @try
     {
         if (sqlite3_open(dbpath, &rememberItDB) == SQLITE_OK)
         {
-            stmtSQL = [NSString stringWithFormat:
-                         @"INSERT INTO EntryPhotos (EntryId, PhotoPath) VALUES (\"%@\", \"%@\")",
-                         entryId, photoPath];
-            
             stmt = [stmtSQL UTF8String];
             sqlite3_prepare_v2(rememberItDB, stmt, -1, &statement, NULL);
             
@@ -411,75 +340,81 @@ sqlite3_stmt *statement;
             if (result == SQLITE_OK || result == SQLITE_DONE)
                 success = TRUE;
             else
-                NSLog(@"...result of saveSelectedPhotoToDB - %d:%s", result, sqlite3_errmsg(rememberItDB));
-
+                NSLog(@"...result of saveSEntryListItems - %d:%s", result, sqlite3_errmsg(rememberItDB));
+            
             sqlite3_finalize(statement);
         }
     }
     @catch (NSException * ex) {
-        NSLog(@"Exception: saveSelectedPhotoToDB:%@", ex.description);
+        NSLog(@"Exception: saveSEntryListItems:%@", ex.description);
     }
     @finally {
         sqlite3_close(rememberItDB);
     }
-
+    
     return success;
 }
 
--(BOOL)setPhotoCover:(NSString *)photoPath entryId:(NSString *)entryId
+
+
+-(BOOL)updateTbl:(NSString *)tblName colNames:(NSArray *)colNames colValues:(NSArray *)colValues whereCol:(NSString *)whereCol whereValue:(NSString *)whereValue
 {
     BOOL success = false;
     const char *dbpath = [self dbPath];
+    
+    NSMutableString *appendSql = [NSMutableString stringWithFormat: @"Update %@ Set ", tblName];
+    
+    for(int i=0;i<colNames.count;i++)
+    {
+        if(i+1 == colNames.count)
+            [appendSql appendString: [NSString stringWithFormat:@"%@ = \"%@\" ", colNames[i], colValues[i] ]];
+        else
+            [appendSql appendString: [NSString stringWithFormat:@"%@ = \"%@\",", colNames[i], colValues[i] ]];
+    }
+    
+    if([[whereCol uppercaseString] isEqualToString:@"ID"]) //if primary key, column is Integer type
+        [appendSql appendString:[NSString stringWithFormat:@"Where %@ = %ld", whereCol, (long)[whereValue integerValue]] ];
+    else
+        [appendSql appendString:[NSString stringWithFormat:@"Where %@ = \"%@\"", whereCol, whereValue] ];
+    
+    stmtSQL = [NSMutableString stringWithString:appendSql];
+    
+    NSLog(@"...updateTbl:%@", stmtSQL);
     
     @try
     {
         if (sqlite3_open(dbpath, &rememberItDB) == SQLITE_OK)
         {
-            NSString *updateSQL = [NSString stringWithFormat:
-                                   @"Update Entry Set PhotoPath = \"%@\" Where Id = %d", photoPath, [entryId intValue]];
+            stmt = [stmtSQL UTF8String];
+            sqlite3_prepare_v2(rememberItDB, stmt, -1, &statement, NULL);
             
-            const char *update_stmt = [updateSQL UTF8String];
-            sqlite3_prepare_v2(rememberItDB, update_stmt, -1, &statement, NULL);
-            int resultCode = sqlite3_step(statement);
-            NSLog(@"...resultCode for edit entry:%d - stmt:%s", resultCode, update_stmt);
-            if (resultCode == SQLITE_DONE)
-            {
-                UIAlertView *alert = [[UIAlertView alloc] initWithTitle:@"Updated PhotoCover" message:@""
-                                                               delegate:nil cancelButtonTitle:@"OK" otherButtonTitles: nil];
-                [alert show];
-                
-            }
+            int result = sqlite3_step(statement);
+            if (result == SQLITE_OK || result == SQLITE_DONE)
+                success = TRUE;
             else
-            {
-                UIAlertView *alert = [[UIAlertView alloc] initWithTitle:@"Unable To Update PhotoCover" message:@""
-                                                               delegate:nil cancelButtonTitle:@"OK" otherButtonTitles: nil];
-                [alert show];
-            }
+                NSLog(@"...result of updateTbl - %d:%s", result, sqlite3_errmsg(rememberItDB));
             
             sqlite3_finalize(statement);
         }
     }
     @catch (NSException * ex) {
-        NSLog(@"Exception: setPhotoCover:%@", ex.description);
+        NSLog(@"Exception: updateTbl:%@", ex.description);
     }
     @finally {
         sqlite3_close(rememberItDB);
     }
-    return success;
+    
+    return true;
 }
 
 -(const char *)dbPath
 {
-    // Get the documents directory
-    NSArray *dirPaths = NSSearchPathForDirectoriesInDomains(NSDocumentDirectory, NSUserDomainMask, YES);
-    NSString *docsDir = dirPaths[0];
-    // Build the path to the database file
-    NSString *databasePath = [[NSString alloc]
-                              initWithString: [docsDir stringByAppendingPathComponent:DBFILE]];
+    NSString *databasePath = [self databasePath];
     const char *dbpath = [databasePath UTF8String];
     return dbpath;
 }
 
+/*
 -(NSString *)docsDirPath
 {
     // Get the documents directory
@@ -487,6 +422,7 @@ sqlite3_stmt *statement;
     NSString *docsDir = dirPaths[0];
     return docsDir;
 }
+*/
 
 -(NSString *)databasePath
 {

@@ -58,6 +58,7 @@
 
 - (IBAction)setAsCoverPhoto:(id)sender {
     DBHelper *dbHelper = [[DBHelper alloc] init];
-    [dbHelper setPhotoCover:self.photoPath entryId:self.entryId];
+    [dbHelper updateTbl:@"Entry" colNames:[[NSArray alloc] initWithObjects:@"PhotoPath", nil] colValues:[[NSArray alloc] initWithObjects:self.photoPath, nil]  whereCol:@"Id" whereValue:self.selectedTrip.entryId];
+    self.selectedTrip.photoPath = self.photoPath;
 }
 @end
