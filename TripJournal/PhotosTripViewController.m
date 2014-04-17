@@ -45,16 +45,13 @@ NSString *addPhotoImage = @"camerared1.png";
     dbHelper = [[DBHelper alloc] init];
     tripPhotos = [[NSMutableArray alloc] init];
     
-    NSArray *returnList = [dbHelper selectFromTbl:@"EntryPhotos" colNames:[[NSArray alloc] initWithObjects:@"PhotoPath", nil]  whereCols:[[NSArray alloc] initWithObjects:@"EntryId", nil] whereColValues:[[NSArray alloc] initWithObjects:self.selectedTrip.entryId, nil] ];
+    NSArray *returnList = [dbHelper selectFromTbl:@"EntryPhotos" colNames:@[@"PhotoPath"] whereCols:@[@"EntryId"] whereColValues:@[self.selectedTrip.entryId] ];
     
-   //NSLog(@"...PhotosTripView...viewDidLoad: returnList-%@", returnList);
     if(returnList)
     {
-        //tripPhotos = [[NSMutableArray alloc] init];
         for(int i=0;i<returnList.count;i++)
         {
             NSArray *returnRow = returnList[i];
-            //NSLog(@"..photo:%@ - rowCount:%lu", returnRow[0], (unsigned long)returnRow.count);
             [tripPhotos addObject:returnRow [0]];
         }
     }
@@ -168,7 +165,6 @@ NSString *addPhotoImage = @"camerared1.png";
     ALAssetsLibrary *library = [[ALAssetsLibrary alloc] init];
     [library assetForURL:aURL resultBlock:^(ALAsset *asset)
      {
-         //UIImage  *copyOfOriginalImage = [UIImage imageWithCGImage:[[asset defaultRepresentation] fullScreenImage] scale:0.3 orientation:UIImageOrientationUp];
          if(asset)
          {
              UIImage  *copyOfOriginalImage = [UIImage imageWithCGImage:[asset thumbnail] scale:1.0 orientation:UIImageOrientationUp];
@@ -193,12 +189,12 @@ NSString *addPhotoImage = @"camerared1.png";
     //NSLog(@"...PhotosTripView:nonExistingPhoto: %@", photo);
     [tripPhotos removeObject:photo];
 
-    [dbHelper deleteFromTbl:@"EntryPhotos" whereCol:@"EntryId" whereValues:[[NSArray alloc] initWithObjects:self.selectedTrip.entryId, nil] andCol:@"PhotoPath" andValue:photo];
+    [dbHelper deleteFromTbl:@"EntryPhotos" whereCol:@"EntryId" whereValues:@[self.selectedTrip.entryId] andCol:@"PhotoPath" andValue:photo];
     
     if([photo isEqualToString:self.selectedTrip.photoPath])
     {
         NSLog(@"...PhotosTripView:nonExistingPhoto: - is cover photo - so update:%@", photo);
-        [dbHelper updateTbl:@"Entry" colNames:[[NSArray alloc] initWithObjects:@"PhotoPath", nil] colValues:[[NSArray alloc] initWithObjects:@"", nil] whereCol:@"Id" whereValue:self.selectedTrip.entryId];
+        [dbHelper updateTbl:@"Entry" colNames:@[@"PhotoPath"] colValues:@[@""] whereCol:@"Id" whereValue:self.selectedTrip.entryId];
         
         self.selectedTrip.photoPath = @"";
     }
@@ -244,7 +240,7 @@ NSString *addPhotoImage = @"camerared1.png";
 {
     if(buttonIndex == 0) //confirm yes on alertView
     {
-        [dbHelper updateTbl:@"Entry" colNames:[[NSArray alloc] initWithObjects:@"PhotoPath", nil]  colValues:[[NSArray alloc] initWithObjects:selectedPhoto, nil]  whereCol:@"Id" whereValue:self.selectedTrip.entryId];
+        [dbHelper updateTbl:@"Entry" colNames:@[@"PhotoPath"]  colValues:@[selectedPhoto]  whereCol:@"Id" whereValue:self.selectedTrip.entryId];
         self.selectedTrip.photoPath = selectedPhoto;
         NSLog(@"...cover photo:%@", selectedPhoto);
         [self.photoCollectionView reloadData];
@@ -281,7 +277,7 @@ NSString *addPhotoImage = @"camerared1.png";
         if([photosToDelete containsObject:self.selectedTrip.photoPath])
         {
             //NSLog(@"..deletePhotos:cover photo in deleted photos:%@", self.selectedTrip.photoPath);
-            [dbHelper updateTbl:@"Entry" colNames:[[NSArray alloc] initWithObjects:@"PhotoPath", nil] colValues:[[NSArray alloc] initWithObjects:@"", nil] whereCol:@"Id" whereValue:self.selectedTrip.entryId];
+            [dbHelper updateTbl:@"Entry" colNames:@[@"PhotoPath"] colValues:@[@""] whereCol:@"Id" whereValue:self.selectedTrip.entryId];
             self.selectedTrip.photoPath = @"";
         }
         for (int i = 0; i<photosToDelete.count; i++)
@@ -310,7 +306,7 @@ NSString *addPhotoImage = @"camerared1.png";
 
         selectedPhoto = [imageUrl absoluteString];
         
-        NSString *insertRowId = [dbHelper insertInToTbl:@"EntryPhotos" colNames:[[NSArray alloc] initWithObjects:@"EntryId, PhotoPath", nil] colValues:[[NSArray alloc] initWithObjects:self.selectedTrip.entryId, selectedPhoto, nil] multiple:false];
+        NSString *insertRowId = [dbHelper insertInToTbl:@"EntryPhotos" colNames:@[@"EntryId, PhotoPath"] colValues:@[self.selectedTrip.entryId, selectedPhoto] multiple:false];
         
         if(insertRowId)
         {

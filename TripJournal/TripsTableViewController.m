@@ -39,19 +39,17 @@
     
     dbHelper = [[DBHelper alloc] init];
     
-    NSArray *returnList= [dbHelper selectFromTbl:@"Entry" colNames:[[NSArray alloc] initWithObjects:@"Id", @"Place", @"Note", @"StartDate", @"EndDate", @"Latitude", @"Longitude", @"Address", @"PhotoPath", @"EntryDate", nil] whereCols:nil whereColValues:nil];
+    NSArray *returnList= [dbHelper selectFromTbl:@"Entry" colNames:@[@"Id", @"Place", @"Note", @"StartDate", @"EndDate", @"Latitude", @"Longitude", @"Address", @"PhotoPath", @"EntryDate"] whereCols:nil whereColValues:nil];
     
     tripsTable = [[NSMutableArray alloc] initWithCapacity:returnList.count];
     for(int i=0;i<returnList.count;i++)
     {
         NSArray *returnRow = returnList[i];
-        //NSLog(@"..entryRow id:%@, place:%@", returnRow[0], returnRow[1] );
-        //TripEntry *entry = [TripEntry returnEntry:returnRow];
+
         TripEntry *entry = [[TripEntry alloc] initWithValues:returnRow];
         if(entry)
         {
             [tripsTable addObject:entry];
-            //NSLog(@"..entry id:%@, place:%@", entry.entryId, entry.place);
         }
         else
             NSLog(@"..entry is nil");
@@ -109,7 +107,6 @@
         [library assetForURL:aURL resultBlock:^(ALAsset *asset)
          {
              photo = [UIImage imageWithCGImage:[asset thumbnail] scale:1.0 orientation:UIImageOrientationUp];
-             //NSLog(@"..TripsTable..photoLibAsset-photo:%@", photo.description);
              cell.imageView.image = photo;
          }
                 failureBlock:^(NSError *error)
@@ -134,8 +131,7 @@
     if ([segue.identifier isEqualToString:@"tripsToPhotos"]) {
         PhotosTripViewController *vc = [segue destinationViewController];
         [vc setSelectedTrip:selectedTrip];
-    }
-    //else is "New" EntryViewController
+    }//else selected "New" for EntryViewController
 }
 
 
@@ -145,15 +141,13 @@
     if (editingStyle == UITableViewCellEditingStyleDelete)
     {
         selectedTrip = tripsTable[indexPath.row];
-        BOOL success = [dbHelper deleteFromTbl:@"EntryPhotos" whereCol:@"EntryId" whereValues:[[NSArray alloc] initWithObjects:selectedTrip.entryId, nil] andCol:nil andValue:nil];
-        
-        //BOOL success = [dbHelper deleteFromTbl:selectedTrip.entryId colName:@"EntryId" tblName:@"EntryPhotos"];
+        BOOL success = [dbHelper deleteFromTbl:@"EntryPhotos" whereCol:@"EntryId" whereValues:@[selectedTrip.entryId] andCol:nil andValue:nil];
+
         if(success)
-            success = [dbHelper deleteFromTbl:@"EntryListItems" whereCol:@"EntryId" whereValues:[[NSArray alloc] initWithObjects:selectedTrip.entryId, nil] andCol:nil andValue:nil];
-            //success = [dbHelper deleteFromTbl:selectedTrip.entryId colName:@"EntryId" tblName:@"EntryListItems"];
+            success = [dbHelper deleteFromTbl:@"EntryListItems" whereCol:@"EntryId" whereValues:@[selectedTrip.entryId] andCol:nil andValue:nil];
+
         if(success)
-            success = [dbHelper deleteFromTbl:@"Entry" whereCol:@"Id" whereValues:[[NSArray alloc] initWithObjects:selectedTrip.entryId, nil] andCol:nil andValue:nil];
-            //success = [dbHelper deleteFromTbl:selectedTrip.entryId colName:@"Id" tblName:@"Entry"];
+            success = [dbHelper deleteFromTbl:@"Entry" whereCol:@"Id" whereValues:@[selectedTrip.entryId] andCol:nil andValue:nil];
         
         if(success)
         {

@@ -62,7 +62,7 @@ BOOL isEdit = false;
         isEdit = true;
         [self setEditEntry];
 
-        NSMutableArray *returnList = [dbHelper selectFromTbl:@"EntryListItems" colNames:[[NSArray alloc] initWithObjects:@"ListItem", @"ListItemSwitch", nil] whereCols:[[NSArray alloc] initWithObjects:@"EntryId", nil] whereColValues:[[NSArray alloc] initWithObjects:self.selectedTrip.entryId, nil]];
+        NSMutableArray *returnList = [dbHelper selectFromTbl:@"EntryListItems" colNames:@[@"ListItem", @"ListItemSwitch"] whereCols:@[@"EntryId"] whereColValues:@[self.selectedTrip.entryId]];
         
         if(returnList && returnList.count > 0)
         {
@@ -504,10 +504,10 @@ BOOL isEdit = false;
         if(selectedImage.length > 0)
         {
             //check if photo path in entry
-            NSArray *returnList = [dbHelper selectFromTbl:@"EntryPhotos"  colNames:[[NSArray alloc] initWithObjects:@"PhotoPath", nil]  whereCols:[[NSArray alloc] initWithObjects:@"EntryId", @"PhotoPath", nil] whereColValues:[[NSArray alloc] initWithObjects:entry.entryId, selectedImage, nil] ];
-            //if not, add it
+            NSArray *returnList = [dbHelper selectFromTbl:@"EntryPhotos"  colNames:@[@"PhotoPath"]  whereCols:@[@"EntryId", @"PhotoPath"] whereColValues:@[entry.entryId, selectedImage] ];
+
             if(returnList.count == 0)
-                [dbHelper insertInToTbl:@"EntryPhotos" colNames:[[NSArray alloc] initWithObjects:@"EntryId, PhotoPath", nil] colValues:[[NSArray alloc] initWithObjects:entry.entryId, selectedImage, nil] multiple:false];
+                [dbHelper insertInToTbl:@"EntryPhotos" colNames:@[@"EntryId, PhotoPath"] colValues:@[entry.entryId, selectedImage] multiple:false];
         }
         
         if(isEdit)
@@ -516,11 +516,13 @@ BOOL isEdit = false;
             [dbHelper deleteFromTbl:@"EntryListItems" whereCol:@"EntryId" whereValues:[[NSArray alloc] initWithObjects:entry.entryId, nil] andCol:nil andValue:nil];
         }
         
-        //[dbHelper saveEntryListItems:entry.entryId listItems:entryListItems listItemsSwitch:entryListItemsSwitch];
+        //NSArray *words = @[@"list", @"of", @"words", @123, @3.14];
         NSMutableArray *entryItemsToAdd = [[NSMutableArray alloc]initWithCapacity:entryListItems.count];
         for(int i=0;i<entryListItems.count;i++)
             [entryItemsToAdd addObject:[NSString stringWithFormat:@"%@\",\"%@\",\"%@", entry.entryId, entryListItems[i], entryListItemsSwitch[i] ]];
-        NSString *lastRowId = [dbHelper insertInToTbl:@"EntryListItems" colNames:[[NSArray alloc] initWithObjects:@"EntryId, ListItem, ListItemSwitch", nil] colValues:entryItemsToAdd multiple:true];
+
+        NSString *lastRowId = [dbHelper insertInToTbl:@"EntryListItems" colNames:@[@"EntryId, ListItem, ListItemSwitch"] colValues:entryItemsToAdd multiple:true];
+        
         if(!lastRowId)//error with insert entryListItems
         {
             
