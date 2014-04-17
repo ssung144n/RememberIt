@@ -8,6 +8,7 @@
 
 #import <UIKit/UIKit.h>
 #import <MapKit/MapKit.h>
+#import <MessageUI/MessageUI.h>
 
 #import "TripEntry.h"
 
@@ -15,7 +16,7 @@
 //So need to conform to the UIImagePickerControllerDelegate protocol.
 //Need to present the camera (or the photo library) modally, so need to implement the UINavigationControllerDelegate protocol
 
-@interface EntryViewController : UIViewController <UIImagePickerControllerDelegate, UINavigationControllerDelegate, MKMapViewDelegate>
+@interface EntryViewController : UIViewController <UIImagePickerControllerDelegate, UINavigationControllerDelegate, MKMapViewDelegate, MFMailComposeViewControllerDelegate>
 //<UITableViewDataSource, UITableViewDelegate, TableCellDelegate>
 
 @property (weak, nonatomic) IBOutlet UITextView *note;
@@ -27,12 +28,13 @@
 
 @property (weak, nonatomic) IBOutlet UIButton *buttonPhoto;
 @property (weak, nonatomic) IBOutlet MKMapView *mapView;
+@property (weak, nonatomic) IBOutlet UIButton *emailButton;
 
 - (IBAction)removeKB:(id)sender;
 
 - (IBAction)buttonPhotoPick:(id)sender;
+- (IBAction)sendEmail:(id)sender;
 
-@property (weak, nonatomic) IBOutlet UIButton *saveButton;
 - (IBAction)saveButtonClick:(id)sender;
 
 @end

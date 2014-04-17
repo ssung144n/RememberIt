@@ -26,6 +26,8 @@
 
 @implementation PhotosTripViewController
 
+NSString *addPhotoImage = @"camerared1.png";
+
 - (id)initWithNibName:(NSString *)nibNameOrNil bundle:(NSBundle *)nibBundleOrNil
 {
     self = [super initWithNibName:nibNameOrNil bundle:nibBundleOrNil];
@@ -41,15 +43,14 @@
 	// Do any additionl setup after loading the view.
     
     dbHelper = [[DBHelper alloc] init];
-    //tripPhotos = [dbHelper loadTripPhotos:self.selectedTrip.entryId];
+    tripPhotos = [[NSMutableArray alloc] init];
     
     NSArray *returnList = [dbHelper selectFromTbl:@"EntryPhotos" colNames:[[NSArray alloc] initWithObjects:@"PhotoPath", nil]  whereCols:[[NSArray alloc] initWithObjects:@"EntryId", nil] whereColValues:[[NSArray alloc] initWithObjects:self.selectedTrip.entryId, nil] ];
     
+   //NSLog(@"...PhotosTripView...viewDidLoad: returnList-%@", returnList);
     if(returnList)
     {
-       // NSLog(@"...returnList from selectFromTbl: %lu", (unsigned long)returnList.count);
-        tripPhotos = [[NSMutableArray alloc] init];
-        
+        //tripPhotos = [[NSMutableArray alloc] init];
         for(int i=0;i<returnList.count;i++)
         {
             NSArray *returnRow = returnList[i];
@@ -59,18 +60,20 @@
     }
     
     self.title = self.selectedTrip.place;
-
     photosToDelete = [NSMutableArray array];
     
     self.photoCollectionView.allowsMultipleSelection = TRUE;
-    //self.photoCollectionView.layer.borderColor = [UIColor blackColor].CGColor;
-    //self.photoCollectionView.layer.borderWidth = 3.0f;
     
     UILongPressGestureRecognizer *lpgr = [[UILongPressGestureRecognizer alloc]
        initWithTarget:self action:@selector(longPressHandler:)];
     lpgr.minimumPressDuration = 1.0; //seconds
     lpgr.delegate = self;
     [self.photoCollectionView addGestureRecognizer:lpgr];
+}
+
+- (void)viewWillAppear:(BOOL)animated {
+    //NSLog(@"...PhotosViewController:viewWillAppear");
+    [self.photoCollectionView reloadData];
 }
 
  - (void)longPressHandler:(UILongPressGestureRecognizer *)lpgr {
@@ -83,13 +86,18 @@
          NSIndexPath *indexPath = [self.photoCollectionView indexPathForItemAtPoint:p];
          if (indexPath != nil) {
              selectedPhoto = [tripPhotos objectAtIndex:indexPath.row];
-             [self performSegueWithIdentifier:@"ShowPhoto" sender:self];
+             
+             //if image is addPhotoImage - go to select photos action
+             if([selectedPhoto isEqualToString:addPhotoImage])
+                 [self selectPhotos:self];
+             else
+                 [self performSegueWithIdentifier:@"ShowPhoto" sender:self];
          }
      }
  }
 
 - (UIEdgeInsets)collectionView:(UICollectionView*)collectionView layout:(UICollectionViewLayout *)collectionViewLayout insetForSectionAtIndex:(NSInteger)section {
-    return UIEdgeInsetsMake(-55, 0, 0, 0); // top, left, bottom, right
+    return UIEdgeInsetsMake(-60, 0, 0, 0); // top, left, bottom, right
     //return UIEdgeInsetsMake(0, 0, 0, 0);
 }
 
@@ -108,6 +116,11 @@
 
 - (NSInteger)collectionView:(UICollectionView *)collectionView numberOfItemsInSection:(NSInteger)section
 {
+    if(tripPhotos.count == 0)
+    {
+        [tripPhotos addObject:addPhotoImage];
+        //NSLog(@"..Photos...nuberOfItemsInSection - %@", addPhotoImage);
+    }
     return tripPhotos.count;
 }
 
@@ -122,44 +135,88 @@
     //Highlight the cell selected to red
     UIView *bgColorView = [[UIView alloc] init];
     bgColorView.backgroundColor = [UIColor redColor];
-    bgColorView.layer.cornerRadius = 8;
+    bgColorView.layer.cornerRadius = 12;
+    //bgColorView.layer.borderWidth = 3.0f;
     bgColorView.layer.masksToBounds = YES;
     [cell setSelectedBackgroundView:bgColorView];
     
     //instantiate the imageview in each cell
     UIImageView *photoView = (UIImageView *)[cell viewWithTag:99];
+    
+    NSString *photo = tripPhotos[indexPath.row];
+    //check if photo exists-------
+    if([photo isEqualToString:self.selectedTrip.photoPath])
+    {
+        UIView *bgColorViewCP = [[UIView alloc] init];
+        bgColorViewCP.backgroundColor = [UIColor greenColor];
+        bgColorViewCP.layer.cornerRadius = 12;
+        bgColorViewCP.layer.masksToBounds = YES;
+        [cell setBackgroundView:bgColorViewCP];
+    }
+    else
+        cell.backgroundView = nil;
 
-    NSURL* aURL = [NSURL URLWithString:[tripPhotos objectAtIndex:indexPath.row]];
+    if([photo isEqualToString:addPhotoImage])
+    {
+        photoView.image = [UIImage imageNamed:photo];
+        //NSLog(@"..Photos...CelllforItemIndex:photo - %@", photoView.image);
+    }
+    else
+    {
+    NSURL* aURL = [NSURL URLWithString:photo];
     
     ALAssetsLibrary *library = [[ALAssetsLibrary alloc] init];
     [library assetForURL:aURL resultBlock:^(ALAsset *asset)
      {
          //UIImage  *copyOfOriginalImage = [UIImage imageWithCGImage:[[asset defaultRepresentation] fullScreenImage] scale:0.3 orientation:UIImageOrientationUp];
-         UIImage  *copyOfOriginalImage = [UIImage imageWithCGImage:[asset thumbnail] scale:1.0 orientation:UIImageOrientationUp];
-         
-         
-         photoView.image = copyOfOriginalImage;
+         if(asset)
+         {
+             UIImage  *copyOfOriginalImage = [UIImage imageWithCGImage:[asset thumbnail] scale:1.0 orientation:UIImageOrientationUp];
+             
+             photoView.image = copyOfOriginalImage;
+         }
+         else
+             [self nonExistingPhoto:photo];
      }
+     
         failureBlock:^(NSError *error)
      {
          // error handling
-         NSLog(@"...Error: Photo doesn't exist. Removing from tripPhotos list");
-         [tripPhotos removeObjectAtIndex:indexPath.row];
+         NSLog(@"...PhotosTripView:cellForItemAtIndexPath: error - %@", error.description);
      }];
-    
+    }
     return cell;
+}
+     
+-(void)nonExistingPhoto:(NSString *)photo
+{
+    //NSLog(@"...PhotosTripView:nonExistingPhoto: %@", photo);
+    [tripPhotos removeObject:photo];
+
+    [dbHelper deleteFromTbl:@"EntryPhotos" whereCol:@"EntryId" whereValues:[[NSArray alloc] initWithObjects:self.selectedTrip.entryId, nil] andCol:@"PhotoPath" andValue:photo];
+    
+    if([photo isEqualToString:self.selectedTrip.photoPath])
+    {
+        NSLog(@"...PhotosTripView:nonExistingPhoto: - is cover photo - so update:%@", photo);
+        [dbHelper updateTbl:@"Entry" colNames:[[NSArray alloc] initWithObjects:@"PhotoPath", nil] colValues:[[NSArray alloc] initWithObjects:@"", nil] whereCol:@"Id" whereValue:self.selectedTrip.entryId];
+        
+        self.selectedTrip.photoPath = @"";
+    }
+    [self.photoCollectionView reloadData];
 }
 
 -(void)collectionView:(UICollectionView *)collectionView didSelectItemAtIndexPath:(NSIndexPath *)indexPath
 {
     selectedPhoto = [tripPhotos objectAtIndex:indexPath.row];
     [photosToDelete addObject:selectedPhoto];
+    //NSLog(@"..did SELECT Item:%@", selectedPhoto);
 }
 
 -(void)collectionView:(UICollectionView *)collectionView didDeselectItemAtIndexPath:(NSIndexPath *)indexPath
 {
     selectedPhoto = [tripPhotos objectAtIndex:indexPath.row];
     [photosToDelete removeObject:selectedPhoto];
+    //NSLog(@"..did REMOVE SelectItem:%@", selectedPhoto);
 }
 
 
@@ -177,20 +234,20 @@
     }
     else if([segue.identifier isEqualToString:@"ToEdit"]) {
         EntryViewController *vc = [segue destinationViewController];
-        //NSLog(@"..ToEditEntry segue-tripId:%@", self.selectedTrip.place);
         [vc setSelectedTrip:self.selectedTrip];
     }
 }
 
 
-//when user confirms delete on trip, then delete and remove current controller
+//when user confirms on cover photo
 - (void)alertView:(UIAlertView *)alertView clickedButtonAtIndex:(NSInteger)buttonIndex
 {
-    //if(buttonIndex == 0 && [alertView.title isEqualToString:alertSetCoverPhotoTitle])
     if(buttonIndex == 0) //confirm yes on alertView
     {
         [dbHelper updateTbl:@"Entry" colNames:[[NSArray alloc] initWithObjects:@"PhotoPath", nil]  colValues:[[NSArray alloc] initWithObjects:selectedPhoto, nil]  whereCol:@"Id" whereValue:self.selectedTrip.entryId];
         self.selectedTrip.photoPath = selectedPhoto;
+        NSLog(@"...cover photo:%@", selectedPhoto);
+        [self.photoCollectionView reloadData];
     }
 }
 
@@ -204,36 +261,26 @@
         imagePicker.sourceType = UIImagePickerControllerSourceTypePhotoLibrary;
         imagePicker.mediaTypes = @[(NSString *) kUTTypeImage];
         imagePicker.allowsEditing = NO;
-        //imagePicker.
-
-        //UIColor * color = [UIColor colorWithRed:255/255.0f green:74/255.0f blue:5/255.0f alpha:1.0f];
-        //imagePicker.navigationBar.barTintColor = color;
         
         [self presentViewController:imagePicker animated:YES completion:nil];
     }
 }
-/*
-- (IBAction)deleteEntry:(id)sender {
-    alertConfirmDelete = [NSString stringWithFormat:@"Confirm delete: %@", self.selectedTrip.place];
-    UIAlertView *updateAlert = [[UIAlertView alloc] initWithTitle:alertConfirmDelete message:@"" delegate: self cancelButtonTitle: @"YES"  otherButtonTitles:@"NO",nil];
-    
-    [updateAlert show];
-}
-*/
 
 //since added segues from IB, is button action event even necessary?
 - (IBAction)showMap:(id)sender {
     [self performSegueWithIdentifier:@"ToMap" sender:self];
 }
 
-- (IBAction)deletePhotos:(id)sender {
-    //tripPhotos = [dbHelper deletePhotos:photosToDelete tripId:self.selectedTrip.entryId tripPhotos:tripPhotos];
+- (IBAction)deletePhotos:(id)sender
+{
+    //NSLog(@"..deletePhotos:num - %lu", (unsigned long)photosToDelete.count);
     BOOL success = [dbHelper deleteFromTbl:@"EntryPhotos" whereCol:@"PhotoPath" whereValues:photosToDelete andCol:@"EntryId" andValue:self.selectedTrip.entryId];
     
     if(success)
     {
-        if([photosToDelete containsObject:selectedPhoto])
+        if([photosToDelete containsObject:self.selectedTrip.photoPath])
         {
+            //NSLog(@"..deletePhotos:cover photo in deleted photos:%@", self.selectedTrip.photoPath);
             [dbHelper updateTbl:@"Entry" colNames:[[NSArray alloc] initWithObjects:@"PhotoPath", nil] colValues:[[NSArray alloc] initWithObjects:@"", nil] whereCol:@"Id" whereValue:self.selectedTrip.entryId];
             self.selectedTrip.photoPath = @"";
         }
@@ -263,14 +310,13 @@
 
         selectedPhoto = [imageUrl absoluteString];
         
-        //Boolean success = [dbHelper saveSelectedPhotoToDB:selectedImage tripId:self.selectedTrip.entryId];
-        NSString *insertRowId = [dbHelper insertIntoTbl:@"EntryPhotos" colNames:[[NSArray alloc] initWithObjects:@"EntryId", @"PhotoPath", nil] colValues:[[NSArray alloc] initWithObjects:self.selectedTrip.entryId, selectedPhoto, nil]];
+        NSString *insertRowId = [dbHelper insertInToTbl:@"EntryPhotos" colNames:[[NSArray alloc] initWithObjects:@"EntryId, PhotoPath", nil] colValues:[[NSArray alloc] initWithObjects:self.selectedTrip.entryId, selectedPhoto, nil] multiple:false];
         
-        NSLog(@"..didFinishPicking...insertRowId:%@", insertRowId);
         if(insertRowId)
         {
+            if([tripPhotos[0] isEqualToString:addPhotoImage])
+                [tripPhotos removeObject:addPhotoImage];
             [self confirmCoverPhoto];
-            
             [tripPhotos addObject:selectedPhoto];
             [self. photoCollectionView reloadData];
         }

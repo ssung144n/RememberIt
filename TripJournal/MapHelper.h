@@ -23,14 +23,12 @@
 @property (strong, nonatomic) NSString *latitude;
 @property (strong, nonatomic) NSString *longitude;
 
-//@property (strong, nonatomic) MKMapItem *destination;
 -(id)initWithMap:(MKMapView *) myMapView;
 
 -(void)setCurrentLocationInfo;
--(void)placeAnnotationforMap;
+-(void)placeAnnotationforMap:(MKMapView *)mapView;
 
 -(BOOL)haveLocationServices;
-//-(void)setCoordinateInfo:(NSString*)latitude longitude:(NSString*)longitude;
 //-(void)addLongPressGesture;
 
 //@property (nonatomic, strong) id delegate;

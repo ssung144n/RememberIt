@@ -28,7 +28,7 @@
 
 NSMutableArray *entryListItems;
 NSMutableArray *entryListItemsSwitch;
-NSString * selectedImage;
+NSString * selectedImage = @"";
 MapHelper *mapHelper;
 DBHelper *dbHelper;
 BOOL isEdit = false;
@@ -42,7 +42,6 @@ BOOL isEdit = false;
     return self;
 }
 
-//may need viewWillAppear to reset the map location
 - (void)viewDidLoad
 {
     [super viewDidLoad];
@@ -51,17 +50,21 @@ BOOL isEdit = false;
     dbHelper = [[DBHelper alloc] init];
     entryListItems = [[NSMutableArray alloc] init];
     entryListItemsSwitch = [[NSMutableArray alloc] init];
-    //mapHelper = [[MapHelper alloc] initWithMap:self.mapView];
+
+    //NSLog(@"EntryViewController:viewDidLoad - alloc/init mapHelper, assign as delegate");
+    mapHelper = [[MapHelper alloc] init];
+    self.mapView.delegate = self; //for select annotation event
     
     //check if editing
+    NSLog(@"..EntryViewController:viewDidLoad - selectedTrip:%@", self.selectedTrip);
     if(self.selectedTrip && self.selectedTrip.entryId)
     {
         isEdit = true;
         [self setEditEntry];
-        //NSArray *entryItems = [dbHelper getListForEntryId:self.selectedTrip.entryId];
 
         NSMutableArray *returnList = [dbHelper selectFromTbl:@"EntryListItems" colNames:[[NSArray alloc] initWithObjects:@"ListItem", @"ListItemSwitch", nil] whereCols:[[NSArray alloc] initWithObjects:@"EntryId", nil] whereColValues:[[NSArray alloc] initWithObjects:self.selectedTrip.entryId, nil]];
-        if(returnList)
+        
+        if(returnList && returnList.count > 0)
         {
             for(int i=0;i<returnList.count;i++)
             {
@@ -70,20 +73,27 @@ BOOL isEdit = false;
                 [entryListItemsSwitch addObject:listItemRow[1]];
             }
         }
+        else
+            [self newEntryListItemRecord];
     }
     else
     {
         isEdit = false;
         [self newEntryListItemRecord]; //insert first list item row
         selectedImage = @"";
+        self.emailButton.hidden = true;
     }
-    
-    //[self setLocationMapInfo];
     
     [self.note.layer setBorderColor: [[UIColor whiteColor] CGColor]];
     [[self.note layer] setBorderWidth:2.3];
     [[self.note layer] setCornerRadius:10];
     [self.note setClipsToBounds: YES];
+    
+    //coverPhoto button border
+    [self.buttonPhoto.layer setBorderColor: [[UIColor greenColor] CGColor]];
+    [[self.buttonPhoto layer] setBorderWidth:2.3];
+    [[self.buttonPhoto layer] setCornerRadius:10];
+    [self.buttonPhoto setClipsToBounds: YES];
     
     //dismiss virtual keyboard on textview
     [self dismissKeyBoardRecognizer];
@@ -92,7 +102,7 @@ BOOL isEdit = false;
     [super setEditing:YES animated:YES];
     [self.listTbl setEditing:YES animated:NO];
     
-    self.entryDate.text = [self currentDateTime];
+    self.entryDate.text = [TripEntry checkDateForToday:[TripEntry currentDate]];
     
     self.name.layer.borderWidth = 2.0f;
     [[self.name layer] setCornerRadius:10];
@@ -104,20 +114,16 @@ BOOL isEdit = false;
     
     [super viewWillAppear:animated];
     
-    NSLog(@"..viewWillAppear:lat:%@, lon:%@", self.selectedTrip.latitude, self.selectedTrip.longitude);
-    mapHelper = [[MapHelper alloc] initWithMap:self.mapView];
-    self.mapView.delegate = self;
+    //NSLog(@"..viewWillAppear: will callsetLocationMapInfo - lat:%@, lon:%@", mapHelper.latitude, mapHelper.longitude);
     [self setLocationMapInfo];
 }
 
 -(void)setEditEntry
 {
     self.navigationItem.title = @"Edit";
-    //set entry fields
     self.name.text = self.selectedTrip.place;
     self.note.text = self.selectedTrip.note;
     
-    //set photo
     [self setEntryCoverPhoto];
 }
 
@@ -125,7 +131,6 @@ BOOL isEdit = false;
 {
     if(self.selectedTrip.photoPath.length > 0)
     {
-        //NSLog(@"..TripsTable..trip.photoPath:%@", trip.photoPath);
         __block UIImage *photo = nil;
         NSURL* aURL = [NSURL URLWithString:self.selectedTrip.photoPath];
         selectedImage = self.selectedTrip.photoPath;
@@ -137,8 +142,7 @@ BOOL isEdit = false;
          }
          failureBlock:^(NSError *error)
          {
-             // error handling
-             NSLog(@"...Error: Photo doesn't exist");
+             NSLog(@"...Error:setEntryCoverPhoto - %@", error.description);
          }];
     }
 }
@@ -167,9 +171,10 @@ BOOL isEdit = false;
         else
             [mapHelper setCurrentLocationInfo];
         
-        [mapHelper placeAnnotationforMap];
-
-        self.mapView.delegate = self; //for touch event annotation/segue - didSelectAnnotationView - implementation
+        if(mapHelper.latitude && [mapHelper.latitude intValue] != 0)
+            NSLog(@"...EntryViewController:setLocationMapInfo - mapHelper.latitude and intvalue:%@, %d", mapHelper.latitude, [mapHelper.latitude intValue]);
+            
+        [mapHelper placeAnnotationforMap:self.mapView];
     }
 }
 
@@ -188,19 +193,6 @@ BOOL isEdit = false;
         self.buttonPhoto.enabled = false;
     }
 }
-
-
--(NSString *)currentDateTime
-{
-    NSDate *date = [[NSDate alloc] init];
-    
-    NSDateFormatter *dateFormatter = [[NSDateFormatter alloc] init];
-    [dateFormatter setDateFormat:@"MMM-dd-yyyy hh:mm"];
-    NSString *dateString = [dateFormatter stringFromDate:date];
-    
-    return dateString;
-}
-
 
 //dismiss the keyboard
 -(void)dismissKeyBoardRecognizer
@@ -289,7 +281,7 @@ BOOL isEdit = false;
     EntryViewTableCell *selectedCell = (EntryViewTableCell *)sender;
     NSString *txtValue = selectedCell.listItem.text;
     
-    entryListItems[row] = txtValue;
+    entryListItems[row] = [self checkForQuotes:txtValue];
 }
 
 //protocol delegate in custom tablecell to move up view so keyboard doesn't block last list entry item
@@ -334,8 +326,6 @@ BOOL isEdit = false;
 
     BOOL switchOn = selectedCell.listItemSwitch.on;
     entryListItemsSwitch[row] = [NSNumber numberWithBool:switchOn];
-    
-    //NSLog(@"...switchToggleCell:row:%d:textValue:%@, switchVal:%@", row, selectedCell.listItem.text, entryListItemsSwitch[row]);
     
     if(!switchOn)
         selectedCell.listItem.backgroundColor = [UIColor lightGrayColor];
@@ -462,7 +452,7 @@ BOOL isEdit = false;
         NSURL *imageUrl = info[UIImagePickerControllerReferenceURL];
         
         selectedImage = [imageUrl absoluteString];
-        NSLog(@"..didFinishPickingMedia...:%@", selectedImage);
+        //NSLog(@"..didFinishPickingMedia...:%@", selectedImage);
     }
     [picker dismissViewControllerAnimated:YES completion:NULL];
 }
@@ -473,6 +463,7 @@ BOOL isEdit = false;
     
 }
 
+//----check all text inputs for quotes and replace with something else ..single quote?
 -(BOOL)validateForSave
 {
     if(!self.name.text.length)
@@ -486,6 +477,12 @@ BOOL isEdit = false;
         return  true;
 }
 
+-(NSString *)checkForQuotes:(NSString *)txtValue
+{
+    NSString *noQuotes = [txtValue stringByReplacingOccurrencesOfString:@"\"" withString:@"'"];
+    return noQuotes;
+}
+
 - (IBAction)saveButtonClick:(id)sender {
     
     if(![self validateForSave])
@@ -495,7 +492,6 @@ BOOL isEdit = false;
     entry.place = self.name.text;
     entry.note = self.note.text;
 
-    entry.entryDate = self.entryDate.text;
     entry.photoPath = selectedImage;
     entry.latitude = mapHelper.latitude;
     entry.longitude = mapHelper.longitude;
@@ -505,27 +501,94 @@ BOOL isEdit = false;
     
     if(entry.entryId && entry.entryId.length)
     {
+        if(selectedImage.length > 0)
+        {
+            //check if photo path in entry
+            NSArray *returnList = [dbHelper selectFromTbl:@"EntryPhotos"  colNames:[[NSArray alloc] initWithObjects:@"PhotoPath", nil]  whereCols:[[NSArray alloc] initWithObjects:@"EntryId", @"PhotoPath", nil] whereColValues:[[NSArray alloc] initWithObjects:entry.entryId, selectedImage, nil] ];
+            //if not, add it
+            if(returnList.count == 0)
+                [dbHelper insertInToTbl:@"EntryPhotos" colNames:[[NSArray alloc] initWithObjects:@"EntryId, PhotoPath", nil] colValues:[[NSArray alloc] initWithObjects:entry.entryId, selectedImage, nil] multiple:false];
+        }
+        
         if(isEdit)
         {
+            //delete existing entrylist first
             [dbHelper deleteFromTbl:@"EntryListItems" whereCol:@"EntryId" whereValues:[[NSArray alloc] initWithObjects:entry.entryId, nil] andCol:nil andValue:nil];
-            
-            if(selectedImage.length > 0)
-            {
-                //check if photo path already in this entry
-                NSArray *returnList = [dbHelper selectFromTbl:@"EntryPhotos"  colNames:[[NSArray alloc] initWithObjects:@"PhotoPath", nil]  whereCols:[[NSArray alloc] initWithObjects:@"EntryId", @"PhotoPath", nil] whereColValues:[[NSArray alloc] initWithObjects:entry.entryId, selectedImage, nil] ];
-                NSLog(@"...returnList - checking if photo exists:%lu", (unsigned long)returnList.count);
-                if(returnList.count == 0)
-                {
-                    [dbHelper insertIntoTbl:@"EntryPhotos" colNames:[[NSArray alloc] initWithObjects:@"EntryId", @"PhotoPath", nil] colValues:[[NSArray alloc] initWithObjects:entry.entryId, selectedImage, nil]];
-                }
-            }
         }
-        else if(!isEdit && selectedImage.length > 0) //set photoCover
-            [dbHelper insertIntoTbl:@"EntryPhotos" colNames:[[NSArray alloc] initWithObjects:@"EntryId", @"PhotoPath", nil] colValues:[[NSArray alloc] initWithObjects:entry.entryId, selectedImage, nil]];
         
-        [dbHelper saveEntryListItems:entry.entryId listItems:entryListItems listItemsSwitch:entryListItemsSwitch];
+        //[dbHelper saveEntryListItems:entry.entryId listItems:entryListItems listItemsSwitch:entryListItemsSwitch];
+        NSMutableArray *entryItemsToAdd = [[NSMutableArray alloc]initWithCapacity:entryListItems.count];
+        for(int i=0;i<entryListItems.count;i++)
+            [entryItemsToAdd addObject:[NSString stringWithFormat:@"%@\",\"%@\",\"%@", entry.entryId, entryListItems[i], entryListItemsSwitch[i] ]];
+        NSString *lastRowId = [dbHelper insertInToTbl:@"EntryListItems" colNames:[[NSArray alloc] initWithObjects:@"EntryId, ListItem, ListItemSwitch", nil] colValues:entryItemsToAdd multiple:true];
+        if(!lastRowId)//error with insert entryListItems
+        {
+            
+            UIAlertView *alert = [[UIAlertView alloc] initWithTitle:@"Unable To Save Entry List Items" message:@""
+                                                           delegate:nil cancelButtonTitle:@"OK" otherButtonTitles: nil];
+            [alert show];
+        }
     }
     else
         NSLog(@"..saveEntry returned with empty entryId");
 }
+
+- (IBAction)sendEmail:(id)sender {
+    // Email Subject
+    NSString *emailTitle = [NSString stringWithFormat:@"RememberIt - %@", self.selectedTrip.place];
+    NSMutableString *msgBody = [NSMutableString stringWithFormat:@"Note: %@\r\n", self.selectedTrip.note];
+    if(entryListItems && entryListItems.count > 0)
+    {
+        [msgBody appendFormat:@"List Items:\r\n"];
+        if(entryListItems.count == 1 && [entryListItems[0] isEqualToString:@""])
+            [msgBody appendFormat:@"...None"];
+        else
+        {
+            for(int i=0;i<entryListItems.count;i++)
+            {   if([entryListItemsSwitch[i] intValue] == 1)
+                    [msgBody appendFormat:@"  *%@\r\n", entryListItems[i]];
+                else
+                    [msgBody appendFormat:@"  *<done> %@\r\n", entryListItems[i]];
+            }
+        }
+    }
+    
+    MFMailComposeViewController *mc = [[MFMailComposeViewController alloc] init];
+    mc.mailComposeDelegate = self;
+    
+    [mc setSubject:emailTitle];
+    [mc setMessageBody:[NSMutableString stringWithString:msgBody] isHTML:NO];
+    if(![self.selectedTrip.photoPath isEqualToString:@""])
+    {
+        NSData* photoData = UIImageJPEGRepresentation(self.buttonPhoto.imageView.image, 1.0);
+        [mc addAttachmentData:photoData mimeType:@"image/jpeg" fileName:@"Entry Photo"];
+    }
+    // Present mail view controller on screen
+    [self presentViewController:mc animated:YES completion:NULL];
+}
+
+- (void) mailComposeController:(MFMailComposeViewController *)controller didFinishWithResult:(MFMailComposeResult)result error:(NSError *)error
+{
+    switch (result)
+    {
+        case MFMailComposeResultCancelled:
+            NSLog(@"Mail cancelled");
+            break;
+        case MFMailComposeResultSaved:
+            NSLog(@"Mail saved");
+            break;
+        case MFMailComposeResultSent:
+            NSLog(@"Mail sent");
+            break;
+        case MFMailComposeResultFailed:
+            NSLog(@"Mail sent failure: %@", [error localizedDescription]);
+            break;
+        default:
+            break;
+    }
+    
+    // Close the Mail Interface
+    [self dismissViewControllerAnimated:YES completion:NULL];
+}
+
 @end

@@ -23,6 +23,7 @@ MKMapView *mapView;
     return self;
 }
 
+
 /*
 -(void)addLongPressGesture
 {
@@ -84,7 +85,7 @@ MKMapView *mapView;
     return locationAllowed;
 }
 
--(void)addAnnotationToMap
+-(void)addAnnotationToMap:(MKMapView *)mapView
 {
     NSMutableArray * annotationsToRemove = [ mapView.annotations mutableCopy ] ;
     [ annotationsToRemove removeObject:mapView.userLocation ] ;
@@ -96,7 +97,7 @@ MKMapView *mapView;
     [mapView addAnnotation:annotationPoint];
 }
 
--(void)placeAnnotationforMap
+-(void)placeAnnotationforMap:(MKMapView *)mapView
 {
     entryLoc.latitude = [self.latitude doubleValue];
     entryLoc.longitude = [self.longitude doubleValue];

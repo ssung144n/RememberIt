@@ -129,67 +129,6 @@ sqlite3_stmt *statement;
 }
 
 
-//generic insert into table
--(NSString *) insertIntoTbl:(NSString *)tblName colNames:(NSArray *)colNames colValues:(NSArray *)colValues
-{
-    NSString *insertRowId;
-    
-    const char *dbpath = [self dbPath];
-    
-    NSMutableString *myStmt = [NSMutableString stringWithFormat:@"Insert Into %@ (", tblName];
-    
-    for(int i=0;i<colNames.count;i++)
-    {
-        if(i+1 == colNames.count)
-            [myStmt appendString: [NSString stringWithFormat:@"%@)", colNames[i]] ];
-        else
-            [myStmt appendString: [NSString stringWithFormat:@"%@ , ", colNames[i]] ];
-    }
-    
-    [myStmt appendString: [NSString stringWithFormat:@" Values ("] ];
-    
-    for(int i=0;i<colValues.count;i++)
-    {
-        if(i+1 == colValues.count)
-            [myStmt appendString: [NSString stringWithFormat:@"\"%@\")", colValues[i] ]];
-        else
-            [myStmt appendString: [NSString stringWithFormat:@"\"%@\", ", colValues[i] ]];
-    }
-    
-    stmtSQL = [NSMutableString stringWithString:myStmt];
-    
-    NSLog(@"...insertIntoTbl:%@", stmtSQL);
-    
-    @try
-    {
-        if(sqlite3_open(dbpath, &rememberItDB) == SQLITE_OK)
-        {
-            stmt = [stmtSQL UTF8String];
-            sqlite3_prepare_v2(rememberItDB, stmt, -1, &statement, NULL);
-            NSLog(@"..resultCode: %d", sqlite3_step(statement));
-            
-            if (sqlite3_step(statement) == SQLITE_DONE)
-            {
-                
-            }
-            insertRowId = [NSString stringWithFormat:@"%lld", sqlite3_last_insert_rowid(rememberItDB)];
-            NSLog(@"...insert return rowid:%@", insertRowId);
-            
-            sqlite3_finalize(statement);
-        }
-    }
-    @catch(NSException *ex)
-    {
-        NSLog(@"Exception: Insert Into tbl:%@, error:%@", tblName, ex.description);
-    }
-    @finally
-    {
-        sqlite3_close(rememberItDB);
-    }
-    
-    return insertRowId;
-}
-
 //generic select from table
 -(NSMutableArray *) selectFromTbl:(NSString *)tblName colNames:(NSArray *)colNames whereCols:(NSArray *)whereCols whereColValues:(NSArray *)whereColValues
 {
@@ -222,7 +161,7 @@ sqlite3_stmt *statement;
     
     stmtSQL = [NSMutableString stringWithString:myStmt];
     
-    NSLog(@"...selectFromTbl:%@", stmtSQL);
+    //NSLog(@"...selectFromTbl:%@", stmtSQL);
     
     @try
     {
@@ -278,7 +217,7 @@ sqlite3_stmt *statement;
         [myStmt appendString: [NSString stringWithFormat:@" And %@ = %@", andCol, andValue] ];
     
     stmtSQL = [NSMutableString stringWithString:myStmt];
-    NSLog(@"..deleteFromTbl:%@", stmtSQL);
+    //NSLog(@"..deleteFromTbl:%@", stmtSQL);
     
     @try
     {
@@ -290,6 +229,7 @@ sqlite3_stmt *statement;
             {
                 success = true;
             }
+            
             sqlite3_finalize(statement);
         }
     }
@@ -305,29 +245,49 @@ sqlite3_stmt *statement;
     return success;
 }
 
--(BOOL)saveEntryListItems:(NSString *)entryId listItems:(NSArray *)listItems listItemsSwitch:(NSArray *)listItemsSwitch
+//generic insert, allows for multiple row inserts
+-(NSString *)insertInToTbl:(NSString *)tblName colNames:(NSArray *)colNames colValues:(NSArray *)colValues multiple:(BOOL)multiple
 {
     const char *dbpath = [self dbPath];
     BOOL success = FALSE;
-    NSString *listItemAppend;
-
-    NSMutableString *myStmt = [NSMutableString stringWithFormat:
-                               @"INSERT INTO EntryListItems (EntryId, ListItem, ListItemSwitch) VALUES "];
+    NSString *insertRowId;
     
-    for(int i=0;i<listItems.count;i++)
+    NSMutableString *myStmt = [NSMutableString stringWithFormat:@"INSERT INTO %@ (", tblName];
+    
+    for(int i=0;i<colNames.count;i++)
     {
-        NSLog(@"...saveEntryListItems:switchVal:%@", listItemsSwitch[i]);
-        
-        if(i+1 == listItems.count)
-            listItemAppend = [NSString stringWithFormat:@"(\"%@\" , \"%@\" , %@)", entryId, listItems[i], listItemsSwitch[i]];
+        if(i+1 == colNames.count)
+            [myStmt appendString:[NSString stringWithFormat:@"%@) VALUES " , colNames[i]] ];
         else
-            listItemAppend = [NSString stringWithFormat:@"(\"%@\" , \"%@\" , %@),", entryId, listItems[i], listItemsSwitch[i]];
-        
-        [myStmt appendString:listItemAppend];
+            [myStmt appendString:[NSString stringWithFormat:@"%@, ", colNames[i]] ];
+    }
+    
+    if(multiple)
+    {
+        for(int i=0;i<colValues.count;i++)
+        {
+            //NSLog(@"...colValues:%@", colValues[i]);
+            if(i+1 == colValues.count)
+                [myStmt appendString:[NSString stringWithFormat:@"(\"%@\")", colValues[i]] ];
+            else
+                [myStmt appendString:[NSString stringWithFormat:@"(\"%@\"), ", colValues[i]] ];
+        }
+    }
+    else
+    {
+        for(int i=0;i<colValues.count;i++)
+        {
+            if(i+1 == colValues.count)
+                [myStmt appendString: [NSString stringWithFormat:@"\"%@\")", colValues[i] ]];
+            else if(i==0)
+                [myStmt appendString: [NSString stringWithFormat:@"(\"%@\", ", colValues[i] ]];
+            else
+                [myStmt appendString: [NSString stringWithFormat:@"\"%@\", ", colValues[i] ]];
+        }
     }
     
     stmtSQL = [NSMutableString stringWithString:myStmt];
-    NSLog(@"...saveEntryListItems: %@", stmtSQL);
+    //NSLog(@"...insertInToTable-multiple: %@", stmtSQL);
     
     @try
     {
@@ -340,22 +300,23 @@ sqlite3_stmt *statement;
             if (result == SQLITE_OK || result == SQLITE_DONE)
                 success = TRUE;
             else
-                NSLog(@"...result of saveSEntryListItems - %d:%s", result, sqlite3_errmsg(rememberItDB));
+                NSLog(@"...result of insertInToTable - %d:%s", result, sqlite3_errmsg(rememberItDB));
+            
+            insertRowId = [NSString stringWithFormat:@"%lld", sqlite3_last_insert_rowid(rememberItDB)];
+            NSLog(@"...insert return rowid:%@", insertRowId);
             
             sqlite3_finalize(statement);
         }
     }
     @catch (NSException * ex) {
-        NSLog(@"Exception: saveSEntryListItems:%@", ex.description);
+        NSLog(@"Exception: insertInToTable:%@", ex.description);
     }
     @finally {
         sqlite3_close(rememberItDB);
     }
     
-    return success;
+    return insertRowId;
 }
-
-
 
 -(BOOL)updateTbl:(NSString *)tblName colNames:(NSArray *)colNames colValues:(NSArray *)colValues whereCol:(NSString *)whereCol whereValue:(NSString *)whereValue
 {
@@ -379,7 +340,7 @@ sqlite3_stmt *statement;
     
     stmtSQL = [NSMutableString stringWithString:appendSql];
     
-    NSLog(@"...updateTbl:%@", stmtSQL);
+    //NSLog(@"...updateTbl:%@", stmtSQL);
     
     @try
     {
@@ -413,16 +374,6 @@ sqlite3_stmt *statement;
     const char *dbpath = [databasePath UTF8String];
     return dbpath;
 }
-
-/*
--(NSString *)docsDirPath
-{
-    // Get the documents directory
-    NSArray *dirPaths = NSSearchPathForDirectoriesInDomains(NSDocumentDirectory, NSUserDomainMask, YES);
-    NSString *docsDir = dirPaths[0];
-    return docsDir;
-}
-*/
 
 -(NSString *)databasePath
 {

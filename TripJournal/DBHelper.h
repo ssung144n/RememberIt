@@ -17,9 +17,7 @@
 
 -(void) createDB;
 
--(BOOL)saveEntryListItems:(NSString *)entryId listItems:(NSArray *)listItems listItemsSwitch:(NSArray *)listItemSwitch;
-
--(NSString *) insertIntoTbl:(NSString *)tblName colNames:(NSArray *)colNames colValues:(NSArray *)colValues;
+-(NSString *)insertInToTbl:(NSString *)tblName colNames:(NSArray *)colNames colValues:(NSArray *)colValues multiple:(BOOL)multiple;
 
 -(BOOL) deleteFromTbl:(NSString *)tblName whereCol:(NSString *)whereCol whereValues:(NSArray *)whereValues andCol:(NSString *)andCol andValue:(NSString *)andValue;
 

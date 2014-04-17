@@ -25,5 +25,8 @@
 //construtor
 -(id)initWithValues:(NSArray *) entryValues;
 
++(NSString *)checkDateForToday:(NSString *)entryDate;
++(NSString *)currentDate;
+
 @end
 

@@ -32,19 +32,23 @@ CLLocationCoordinate2D entryLoc;
 {
     [super viewDidLoad];
 	// Do any additional setup after loading the view.
-    mapHelper = [[MapHelper alloc] initWithMap:self.tripMap];
-    self.tripMap.delegate = self;
+    mapHelper = [[MapHelper alloc] init];
+    self.tripMap.delegate = self; //MKMapViewDelegate
     
     //set saved location
     mapHelper.latitude = self.selectedTrip.latitude;
     mapHelper.longitude = self.selectedTrip.longitude;
     
     //[mapHelper addLongPressGesture];
-    [mapHelper placeAnnotationforMap];
+    
+    entryLoc.latitude = [self.selectedTrip.latitude doubleValue];
+    entryLoc.longitude = [self.selectedTrip.longitude doubleValue];
+    
+    [mapHelper placeAnnotationforMap:self.tripMap];
     
     UILongPressGestureRecognizer *lpgr = [[UILongPressGestureRecognizer alloc]
                                           initWithTarget:self action:@selector(handleLongPress:)];
-    lpgr.minimumPressDuration = 1.5;
+    lpgr.minimumPressDuration = 1.0;
     [self.tripMap addGestureRecognizer:lpgr];
 }
 

@@ -98,8 +98,8 @@
     long rowCount = indexPath.row;
     TripEntry * trip = [tripsTable objectAtIndex:rowCount];
     cell.textLabel.text = trip.place;
-    NSString *tripDates;
-    tripDates = [NSString stringWithFormat:@"%@", trip.entryDate];
+    NSString *tripDates = [TripEntry checkDateForToday:trip.entryDate];
+    //tripDates = [NSString stringWithFormat:@"%@", trip.entryDate];
     cell.detailTextLabel.text = tripDates;
     if(trip.photoPath.length > 0)
     {
@@ -135,13 +135,7 @@
         PhotosTripViewController *vc = [segue destinationViewController];
         [vc setSelectedTrip:selectedTrip];
     }
-    //net setting selected trip = so will be nil
-    /*
-    else if ([segue.identifier isEqualToString:@"ToEntry"]) {
-        EntryViewController *vc = [segue destinationViewController];
-        [vc setSelectedTrip:nil];
-    }
-     */
+    //else is "New" EntryViewController
 }
 
 

@@ -10,6 +10,24 @@
 
 @implementation TripEntry
 
+
+-(NSString *)place
+{
+    if(_place == nil)
+        return @"";
+    else
+        return [_place stringByReplacingOccurrencesOfString:@"\"" withString:@"'"];;
+}
+
+-(NSString *)note
+{
+    if(_note == nil)
+        return @"";
+    else
+        return [_note stringByReplacingOccurrencesOfString:@"\"" withString:@"'"];;
+}
+
+
 -(NSString *)photoPath
 {
     if(_photoPath == nil)
@@ -40,6 +58,50 @@
         return @"";
     else
         return _endDate;
+}
+
+-(NSString *)entryDate
+{
+    if(_entryDate == nil)
+    {
+        _entryDate = [TripEntry currentDate];
+    }
+    return _entryDate;
+}
+
++(NSString *)currentDate
+{
+    NSDate *date = [[NSDate alloc] init];
+    
+    NSDateFormatter *dateFormatter = [[NSDateFormatter alloc] init];
+    [dateFormatter setDateFormat:@"MMM-dd-yyyy hh:mm"];
+    return [dateFormatter stringFromDate:date];
+}
+
+
++(NSString *)checkDateForToday:(NSString *)entryDate
+{
+    NSDate *today = [[NSDate alloc] init];
+    
+    NSDateFormatter *dateFormatter = [[NSDateFormatter alloc] init];
+    [dateFormatter setDateFormat:@"MMM-dd-yyyy"];
+    
+    NSString *todayStringCompare = [dateFormatter stringFromDate:today];
+    NSArray *entryDateArray = [entryDate componentsSeparatedByString: @" "];
+    NSString *entryDateStringCompare = entryDateArray[0];
+    
+    NSLog(@"..checkDateForToday:entryDateCompare - %@, todayDateCompare - %@", entryDateStringCompare, todayStringCompare);
+    if([todayStringCompare isEqualToString:entryDateStringCompare])
+    {
+        [dateFormatter setDateFormat:@"MMM-dd-yyyy hh:mm"];
+        NSDate *entryDateOrig = [dateFormatter dateFromString:entryDate];
+        
+        [dateFormatter setDateFormat:@"hh:mm"];
+        NSString *hoursMinutes = [dateFormatter stringFromDate:entryDateOrig];
+        entryDate = [NSString stringWithFormat:@"Today %@", hoursMinutes];
+    }
+
+    return entryDate;
 }
 
 -(id)initWithValues:(NSArray *) entryValues
