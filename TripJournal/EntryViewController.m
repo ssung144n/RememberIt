@@ -108,9 +108,6 @@ NSString *listTitle;
 
 - (void)handleTap:(UIGestureRecognizer *)gestureRecognizer
 {
-    //if (gestureRecognizer.state != UIGestureRecognizerStateBegan)
-        //return;
-    
     [self performSegueWithIdentifier:@"ToMapFromEntry" sender:self];
 }
 
@@ -126,7 +123,7 @@ NSString *listTitle;
 -(void)setEditEntry
 {
     isEdit = true;
-    self.navigationItem.title = @"Edit";
+    self.navigationItem.title = self.entry.place;
     self.name.text = self.entry.place;
     self.note.text = self.entry.note;
     
@@ -250,9 +247,9 @@ NSString *listTitle;
 - (NSString *)tableView:(UITableView *)tableView titleForHeaderInSection:(NSInteger)section
 {
     if([entryListItems[entryListItems.count - 1] isEqualToString:@""])
-        listTitle = [NSString stringWithFormat:@"List: %d items", (entryListItems.count-1)];
+        listTitle = [NSString stringWithFormat:@"List: %lu items", (entryListItems.count-1)];
     else
-        listTitle = [NSString stringWithFormat:@"List: %d items", entryListItems.count];
+        listTitle = [NSString stringWithFormat:@"List: %lu items", (unsigned long)entryListItems.count];
     return listTitle;
 }
 
@@ -403,7 +400,7 @@ NSString *listTitle;
     {
         // Add a row if the current row has value
         NSString *temp = [entryListItems[indexPath.row] stringByTrimmingCharactersInSet:[NSCharacterSet whitespaceCharacterSet]];
-        NSLog(@"..EVC:commitEditingStyle-Insert:row-%d:temp:%@", indexPath.row, temp);
+        //NSLog(@"..EVC:commitEditingStyle-Insert:row-%ld:temp:%@", (long)indexPath.row, temp);
         if(![temp isEqualToString:@""])
         {
             [self newEntryListItemRecord];
@@ -454,12 +451,6 @@ NSString *listTitle;
         PhotosTripViewController *vc = [segue destinationViewController];
         [vc setSelectedTrip:self.entry];
     }
-    /*
-    else if([segue.identifier isEqualToString:@"ToList"]) {
-        TripsTableViewController *vc = [segue destinationViewController];
-        [vc setSelectedTrip:self.entry];
-    }
-*/
 }
 
 //---------------- camera -----------------------
