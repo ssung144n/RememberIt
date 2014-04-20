@@ -90,7 +90,7 @@
     NSArray *entryDateArray = [entryDate componentsSeparatedByString: @" "];
     NSString *entryDateStringCompare = entryDateArray[0];
     
-    NSLog(@"..checkDateForToday:entryDateCompare - %@, todayDateCompare - %@", entryDateStringCompare, todayStringCompare);
+    //NSLog(@"..checkDateForToday:entryDateCompare - %@, todayDateCompare - %@", entryDateStringCompare, todayStringCompare);
     if([todayStringCompare isEqualToString:entryDateStringCompare])
     {
         [dateFormatter setDateFormat:@"MMM-dd-yyyy hh:mm"];

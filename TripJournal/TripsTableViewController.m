@@ -11,6 +11,7 @@
 #import "PhotosTripViewController.h"
 #import "EntryViewController.h"
 #import "DBHelper.h"
+#import "EntryViewController.h"
 
 #import <AssetsLibrary/ALAsset.h>
 
@@ -39,7 +40,7 @@
     
     dbHelper = [[DBHelper alloc] init];
     
-    NSArray *returnList= [dbHelper selectFromTbl:@"Entry" colNames:@[@"Id", @"Place", @"Note", @"StartDate", @"EndDate", @"Latitude", @"Longitude", @"Address", @"PhotoPath", @"EntryDate"] whereCols:nil whereColValues:nil];
+    NSArray *returnList= [dbHelper selectFromTbl:@"Entry" colNames:@[@"Id", @"Place", @"Note", @"StartDate", @"EndDate", @"Latitude", @"Longitude", @"Address", @"PhotoPath", @"EntryDate"] whereCols:nil whereColValues:nil orderByDesc:true];
     
     tripsTable = [[NSMutableArray alloc] initWithCapacity:returnList.count];
     for(int i=0;i<returnList.count;i++)
@@ -52,7 +53,7 @@
             [tripsTable addObject:entry];
         }
         else
-            NSLog(@"..entry is nil");
+            NSLog(@"..TTVC:viewDidLoad: no entries");
         
         entry = nil;
 
@@ -123,15 +124,23 @@
 {
     selectedTrip = tripsTable[indexPath.row];
     
-    [self performSegueWithIdentifier:@"tripsToPhotos" sender:self];
+    [self performSegueWithIdentifier:@"ToEditEntry" sender:self];
 }
 
--(void) prepareForSegue:(UIStoryboardSegue *)segue sender:(id)sender {
-    //this tells us where we are going
-    if ([segue.identifier isEqualToString:@"tripsToPhotos"]) {
-        PhotosTripViewController *vc = [segue destinationViewController];
-        [vc setSelectedTrip:selectedTrip];
-    }//else selected "New" for EntryViewController
+-(void) prepareForSegue:(UIStoryboardSegue *)segue sender:(id)sender
+{
+    /*
+    else if ([segue.identifier isEqualToString:@"ToNewEntry"]) {
+     --Nothing..want to pass in an nil entry
+    }
+    */
+    
+    if ([segue.identifier isEqualToString:@"ToEditEntry"])
+    {
+        NSLog(@"..TTVC:prepareForSegue-ToEditEntry:entry selected: %@", selectedTrip.place);
+        EntryViewController *vc = [segue destinationViewController];
+        [vc setEntry: selectedTrip];
+    }
 }
 
 

@@ -7,7 +7,6 @@
 //
 
 #import "EntryViewTableCell.h"
-#import "EntryViewController.h"
 
 @implementation EntryViewTableCell
 

@@ -91,7 +91,7 @@ sqlite3_stmt *statement;
     {
         if (sqlite3_open(dbpath, &rememberItDB) == SQLITE_OK)
         {
-            NSLog(@"..saveData:%@", stmtSQL);
+            //NSLog(@"..saveData:%@", stmtSQL);
 
             const char *sql_stmt = [stmtSQL UTF8String];
             sqlite3_prepare_v2(rememberItDB, sql_stmt, -1, &statement, NULL);
@@ -130,7 +130,7 @@ sqlite3_stmt *statement;
 
 
 //generic select from table
--(NSMutableArray *) selectFromTbl:(NSString *)tblName colNames:(NSArray *)colNames whereCols:(NSArray *)whereCols whereColValues:(NSArray *)whereColValues
+-(NSMutableArray *) selectFromTbl:(NSString *)tblName colNames:(NSArray *)colNames whereCols:(NSArray *)whereCols whereColValues:(NSArray *)whereColValues orderByDesc:(BOOL)orderByDesc
 {
     NSMutableArray *returnRow, *returnList;
     const char *dbpath = [self dbPath];
@@ -158,6 +158,8 @@ sqlite3_stmt *statement;
                 [myStmt appendString: [NSString stringWithFormat:@"%@ = \"%@\" And ", whereCols[i], whereColValues[i] ]];
         }
     }
+    if(orderByDesc)
+        [myStmt appendString: [NSString stringWithFormat:@" ORDER BY ID DESC"]];
     
     stmtSQL = [NSMutableString stringWithString:myStmt];
     

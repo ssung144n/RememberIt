@@ -50,31 +50,22 @@
                         </connections>
                     </tableView>
                     <navigationItem key="navigationItem" title="List" id="OS5-bg-6sH">
-                        <barButtonItem key="leftBarButtonItem" id="uFO-hc-I0g">
-                            <button key="customView" opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" id="bxV-xd-6CO">
-                                <rect key="frame" x="16" y="5" width="71" height="33"/>
-                                <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
-                                <fontDescription key="fontDescription" name="HelveticaNeue" family="Helvetica Neue" pointSize="17"/>
-                                <color key="tintColor" red="0.16780542640000001" green="0.1245308797" blue="0.51766304350000003" alpha="1" colorSpace="calibratedRGB"/>
-                                <inset key="contentEdgeInsets" minX="-35" minY="0.0" maxX="0.0" maxY="0.0"/>
-                                <state key="normal" title="New">
-                                    <color key="titleColor" red="0.16780542640000001" green="0.1245308797" blue="0.51766304350000003" alpha="1" colorSpace="calibratedRGB"/>
-                                </state>
-                                <connections>
-                                    <segue destination="go9-X3-MTu" kind="push" identifier="ToEntry" id="YZ9-kz-GCI"/>
-                                </connections>
-                            </button>
+                        <barButtonItem key="rightBarButtonItem" title="New" id="O0u-AE-ji9">
+                            <color key="tintColor" red="0.16780542640000001" green="0.1245308797" blue="0.51766304350000003" alpha="1" colorSpace="calibratedRGB"/>
+                            <connections>
+                                <segue destination="go9-X3-MTu" kind="push" identifier="ToNewEntry" id="5fS-gk-iGj"/>
+                            </connections>
                         </barButtonItem>
                     </navigationItem>
                     <simulatedNavigationBarMetrics key="simulatedTopBarMetrics" prompted="NO"/>
                     <nil key="simulatedBottomBarMetrics"/>
                     <connections>
-                        <segue destination="pjn-z0-gj2" kind="push" identifier="tripsToPhotos" id="9yZ-xu-OAs"/>
+                        <segue destination="go9-X3-MTu" kind="push" identifier="ToEditEntry" id="QKh-4D-vsS"/>
                     </connections>
                 </tableViewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="N1V-2S-qe2" userLabel="First Responder" sceneMemberID="firstResponder"/>
             </objects>
-            <point key="canvasLocation" x="1614" y="303"/>
+            <point key="canvasLocation" x="1251" y="313"/>
         </scene>
         <!--Entry View Controller - RememberIt-->
         <scene sceneID="jYh-Ar-Kdz">
@@ -203,11 +194,24 @@
                                     <action selector="sendEmail:" destination="go9-X3-MTu" eventType="touchUpInside" id="Zcm-rR-2Ep"/>
                                 </connections>
                             </button>
+                            <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="RPf-41-wLq">
+                                <rect key="frame" x="15" y="444" width="74" height="30"/>
+                                <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
+                                <state key="normal" title="+Photo">
+                                    <color key="titleColor" red="0.16780542640000001" green="0.1245308797" blue="0.51766304350000003" alpha="1" colorSpace="calibratedRGB"/>
+                                    <color key="titleShadowColor" white="0.5" alpha="1" colorSpace="calibratedWhite"/>
+                                </state>
+                                <connections>
+                                    <segue destination="pjn-z0-gj2" kind="push" identifier="ToPhotosFromEntry" id="iIQ-Dj-diX"/>
+                                </connections>
+                            </button>
                         </subviews>
                         <color key="backgroundColor" white="1" alpha="1" colorSpace="custom" customColorSpace="calibratedWhite"/>
                         <constraints>
+                            <constraint firstItem="oM2-4S-Am6" firstAttribute="leading" secondItem="RPf-41-wLq" secondAttribute="trailing" constant="48" id="4gC-Ps-qyd"/>
                             <constraint firstItem="dqk-7D-GbB" firstAttribute="leading" secondItem="ogN-p2-o8g" secondAttribute="leading" constant="11" id="6oA-1E-2Fd"/>
                             <constraint firstItem="si1-jD-YlW" firstAttribute="leading" secondItem="QvU-XI-xbo" secondAttribute="trailing" constant="41" id="7Ed-Pl-Ehn"/>
+                            <constraint firstItem="RPf-41-wLq" firstAttribute="baseline" secondItem="oM2-4S-Am6" secondAttribute="baseline" id="8hD-aG-PTq"/>
                             <constraint firstItem="GMf-Lh-sYS" firstAttribute="trailing" secondItem="si1-jD-YlW" secondAttribute="trailing" id="9dm-3F-0hY"/>
                             <constraint firstItem="YYE-jU-9aC" firstAttribute="top" secondItem="QvU-XI-xbo" secondAttribute="bottom" constant="50" id="ACS-bm-cWY"/>
                             <constraint firstItem="3Bw-xo-DEX" firstAttribute="leading" secondItem="dqk-7D-GbB" secondAttribute="leading" id="GGf-rP-Ke0"/>
@@ -225,17 +229,20 @@
                             <constraint firstItem="dqk-7D-GbB" firstAttribute="centerX" secondItem="kyZ-Kn-FwO" secondAttribute="centerX" id="clQ-ww-eMP"/>
                             <constraint firstItem="kyZ-Kn-FwO" firstAttribute="leading" secondItem="ogN-p2-o8g" secondAttribute="leading" constant="20" symbolic="YES" id="fGY-6e-p7x"/>
                             <constraint firstItem="dqk-7D-GbB" firstAttribute="top" secondItem="kyZ-Kn-FwO" secondAttribute="bottom" constant="8" symbolic="YES" id="g6D-pT-wbj"/>
+                            <constraint firstItem="RPf-41-wLq" firstAttribute="centerX" secondItem="QvU-XI-xbo" secondAttribute="centerX" id="ikG-Pp-HQz"/>
                             <constraint firstItem="GMf-Lh-sYS" firstAttribute="top" secondItem="ogN-p2-o8g" secondAttribute="top" constant="63" id="m1h-mB-5N5"/>
                             <constraint firstItem="QvU-XI-xbo" firstAttribute="top" secondItem="3Bw-xo-DEX" secondAttribute="bottom" constant="17" id="uWf-Bn-aI7"/>
                         </constraints>
                     </view>
                     <navigationItem key="navigationItem" title="RememberIt" id="E9t-zQ-Uz7">
                         <barButtonItem key="leftBarButtonItem" title="Save    " width="40" id="b2a-iA-JtI">
+                            <color key="tintColor" red="0.16780542640000001" green="0.1245308797" blue="0.51766304350000003" alpha="1" colorSpace="calibratedRGB"/>
                             <connections>
                                 <action selector="saveButtonClick:" destination="go9-X3-MTu" id="eza-n4-uQm"/>
                             </connections>
                         </barButtonItem>
                         <barButtonItem key="rightBarButtonItem" title="List" id="6SQ-Gs-9OG">
+                            <color key="tintColor" red="0.16780542640000001" green="0.1245308797" blue="0.51766304350000003" alpha="1" colorSpace="calibratedRGB"/>
                             <connections>
                                 <segue destination="N93-MB-aoR" kind="push" identifier="ToList" id="xJE-jD-K0g"/>
                             </connections>
@@ -247,6 +254,7 @@
                         <outlet property="entryDate" destination="GMf-Lh-sYS" id="CId-RG-hpu"/>
                         <outlet property="listTbl" destination="3Bw-xo-DEX" id="QQD-PN-Shw"/>
                         <outlet property="mapView" destination="si1-jD-YlW" id="CU3-G9-HxN"/>
+                        <outlet property="morePhotosButton" destination="RPf-41-wLq" id="DfX-ko-m9i"/>
                         <outlet property="name" destination="kyZ-Kn-FwO" id="f1Q-fM-EYD"/>
                         <outlet property="note" destination="dqk-7D-GbB" id="d5o-zw-xqu"/>
                         <segue destination="7Cy-Cc-MlF" kind="push" identifier="ToMapFromEntry" id="YdJ-UT-9eh"/>
@@ -254,7 +262,7 @@
                 </viewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="NEf-7N-Fzv" userLabel="First Responder" sceneMemberID="firstResponder"/>
             </objects>
-            <point key="canvasLocation" x="1045" y="273"/>
+            <point key="canvasLocation" x="499" y="100"/>
         </scene>
         <!--Map View Controller - Map-->
         <scene sceneID="LMe-xL-lRB">
@@ -276,7 +284,7 @@
                                 <rect key="frame" x="97" y="445" width="127" height="27"/>
                                 <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
                                 <constraints>
-                                    <constraint firstAttribute="height" constant="27" id="Ow5-rJ-4JE"/>
+                                    <constraint firstAttribute="height" constant="27" id="bFl-e8-Yyp"/>
                                 </constraints>
                                 <fontDescription key="fontDescription" type="system" pointSize="17"/>
                                 <state key="normal" title="Get Directions">
@@ -291,7 +299,7 @@
                                 <rect key="frame" x="4" y="72" width="313" height="21"/>
                                 <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
                                 <constraints>
-                                    <constraint firstAttribute="height" constant="21" id="yas-j9-EbT"/>
+                                    <constraint firstAttribute="height" constant="21" id="eNd-je-JFP"/>
                                 </constraints>
                                 <fontDescription key="fontDescription" type="system" pointSize="15"/>
                                 <nil key="highlightedColor"/>
@@ -299,16 +307,16 @@
                         </subviews>
                         <color key="backgroundColor" white="1" alpha="1" colorSpace="custom" customColorSpace="calibratedWhite"/>
                         <constraints>
-                            <constraint firstItem="6Hc-yf-jwK" firstAttribute="leading" secondItem="4to-Yj-SE6" secondAttribute="leading" constant="4" id="D2J-p7-QUl"/>
+                            <constraint firstAttribute="trailing" secondItem="6Hc-yf-jwK" secondAttribute="trailing" constant="3" id="F7H-wO-sL5"/>
+                            <constraint firstItem="6Hc-yf-jwK" firstAttribute="top" secondItem="aFO-Dh-qeG" secondAttribute="bottom" constant="8" id="GyG-Sx-zM0"/>
+                            <constraint firstItem="yWf-cb-aql" firstAttribute="top" secondItem="otZ-XX-8Cs" secondAttribute="bottom" constant="8" symbolic="YES" id="IeG-d7-IAJ"/>
+                            <constraint firstItem="6Hc-yf-jwK" firstAttribute="leading" secondItem="4to-Yj-SE6" secondAttribute="leading" constant="4" id="K5V-on-GhI"/>
                             <constraint firstItem="otZ-XX-8Cs" firstAttribute="leading" secondItem="4to-Yj-SE6" secondAttribute="leading" id="Lqv-60-vdS"/>
-                            <constraint firstItem="6Hc-yf-jwK" firstAttribute="centerX" secondItem="otZ-XX-8Cs" secondAttribute="centerX" id="LxG-Os-Vfa"/>
-                            <constraint firstItem="VSI-pm-Zre" firstAttribute="top" secondItem="yWf-cb-aql" secondAttribute="bottom" constant="8" id="Nqt-rR-H8B"/>
-                            <constraint firstItem="6Hc-yf-jwK" firstAttribute="top" secondItem="aFO-Dh-qeG" secondAttribute="bottom" constant="8" id="PVG-Mk-SqZ"/>
-                            <constraint firstItem="yWf-cb-aql" firstAttribute="top" secondItem="otZ-XX-8Cs" secondAttribute="bottom" constant="8" symbolic="YES" id="ZdL-Wi-oiz"/>
-                            <constraint firstItem="yWf-cb-aql" firstAttribute="leading" secondItem="4to-Yj-SE6" secondAttribute="leading" constant="97" id="dDx-6J-C1Y"/>
+                            <constraint firstItem="VSI-pm-Zre" firstAttribute="top" secondItem="yWf-cb-aql" secondAttribute="bottom" constant="8" id="Qz7-Ck-zTa"/>
                             <constraint firstAttribute="trailing" secondItem="otZ-XX-8Cs" secondAttribute="trailing" id="g9B-xc-Fna"/>
-                            <constraint firstItem="yWf-cb-aql" firstAttribute="centerX" secondItem="otZ-XX-8Cs" secondAttribute="centerX" id="hAy-CK-vbS"/>
-                            <constraint firstItem="otZ-XX-8Cs" firstAttribute="top" secondItem="6Hc-yf-jwK" secondAttribute="bottom" constant="8" symbolic="YES" id="pPw-8x-3ks"/>
+                            <constraint firstItem="yWf-cb-aql" firstAttribute="leading" secondItem="4to-Yj-SE6" secondAttribute="leading" constant="97" id="lBk-ke-PqO"/>
+                            <constraint firstItem="yWf-cb-aql" firstAttribute="centerX" secondItem="6Hc-yf-jwK" secondAttribute="centerX" id="qp8-ew-dkl"/>
+                            <constraint firstItem="otZ-XX-8Cs" firstAttribute="top" secondItem="6Hc-yf-jwK" secondAttribute="bottom" constant="8" symbolic="YES" id="v9s-AJ-Mng"/>
                         </constraints>
                     </view>
                     <navigationItem key="navigationItem" title="Map" id="b92-ne-vFe"/>
@@ -320,7 +328,7 @@
                 </viewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="puU-Md-cDK" userLabel="First Responder" sceneMemberID="firstResponder"/>
             </objects>
-            <point key="canvasLocation" x="1965" y="-125"/>
+            <point key="canvasLocation" x="1729" y="-535"/>
         </scene>
         <!--Show Photo View Controller - Show Photo-->
         <scene sceneID="tWX-7O-XdV">
@@ -373,7 +381,7 @@
                 </viewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="5Pe-UA-cfM" userLabel="First Responder" sceneMemberID="firstResponder"/>
             </objects>
-            <point key="canvasLocation" x="557" y="-364"/>
+            <point key="canvasLocation" x="612" y="-612"/>
         </scene>
         <!--Photos Trip View Controller - Detail-->
         <scene sceneID="8Ar-38-BxZ">
@@ -435,13 +443,7 @@
                                             <action selector="showMap:" destination="pjn-z0-gj2" id="JST-5h-Mbj"/>
                                         </connections>
                                     </barButtonItem>
-                                    <barButtonItem width="82" style="plain" systemItem="fixedSpace" id="Ocy-jG-SWW"/>
-                                    <barButtonItem systemItem="edit" id="7oJ-1R-xje">
-                                        <connections>
-                                            <segue destination="go9-X3-MTu" kind="push" identifier="ToEdit" id="dD0-4L-Fqc"/>
-                                        </connections>
-                                    </barButtonItem>
-                                    <barButtonItem width="76" style="plain" systemItem="fixedSpace" id="SPC-6w-wJh"/>
+                                    <barButtonItem width="196" style="plain" systemItem="fixedSpace" id="Ocy-jG-SWW"/>
                                     <barButtonItem title="Delete" id="UwL-07-RZw">
                                         <connections>
                                             <action selector="deletePhotos:" destination="pjn-z0-gj2" id="b98-NN-QcX"/>
@@ -464,12 +466,6 @@
                     </view>
                     <extendedEdge key="edgesForExtendedLayout" top="YES"/>
                     <navigationItem key="navigationItem" title="Detail" id="afy-kn-coe">
-                        <barButtonItem key="leftBarButtonItem" title="List" id="eeL-EU-Kx1">
-                            <color key="tintColor" red="0.16780542640000001" green="0.1245308797" blue="0.51766304350000003" alpha="1" colorSpace="calibratedRGB"/>
-                            <connections>
-                                <segue destination="N93-MB-aoR" kind="push" identifier="BackToMyTrips" id="OBK-XG-BU9"/>
-                            </connections>
-                        </barButtonItem>
                         <barButtonItem key="rightBarButtonItem" systemItem="camera" id="fqD-rM-cY4">
                             <color key="tintColor" red="0.16780542640000001" green="0.1245308797" blue="0.51766304350000003" alpha="1" colorSpace="calibratedRGB"/>
                             <connections>
@@ -480,6 +476,7 @@
                     <simulatedNavigationBarMetrics key="simulatedTopBarMetrics" prompted="NO"/>
                     <nil key="simulatedBottomBarMetrics"/>
                     <connections>
+                        <outlet property="mapBarButton" destination="lfL-9P-JZt" id="wRC-kb-BzG"/>
                         <outlet property="navigationTitle" destination="afy-kn-coe" id="way-rX-XI1"/>
                         <outlet property="photoCollectionView" destination="Is8-t1-dSH" id="LBx-gH-I3g"/>
                         <segue destination="7Cy-Cc-MlF" kind="push" identifier="ToMap" id="OPs-uY-y53"/>
@@ -488,7 +485,7 @@
                 </viewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="ZXc-QC-cXj" userLabel="First Responder" sceneMemberID="firstResponder"/>
             </objects>
-            <point key="canvasLocation" x="1031" y="-352"/>
+            <point key="canvasLocation" x="1055" y="-405"/>
         </scene>
         <!--Navigation Controller-->
         <scene sceneID="Gye-96-mPG">
@@ -507,7 +504,7 @@
                 </navigationController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="sb7-85-4fI" userLabel="First Responder" sceneMemberID="firstResponder"/>
             </objects>
-            <point key="canvasLocation" x="551" y="259"/>
+            <point key="canvasLocation" x="-102" y="257"/>
         </scene>
     </scenes>
     <resources>
@@ -519,8 +516,7 @@
         <simulatedScreenMetrics key="destination"/>
     </simulatedMetricsContainer>
     <inferredMetricsTieBreakers>
-        <segue reference="xJE-jD-K0g"/>
-        <segue reference="dD0-4L-Fqc"/>
-        <segue reference="YdJ-UT-9eh"/>
+        <segue reference="5fS-gk-iGj"/>
+        <segue reference="OPs-uY-y53"/>
     </inferredMetricsTieBreakers>
 </document>

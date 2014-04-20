@@ -45,7 +45,10 @@ NSString *addPhotoImage = @"camerared1.png";
     dbHelper = [[DBHelper alloc] init];
     tripPhotos = [[NSMutableArray alloc] init];
     
-    NSArray *returnList = [dbHelper selectFromTbl:@"EntryPhotos" colNames:@[@"PhotoPath"] whereCols:@[@"EntryId"] whereColValues:@[self.selectedTrip.entryId] ];
+    if([self.selectedTrip.latitude intValue] == 0)
+        self.mapBarButton.enabled = false;
+    
+    NSArray *returnList = [dbHelper selectFromTbl:@"EntryPhotos" colNames:@[@"PhotoPath"] whereCols:@[@"EntryId"] whereColValues:@[self.selectedTrip.entryId] orderByDesc:false ];
     
     if(returnList)
     {
@@ -228,10 +231,7 @@ NSString *addPhotoImage = @"camerared1.png";
         [vc setSelectedTrip: self.selectedTrip];
         [vc setPhotoPath:selectedPhoto];
     }
-    else if([segue.identifier isEqualToString:@"ToEdit"]) {
-        EntryViewController *vc = [segue destinationViewController];
-        [vc setSelectedTrip:self.selectedTrip];
-    }
+
 }
 
 
@@ -287,10 +287,6 @@ NSString *addPhotoImage = @"camerared1.png";
         
         [self.photoCollectionView reloadData];
     }
-}
-
-- (IBAction)editEntry:(id)sender {
-    [self performSegueWithIdentifier:@"ToEdit" sender:self];
 }
 
 #pragma mark UIImagePickerControllerDelegate

@@ -13,6 +13,7 @@
 #import "MapViewController.h"
 #import "DBHelper.h"
 #import "TripsTableViewController.h"
+#import "PhotosTripViewController.h"
 
 #import <MobileCoreServices/MobileCoreServices.h>
 #import <AssetsLibrary/ALAsset.h>
@@ -32,6 +33,7 @@ NSString * selectedImage = @"";
 MapHelper *mapHelper;
 DBHelper *dbHelper;
 BOOL isEdit = false;
+NSString *listTitle;
 
 - (id)initWithNibName:(NSString *)nibNameOrNil bundle:(NSBundle *)nibBundleOrNil
 {
@@ -48,40 +50,37 @@ BOOL isEdit = false;
     // Do any additional setup after loading the view.
     
     dbHelper = [[DBHelper alloc] init];
+    [dbHelper createDB];
+    
     entryListItems = [[NSMutableArray alloc] init];
     entryListItemsSwitch = [[NSMutableArray alloc] init];
-
-    //NSLog(@"EntryViewController:viewDidLoad - alloc/init mapHelper, assign as delegate");
-    mapHelper = [[MapHelper alloc] init];
-    self.mapView.delegate = self; //for select annotation event
     
-    //check if editing
-    NSLog(@"..EntryViewController:viewDidLoad - selectedTrip:%@", self.selectedTrip);
-    if(self.selectedTrip && self.selectedTrip.entryId)
+    UITapGestureRecognizer *gesture = [[UITapGestureRecognizer alloc]
+                                          initWithTarget:self action:@selector(handleTap:)];
+    [self.mapView addGestureRecognizer:gesture];
+    
+    mapHelper = [[MapHelper alloc] init];
+    if(![mapHelper haveLocationServices])
+        self.mapView.hidden = true;
+    [mapHelper setDelegate:self];
+    
+     //self.navigationItem.hidesBackButton = YES;
+    [self validateCamera];
+    
+    //NSLog(@"..EntryViewController:viewDidLoad - selectedTrip:%@", self.selectedTrip);
+    if(self.entry && self.entry.entryId)
     {
-        isEdit = true;
         [self setEditEntry];
-
-        NSMutableArray *returnList = [dbHelper selectFromTbl:@"EntryListItems" colNames:@[@"ListItem", @"ListItemSwitch"] whereCols:@[@"EntryId"] whereColValues:@[self.selectedTrip.entryId]];
-        
-        if(returnList && returnList.count > 0)
-        {
-            for(int i=0;i<returnList.count;i++)
-            {
-                NSArray *listItemRow = returnList[i];
-                [entryListItems addObject:listItemRow[0]];
-                [entryListItemsSwitch addObject:listItemRow[1]];
-            }
-        }
-        else
-            [self newEntryListItemRecord];
     }
     else
     {
+        [mapHelper setCurrentLocationInfo]; //if first time loading app, init loc manager, loc, current loc, etc
+        
         isEdit = false;
         [self newEntryListItemRecord]; //insert first list item row
+        self.emailButton.hidden = TRUE;
         selectedImage = @"";
-        self.emailButton.hidden = true;
+        self.morePhotosButton.hidden = true;
     }
     
     [self.note.layer setBorderColor: [[UIColor whiteColor] CGColor]];
@@ -89,7 +88,6 @@ BOOL isEdit = false;
     [[self.note layer] setCornerRadius:10];
     [self.note setClipsToBounds: YES];
     
-    //coverPhoto button border
     [self.buttonPhoto.layer setBorderColor: [[UIColor greenColor] CGColor]];
     [[self.buttonPhoto layer] setBorderWidth:2.3];
     [[self.buttonPhoto layer] setCornerRadius:10];
@@ -106,8 +104,14 @@ BOOL isEdit = false;
     
     self.name.layer.borderWidth = 2.0f;
     [[self.name layer] setCornerRadius:10];
+}
+
+- (void)handleTap:(UIGestureRecognizer *)gestureRecognizer
+{
+    //if (gestureRecognizer.state != UIGestureRecognizerStateBegan)
+        //return;
     
-    [self validateCamera];
+    [self performSegueWithIdentifier:@"ToMapFromEntry" sender:self];
 }
 
 -(void)viewWillAppear:(BOOL)animated {
@@ -115,25 +119,46 @@ BOOL isEdit = false;
     [super viewWillAppear:animated];
     
     //NSLog(@"..viewWillAppear: will callsetLocationMapInfo - lat:%@, lon:%@", mapHelper.latitude, mapHelper.longitude);
+    //[mapHelper setCurrentLocationInfo];
     [self setLocationMapInfo];
 }
 
 -(void)setEditEntry
 {
+    isEdit = true;
     self.navigationItem.title = @"Edit";
-    self.name.text = self.selectedTrip.place;
-    self.note.text = self.selectedTrip.note;
+    self.name.text = self.entry.place;
+    self.note.text = self.entry.note;
     
+    self.emailButton.hidden = false;
     [self setEntryCoverPhoto];
+    
+    //get list items
+    NSMutableArray *returnList = [dbHelper selectFromTbl:@"EntryListItems" colNames:@[@"ListItem", @"ListItemSwitch"] whereCols:@[@"EntryId"] whereColValues:@[self.entry.entryId] orderByDesc:false];
+    
+    if(returnList && returnList.count > 0)
+    {
+        for(int i=0;i<returnList.count;i++)
+        {
+            NSArray *listItemRow = returnList[i];
+            [entryListItems addObject:listItemRow[0]];
+            [entryListItemsSwitch addObject:listItemRow[1]];
+        }
+    }
+    else
+    {
+        [self newEntryListItemRecord];
+    }
 }
 
 -(void)setEntryCoverPhoto
 {
-    if(self.selectedTrip.photoPath.length > 0)
+    if(self.entry.photoPath.length > 0)
     {
+        self.morePhotosButton.hidden = false;
         __block UIImage *photo = nil;
-        NSURL* aURL = [NSURL URLWithString:self.selectedTrip.photoPath];
-        selectedImage = self.selectedTrip.photoPath;
+        NSURL* aURL = [NSURL URLWithString:self.entry.photoPath];
+        selectedImage = self.entry.photoPath;
         ALAssetsLibrary *library = [[ALAssetsLibrary alloc] init];
         [library assetForURL:aURL resultBlock:^(ALAsset *asset)
          {
@@ -145,6 +170,8 @@ BOOL isEdit = false;
              NSLog(@"...Error:setEntryCoverPhoto - %@", error.description);
          }];
     }
+    else
+        self.morePhotosButton.hidden = true;
 }
 
 -(void)newEntryListItemRecord
@@ -163,18 +190,17 @@ BOOL isEdit = false;
 {
     if([mapHelper haveLocationServices])
     {
-        if(self.selectedTrip.latitude && self.selectedTrip.longitude)
+        if(self.entry.latitude && self.entry.longitude)
         {
-            mapHelper.latitude = self.selectedTrip.latitude;
-            mapHelper.longitude = self.selectedTrip.longitude;
+           // NSLog(@"..setLocInfo..selectedTrip.lat: %@", self.selectedTrip.latitude);
+            mapHelper.latitude = self.entry.latitude;
+            mapHelper.longitude = self.entry.longitude;
         }
-        else
-            [mapHelper setCurrentLocationInfo];
         
         if(mapHelper.latitude && [mapHelper.latitude intValue] != 0)
-            NSLog(@"...EntryViewController:setLocationMapInfo - mapHelper.latitude and intvalue:%@, %d", mapHelper.latitude, [mapHelper.latitude intValue]);
-            
-        [mapHelper placeAnnotationforMap:self.mapView];
+        {
+            [mapHelper placeAnnotationforMap:self.mapView setRegion:TRUE];
+        }
     }
 }
 
@@ -223,7 +249,11 @@ BOOL isEdit = false;
 
 - (NSString *)tableView:(UITableView *)tableView titleForHeaderInSection:(NSInteger)section
 {
-    return @"List";
+    if([entryListItems[entryListItems.count - 1] isEqualToString:@""])
+        listTitle = [NSString stringWithFormat:@"List: %d items", (entryListItems.count-1)];
+    else
+        listTitle = [NSString stringWithFormat:@"List: %d items", entryListItems.count];
+    return listTitle;
 }
 
 - (CGFloat)tableView:(UITableView *)tableView heightForHeaderInSection:(NSInteger)section;
@@ -273,8 +303,8 @@ BOOL isEdit = false;
 
 //http://www.codigator.com/tutorials/ios-uitableview-tutorial-custom-cell-and-delegates/
 //protocol delegate in custom tablecell for controlEvent for textField
-
-- (void)textFieldChangedCell:(id)sender {
+- (void)textFieldChangedCell:(id)sender
+{
     NSIndexPath *indexpath = [self.listTbl indexPathForCell:sender];
     int row = (int)indexpath.row;
     
@@ -282,10 +312,10 @@ BOOL isEdit = false;
     NSString *txtValue = selectedCell.listItem.text;
     
     entryListItems[row] = [self checkForQuotes:txtValue];
+    [self.listTbl reloadData]; //so section list title will update
 }
 
-//protocol delegate in custom tablecell to move up view so keyboard doesn't block last list entry item
-//check if textField is last one in listTbl, if so - scroll view up by ~ 20 (do in DidBegin...) do opp when done
+//protocol delegate in custom tablecell to move up view so keyboard doesn't block list entry item
 - (void)textFieldEditingBeginCell:(id)sender
 {
     //calculate where cursor is (y height) and size of keyboard, and adjust view frame accordingly...
@@ -301,8 +331,7 @@ BOOL isEdit = false;
     }
 }
 
-//protocol delegate in custom tablecell to move up view so keyboard doesn't block last list entry item
-//check if textField is last one in listTbl, if so - scroll view up by ~ 20 (do in DidBegin...) do opp when done
+//protocol delegate in custom tablecell to move up view so keyboard doesn't block list entry item
 - (void)textFieldEditingEndCell:(id)sender
 {
     NSIndexPath *indexpath = [self.listTbl indexPathForCell:sender];
@@ -351,13 +380,11 @@ BOOL isEdit = false;
 
 - (UITableViewCellEditingStyle)tableView:(UITableView *)aTableView editingStyleForRowAtIndexPath:(NSIndexPath *)indexPath
 {
-    //NSLog(@"..editingStyleForRowAtIndexPath:%ld", (long)indexPath.row);
     if (indexPath.row+1 == ([entryListItems count])) //if last row, insert style
         return UITableViewCellEditingStyleInsert;
     else
         return UITableViewCellEditingStyleDelete;
-    
-    //return UITableViewCellEditingStyleNone;
+
 }
 
 //delete or insert in edit mode
@@ -366,23 +393,26 @@ BOOL isEdit = false;
     if (editingStyle == UITableViewCellEditingStyleDelete)
     {
         [entryListItems removeObjectAtIndex:indexPath.row];
-
-        //[self.listTbl reloadData];
-        [self.listTbl deleteRowsAtIndexPaths:@[indexPath] withRowAnimation:UITableViewRowAnimationAutomatic];
+        [self.listTbl reloadData];//so section list title will update
+        //[self.listTbl deleteRowsAtIndexPaths:@[indexPath] withRowAnimation:UITableViewRowAnimationAutomatic];
 
         // Delete the row from the data source
         //[tableView deleteRowsAtIndexPaths:@[indexPath] withRowAnimation:UITableViewRowAnimationFade];
     }
     else if (editingStyle == UITableViewCellEditingStyleInsert)
     {
-        // Add the row from the data source
-        [self newEntryListItemRecord];
-              
-        [self.listTbl reloadData];
-        
-        //scroll down to last entry
-        NSIndexPath* ipath = [NSIndexPath indexPathForRow: entryListItems.count-1 inSection: 0];
-        [self.listTbl scrollToRowAtIndexPath: ipath atScrollPosition: UITableViewScrollPositionBottom animated: YES];
+        // Add a row if the current row has value
+        NSString *temp = [entryListItems[indexPath.row] stringByTrimmingCharactersInSet:[NSCharacterSet whitespaceCharacterSet]];
+        NSLog(@"..EVC:commitEditingStyle-Insert:row-%d:temp:%@", indexPath.row, temp);
+        if(![temp isEqualToString:@""])
+        {
+            [self newEntryListItemRecord];
+            [self.listTbl reloadData];
+            
+            //scroll down to last entry
+            NSIndexPath* ipath = [NSIndexPath indexPathForRow: entryListItems.count-1 inSection: 0];
+            [self.listTbl scrollToRowAtIndexPath: ipath atScrollPosition: UITableViewScrollPositionBottom animated: YES];
+        }
     }
 }
 
@@ -403,35 +433,40 @@ BOOL isEdit = false;
     [sender resignFirstResponder];
 }
 
-//------------- location ------------------------
-
-//MKMapView delegate - when selecting annotation-----------------
-- (void)mapView:(MKMapView *)mapView didSelectAnnotationView:(MKAnnotationView *)view {
-    [self performSegueWithIdentifier:@"ToMapFromEntry" sender:self];
-}
+//------------- map ------------------------
 
 -(void) prepareForSegue:(UIStoryboardSegue *)segue sender:(id)sender {
     
     if([segue.identifier isEqualToString:@"ToMapFromEntry"]) {
         MapViewController *vc = [segue destinationViewController];
         
-        if(!(self.selectedTrip && self.selectedTrip.entryId))
+        if(!(self.entry && self.entry.entryId))
         {
-            self.selectedTrip = [[TripEntry alloc] init];
+            self.entry = [[TripEntry alloc] init];
         }
         
-        self.selectedTrip.latitude = mapHelper.latitude;
-        self.selectedTrip.longitude = mapHelper.longitude;
+        self.entry.latitude = mapHelper.latitude;
+        self.entry.longitude = mapHelper.longitude;
         
-        [vc setSelectedTrip: self.selectedTrip];
+        [vc setSelectedTrip: self.entry];
     }
-
+    else if([segue.identifier isEqualToString:@"ToPhotosFromEntry"]) {
+        PhotosTripViewController *vc = [segue destinationViewController];
+        [vc setSelectedTrip:self.entry];
+    }
+    /*
+    else if([segue.identifier isEqualToString:@"ToList"]) {
+        TripsTableViewController *vc = [segue destinationViewController];
+        [vc setSelectedTrip:self.entry];
+    }
+*/
 }
 
 //---------------- camera -----------------------
 // TO DO - popup selection of take photo or select existing photo
 
 - (IBAction)buttonPhotoPick:(id)sender {
+    NSLog(@"..EVC:buttonPhotoPick: %@", selectedImage);
     UIImagePickerController *picker = [[UIImagePickerController alloc] init];
     picker.delegate = self;
     picker.allowsEditing = YES;
@@ -441,24 +476,23 @@ BOOL isEdit = false;
     [self presentViewController:picker animated:YES completion:NULL];
 }
 
-- (void)imagePickerController:(UIImagePickerController *)picker didFinishPickingMediaWithInfo:(NSDictionary *)info {
-    
-    UIImage *chosenImage = info[UIImagePickerControllerEditedImage];
-    self.buttonPhoto.imageView.image = chosenImage;
-    //NSLog(@"..didFinishPickingMedia...:%@", chosenImage.description);
-    
+- (void)imagePickerController:(UIImagePickerController *)picker didFinishPickingMediaWithInfo:(NSDictionary *)info
+{
     NSString *mediaType = info[UIImagePickerControllerMediaType];
+    
     if ([mediaType isEqualToString:(NSString *)kUTTypeImage]) {
+        UIImage *chosenImage = info[UIImagePickerControllerEditedImage];
+        self.buttonPhoto.imageView.image = chosenImage;
         NSURL *imageUrl = info[UIImagePickerControllerReferenceURL];
         
         selectedImage = [imageUrl absoluteString];
-        //NSLog(@"..didFinishPickingMedia...:%@", selectedImage);
+        NSLog(@"..EVC:didFinishPickingMediaWithInfo: %@", selectedImage);
     }
     [picker dismissViewControllerAnimated:YES completion:NULL];
 }
 
 - (void)imagePickerControllerDidCancel:(UIImagePickerController *)picker {
-    
+    [self setEntryCoverPhoto]; //if cancel on imagePicker, reset to previous cover photo
     [picker dismissViewControllerAnimated:YES completion:NULL];
     
 }
@@ -488,38 +522,42 @@ BOOL isEdit = false;
     if(![self validateForSave])
         return;
     
-    TripEntry *entry = [[TripEntry alloc] init];
-    entry.place = self.name.text;
-    entry.note = self.note.text;
+    if(!self.entry)
+        self.entry = [[TripEntry alloc] init];
+    self.entry.place = self.name.text;
+    self.entry.note = self.note.text;
 
-    entry.photoPath = selectedImage;
-    entry.latitude = mapHelper.latitude;
-    entry.longitude = mapHelper.longitude;
-    entry.entryId = self.selectedTrip.entryId;
+    self.entry.photoPath = selectedImage;
+    self.entry.latitude = mapHelper.latitude;
+    self.entry.longitude = mapHelper.longitude;
     
-    entry = [dbHelper saveEntry:entry];
+    self.entry = [dbHelper saveEntry:self.entry];
     
-    if(entry.entryId && entry.entryId.length)
+    if(self.entry.entryId && self.entry.entryId.length)
     {
+        self.emailButton.hidden = false;
         if(selectedImage.length > 0)
         {
+            self.morePhotosButton.hidden = false;
             //check if photo path in entry
-            NSArray *returnList = [dbHelper selectFromTbl:@"EntryPhotos"  colNames:@[@"PhotoPath"]  whereCols:@[@"EntryId", @"PhotoPath"] whereColValues:@[entry.entryId, selectedImage] ];
+            NSArray *returnList = [dbHelper selectFromTbl:@"EntryPhotos"  colNames:@[@"PhotoPath"]  whereCols:@[@"EntryId", @"PhotoPath"] whereColValues:@[self.entry.entryId, selectedImage] orderByDesc:false];
 
             if(returnList.count == 0)
-                [dbHelper insertInToTbl:@"EntryPhotos" colNames:@[@"EntryId, PhotoPath"] colValues:@[entry.entryId, selectedImage] multiple:false];
+                [dbHelper insertInToTbl:@"EntryPhotos" colNames:@[@"EntryId, PhotoPath"] colValues:@[self.entry.entryId, selectedImage] multiple:false];
         }
         
         if(isEdit)
         {
             //delete existing entrylist first
-            [dbHelper deleteFromTbl:@"EntryListItems" whereCol:@"EntryId" whereValues:[[NSArray alloc] initWithObjects:entry.entryId, nil] andCol:nil andValue:nil];
+            [dbHelper deleteFromTbl:@"EntryListItems" whereCol:@"EntryId" whereValues:@[self.entry.entryId] andCol:nil andValue:nil];
         }
         
-        //NSArray *words = @[@"list", @"of", @"words", @123, @3.14];
         NSMutableArray *entryItemsToAdd = [[NSMutableArray alloc]initWithCapacity:entryListItems.count];
         for(int i=0;i<entryListItems.count;i++)
-            [entryItemsToAdd addObject:[NSString stringWithFormat:@"%@\",\"%@\",\"%@", entry.entryId, entryListItems[i], entryListItemsSwitch[i] ]];
+        {
+            if(![entryListItems[i] isEqualToString:@""])
+                [entryItemsToAdd addObject:[NSString stringWithFormat:@"%@\",\"%@\",\"%@", self.entry.entryId, entryListItems[i], entryListItemsSwitch[i] ]];
+        }
 
         NSString *lastRowId = [dbHelper insertInToTbl:@"EntryListItems" colNames:@[@"EntryId, ListItem, ListItemSwitch"] colValues:entryItemsToAdd multiple:true];
         
@@ -537,20 +575,23 @@ BOOL isEdit = false;
 
 - (IBAction)sendEmail:(id)sender {
     // Email Subject
-    NSString *emailTitle = [NSString stringWithFormat:@"RememberIt - %@", self.selectedTrip.place];
-    NSMutableString *msgBody = [NSMutableString stringWithFormat:@"Note: %@\r\n", self.selectedTrip.note];
+    NSString *emailTitle = [NSString stringWithFormat:@"RememberIt - %@", self.entry.place];
+    NSMutableString *msgBody = [NSMutableString stringWithFormat:@"Note: %@\r\n", self.entry.note];
     if(entryListItems && entryListItems.count > 0)
     {
-        [msgBody appendFormat:@"List Items:\r\n"];
-        if(entryListItems.count == 1 && [entryListItems[0] isEqualToString:@""])
-            [msgBody appendFormat:@"...None"];
-        else
+        [msgBody appendFormat:@"%@\r\n", listTitle];
+        if(!(entryListItems.count == 1 && [entryListItems[0] isEqualToString:@""]))
         {
             for(int i=0;i<entryListItems.count;i++)
-            {   if([entryListItemsSwitch[i] intValue] == 1)
-                    [msgBody appendFormat:@"  *%@\r\n", entryListItems[i]];
-                else
-                    [msgBody appendFormat:@"  *<done> %@\r\n", entryListItems[i]];
+            {
+                if(![entryListItems[i] isEqualToString:@""])
+                {
+                    if([entryListItemsSwitch[i] intValue] == 1)
+                        [msgBody appendFormat:@"  *%@\r\n", entryListItems[i]];
+                    else
+                        [msgBody appendFormat:@"  *<done> %@\r\n", entryListItems[i]];
+                }
+                
             }
         }
     }
@@ -560,7 +601,9 @@ BOOL isEdit = false;
     
     [mc setSubject:emailTitle];
     [mc setMessageBody:[NSMutableString stringWithString:msgBody] isHTML:NO];
-    if(![self.selectedTrip.photoPath isEqualToString:@""])
+    
+    //NSLog(@"..EVC:sendEmail: photoPath-%@: selectedImage-%@", self.entry.photoPath, selectedImage);
+    if(!([self.entry.photoPath isEqualToString:@""]))
     {
         NSData* photoData = UIImageJPEGRepresentation(self.buttonPhoto.imageView.image, 1.0);
         [mc addAttachmentData:photoData mimeType:@"image/jpeg" fileName:@"Entry Photo"];
@@ -591,6 +634,13 @@ BOOL isEdit = false;
     
     // Close the Mail Interface
     [self dismissViewControllerAnimated:YES completion:NULL];
+}
+
+
+- (void)updateMap
+{
+    NSLog(@"..EntryViewController:updateMap - latitude: %@", mapHelper.latitude);
+    [mapHelper placeAnnotationforMap:self.mapView setRegion:TRUE];
 }
 
 @end

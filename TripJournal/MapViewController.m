@@ -17,7 +17,7 @@
 
 @implementation MapViewController
 
-CLLocationCoordinate2D entryLoc;
+//CLLocationCoordinate2D entryLoc;
 
 - (id)initWithNibName:(NSString *)nibNameOrNil bundle:(NSBundle *)nibBundleOrNil
 {
@@ -39,16 +39,14 @@ CLLocationCoordinate2D entryLoc;
     mapHelper.latitude = self.selectedTrip.latitude;
     mapHelper.longitude = self.selectedTrip.longitude;
     
-    //[mapHelper addLongPressGesture];
+    //entryLoc.latitude = [self.selectedTrip.latitude doubleValue];
+    //entryLoc.longitude = [self.selectedTrip.longitude doubleValue];
     
-    entryLoc.latitude = [self.selectedTrip.latitude doubleValue];
-    entryLoc.longitude = [self.selectedTrip.longitude doubleValue];
-    
-    [mapHelper placeAnnotationforMap:self.tripMap];
+    [mapHelper placeAnnotationforMap:self.tripMap setRegion:TRUE];
     
     UILongPressGestureRecognizer *lpgr = [[UILongPressGestureRecognizer alloc]
                                           initWithTarget:self action:@selector(handleLongPress:)];
-    lpgr.minimumPressDuration = 1.0;
+    lpgr.minimumPressDuration = .5;
     [self.tripMap addGestureRecognizer:lpgr];
 }
 
@@ -58,8 +56,20 @@ CLLocationCoordinate2D entryLoc;
         return;
     
     CGPoint touchPoint = [gestureRecognizer locationInView:self.tripMap];
+    [mapHelper setTouchLocation:self.tripMap touchPoint:touchPoint];
+    
+    self.selectedTrip.latitude = mapHelper.latitude;
+    self.selectedTrip.longitude = mapHelper.longitude;
+    /*
     entryLoc = [self.tripMap convertPoint:touchPoint toCoordinateFromView:self.tripMap];
     
+    self.selectedTrip.latitude = [NSString stringWithFormat:@"%f", entryLoc.latitude];
+    self.selectedTrip.longitude = [NSString stringWithFormat:@"%f", entryLoc.longitude];
+    mapHelper.latitude = self.selectedTrip.latitude;
+    mapHelper.longitude = self.selectedTrip.longitude;
+     */
+    [mapHelper placeAnnotationforMap:self.tripMap setRegion:FALSE];
+    /*
     NSMutableArray * annotationsToRemove = [ self.tripMap.annotations mutableCopy ] ;
     [ annotationsToRemove removeObject:self.tripMap.userLocation ] ;
     [ self.tripMap removeAnnotations:annotationsToRemove ] ;
@@ -67,12 +77,7 @@ CLLocationCoordinate2D entryLoc;
     MKPointAnnotation *annotationPoint = [[MKPointAnnotation alloc] init];
     annotationPoint.coordinate = entryLoc;
     [self.tripMap addAnnotation:annotationPoint];
-    
-    self.selectedTrip.latitude = [NSString stringWithFormat:@"%f", entryLoc.latitude];
-    self.selectedTrip.longitude = [NSString stringWithFormat:@"%f", entryLoc.longitude];
-    
-    mapHelper.latitude = self.selectedTrip.latitude;
-    mapHelper.longitude = self.selectedTrip.longitude;
+    */
     
     NSLog(@"..MapViewController:handleLongPress:lat:%@, lon:%@", self.selectedTrip.latitude, self.selectedTrip.longitude);
 }
@@ -95,45 +100,10 @@ CLLocationCoordinate2D entryLoc;
     // Dispose of any resources that can be recreated.
 }
 
-/*
--(void)confirmUpdatedLocation
-{
-    NSString *alertTitle = [NSString stringWithFormat:@"Save to new location?"];
-    UIAlertView *updateAlert = [[UIAlertView alloc] initWithTitle:alertTitle message:@"" delegate: self cancelButtonTitle: @"YES"  otherButtonTitles:@"NO",nil];
-    
-    [updateAlert show];
-}
-
-//when user confirms on updated location
-- (void)alertView:(UIAlertView *)alertView clickedButtonAtIndex:(NSInteger)buttonIndex
-{
-    if(buttonIndex == 0) //confirm yes on alertView
-    {
-        self.selectedTrip.latitude = [NSString stringWithFormat:@"%f", entryLoc.latitude];
-        self.selectedTrip.longitude = [NSString stringWithFormat:@"%f", entryLoc.longitude];
-        
-        NSLog(@"...MapViewController:alertView confirm: lat:%@, lon:%@", self.selectedTrip.latitude, self.selectedTrip.longitude);
-    }
-    else{
-        NSMutableArray * annotationsToRemove = [ self.tripMap.annotations mutableCopy ] ;
-        [ annotationsToRemove removeObject:self.tripMap.userLocation ] ;
-        [ self.tripMap removeAnnotations:annotationsToRemove ] ;
-        
-        MKPointAnnotation *annotationPoint = [[MKPointAnnotation alloc] init];
-        entryLoc.latitude = [self.selectedTrip.latitude doubleValue];
-        entryLoc.longitude = [self.selectedTrip.longitude doubleValue];
-
-        annotationPoint.coordinate = entryLoc;
-        annotationPoint.title = self.selectedTrip.place;
-        [self.tripMap addAnnotation:annotationPoint];
-    }
-}
-
-*/
-
 - (void)useMapApp
 {
-    CLLocationCoordinate2D coordinate = CLLocationCoordinate2DMake(entryLoc.latitude, entryLoc.longitude);
+    //CLLocationCoordinate2D coordinate = CLLocationCoordinate2DMake(entryLoc.latitude, entryLoc.longitude);
+    CLLocationCoordinate2D coordinate = CLLocationCoordinate2DMake([mapHelper.latitude doubleValue], [mapHelper.longitude doubleValue]);
     
     MKPlacemark *placemark = [[MKPlacemark alloc] initWithCoordinate:coordinate addressDictionary:nil];
     MKMapItem *mapItem = [[MKMapItem alloc] initWithPlacemark:placemark];

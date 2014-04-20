@@ -19,6 +19,7 @@
 
 @property (strong, nonatomic) IBOutlet UICollectionView *photoCollectionView;
 @property (strong, nonatomic) IBOutlet UINavigationItem *navigationTitle;
+@property (weak, nonatomic) IBOutlet UIBarButtonItem *mapBarButton;
 
 //@property (strong, nonatomic) IBOutlet UILabel *tripName;
 
@@ -27,6 +28,6 @@
 //- (IBAction)deleteEntry:(id)sender;
 - (IBAction)showMap:(id)sender;
 - (IBAction)deletePhotos:(id)sender;
-- (IBAction)editEntry:(id)sender;
+//- (IBAction)editEntry:(id)sender;
 
 @end
