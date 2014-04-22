@@ -277,14 +277,19 @@ sqlite3_stmt *statement;
     }
     else
     {
-        for(int i=0;i<colValues.count;i++)
+        if(colValues.count == 1)//if count is 1 - then don't want to insert"( or )" in value returned
+            [myStmt appendString: [NSString stringWithFormat:@"(\"%@\")", colValues[0] ]];
+        else
         {
-            if(i+1 == colValues.count)
-                [myStmt appendString: [NSString stringWithFormat:@"\"%@\")", colValues[i] ]];
-            else if(i==0)
-                [myStmt appendString: [NSString stringWithFormat:@"(\"%@\", ", colValues[i] ]];
-            else
-                [myStmt appendString: [NSString stringWithFormat:@"\"%@\", ", colValues[i] ]];
+            for(int i=0;i<colValues.count;i++)
+            {
+                if(i+1 == colValues.count)
+                    [myStmt appendString: [NSString stringWithFormat:@"\"%@\")", colValues[i] ]];
+                else if(i==0)
+                    [myStmt appendString: [NSString stringWithFormat:@"(\"%@\", ", colValues[i] ]];
+                else
+                    [myStmt appendString: [NSString stringWithFormat:@"\"%@\", ", colValues[i] ]];
+            }
         }
     }
     

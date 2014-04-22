@@ -14,18 +14,19 @@
 - (void)textFieldEditingBeginCell:(id)sender;
 - (void)textFieldEditingEndCell:(id)sender;
 - (void)switchToggleCell:(id)sender;
+- (void)buttonListItemCell:(id)sender;
 @end
 
 @interface EntryViewTableCell : UITableViewCell
 
 @property (weak, nonatomic) IBOutlet UITextField *listItem;
-@property (weak, nonatomic) IBOutlet UISwitch *listItemSwitch;
+@property (weak, nonatomic) IBOutlet UIButton *listItemDoneButton;
 
-- (IBAction)listItemSwitchChanged:(id)sender;
 - (IBAction)doneListItemEdit:(id)sender;
 - (IBAction)editingBegin:(id)sender;
 - (IBAction)editingEnd:(id)sender;
 
+- (IBAction)listItemDoneChanged:(id)sender;
 
 @property (nonatomic, strong) id delegate;
 

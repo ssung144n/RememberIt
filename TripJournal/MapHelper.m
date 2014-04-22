@@ -84,7 +84,7 @@ NSTimer *myTimer;
 {
     BOOL locationAllowed = [CLLocationManager locationServicesEnabled];
     UIAlertView *alert;
-    
+
     if (!locationAllowed)
     {
         UIAlertView *alert = [[UIAlertView alloc] initWithTitle:@"Location Service Disabled"
@@ -96,19 +96,20 @@ NSTimer *myTimer;
     }
     
     if([CLLocationManager authorizationStatus]==kCLAuthorizationStatusDenied){
-        alert = [[UIAlertView alloc] initWithTitle:@"App Permission Denied"
-                                           message:@"To re-enable, please go to Settings and turn on Location Service for this app."
+        alert = [[UIAlertView alloc] initWithTitle:@"Location Services For RememberIt Denied"
+                                           message:@"To re-enable, please go to Settings and turn on Location Service for RememberIt App."
                                           delegate:nil
                                  cancelButtonTitle:@"OK"
                                  otherButtonTitles:nil];
         [alert show];
+        locationAllowed = NO;
     }
     return locationAllowed;
 }
 
 -(void)placeAnnotationforMap:(MKMapView *)mapView setRegion:(BOOL)setRegion
 {
-    NSLog(@"..MapHelper:placeAnnotation - %@", self.latitude);
+    //NSLog(@"..MapHelper:placeAnnotation - %@", self.latitude);
     
     entryLoc.latitude = [self.latitude doubleValue];
     entryLoc.longitude = [self.longitude doubleValue];
@@ -134,7 +135,7 @@ NSTimer *myTimer;
 - (void)processComplete
 {
     [self currentLocation];
-    NSLog(@"..MapHelper.processComplete..checking if have current location: latitude: %@", self.latitude);
+    //NSLog(@"..MapHelper.processComplete..checking if have current location: latitude: %@", self.latitude);
     if([self.latitude intValue] != 0)
     {
         [[self delegate] updateMap];

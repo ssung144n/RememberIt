@@ -10,6 +10,7 @@
 
 @implementation EntryViewTableCell
 
+
 - (id)initWithStyle:(UITableViewCellStyle)style reuseIdentifier:(NSString *)reuseIdentifier
 {
     self = [super initWithStyle:style reuseIdentifier:reuseIdentifier];
@@ -22,6 +23,8 @@
 - (void)awakeFromNib
 {
     // Initialization code
+    [self.listItemDoneButton setBackgroundImage: [UIImage imageNamed:@"greencheckhollow1_56x56.png"] forState:(UIControlStateSelected)];
+    [self.listItemDoneButton setBackgroundImage: [UIImage imageNamed:@"greencheckhollowempty1_56x56.png"] forState:(UIControlStateNormal)];
 }
 
 - (void)setSelected:(BOOL)selected animated:(BOOL)animated
@@ -29,10 +32,6 @@
     [super setSelected:selected animated:animated];
 
     // Configure the view for the selected state
-}
-
-- (IBAction)listItemSwitchChanged:(id)sender {
-    [self.delegate switchToggleCell:self];
 }
 
 - (IBAction)doneListItemEdit:(id)sender {
@@ -47,6 +46,13 @@
 
 - (IBAction)editingEnd:(id)sender {
     [self.delegate textFieldEditingEndCell:self];
+}
+
+- (IBAction)listItemDoneChanged:(id)sender {
+    //NSLog(@"..EVTCell:listItemDoneChanged- checkbox:%d", self.listItemDoneButton.selected);
+
+    self.listItemDoneButton.selected=!self.listItemDoneButton.selected;
+    [self.delegate buttonListItemCell:self];
 }
 
 @end

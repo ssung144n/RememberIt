@@ -8,6 +8,7 @@
 
 #import "ShowPhotoViewController.h"
 #import "DBHelper.h"
+#import "PhotosTripViewController.h"
 
 @interface ShowPhotoViewController ()
 
@@ -51,14 +52,18 @@
     // Dispose of any resources that can be recreated.
 }
 
-
+/*
 - (IBAction)done:(id)sender {
     [self dismissViewControllerAnimated:YES completion:NULL];
 }
+ */
 
 - (IBAction)setAsCoverPhoto:(id)sender {
+    
     DBHelper *dbHelper = [[DBHelper alloc] init];
     [dbHelper updateTbl:@"Entry" colNames:@[@"PhotoPath"] colValues:@[self.photoPath]  whereCol:@"Id" whereValue:self.selectedTrip.entryId];
-    self.selectedTrip.photoPath = self.photoPath;
+    NSLog(@"..SPC:setAsCoverPhoto-entry photo:%@",self.selectedTrip.photoPath);
+    //self.selectedTrip.photoPath = self.photoPath;
+    [self.navigationController popViewControllerAnimated:YES];
 }
 @end

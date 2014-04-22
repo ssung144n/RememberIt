@@ -60,24 +60,8 @@
     
     self.selectedTrip.latitude = mapHelper.latitude;
     self.selectedTrip.longitude = mapHelper.longitude;
-    /*
-    entryLoc = [self.tripMap convertPoint:touchPoint toCoordinateFromView:self.tripMap];
     
-    self.selectedTrip.latitude = [NSString stringWithFormat:@"%f", entryLoc.latitude];
-    self.selectedTrip.longitude = [NSString stringWithFormat:@"%f", entryLoc.longitude];
-    mapHelper.latitude = self.selectedTrip.latitude;
-    mapHelper.longitude = self.selectedTrip.longitude;
-     */
     [mapHelper placeAnnotationforMap:self.tripMap setRegion:FALSE];
-    /*
-    NSMutableArray * annotationsToRemove = [ self.tripMap.annotations mutableCopy ] ;
-    [ annotationsToRemove removeObject:self.tripMap.userLocation ] ;
-    [ self.tripMap removeAnnotations:annotationsToRemove ] ;
-    
-    MKPointAnnotation *annotationPoint = [[MKPointAnnotation alloc] init];
-    annotationPoint.coordinate = entryLoc;
-    [self.tripMap addAnnotation:annotationPoint];
-    */
     
     NSLog(@"..MapViewController:handleLongPress:lat:%@, lon:%@", self.selectedTrip.latitude, self.selectedTrip.longitude);
 }

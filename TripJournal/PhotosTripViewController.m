@@ -48,7 +48,7 @@ NSString *addPhotoImage = @"camerared1.png";
     if([self.selectedTrip.latitude intValue] == 0)
         self.mapBarButton.enabled = false;
     
-    NSArray *returnList = [dbHelper selectFromTbl:@"EntryPhotos" colNames:@[@"PhotoPath"] whereCols:@[@"EntryId"] whereColValues:@[self.selectedTrip.entryId] orderByDesc:false ];
+    NSArray *returnList = [dbHelper selectFromTbl:@"EntryPhotos" colNames:@[@"PhotoPath"] whereCols:@[@"EntryId"] whereColValues:@[self.selectedTrip.entryId] orderByDesc:NO ];
     
     if(returnList)
     {
@@ -66,20 +66,25 @@ NSString *addPhotoImage = @"camerared1.png";
     
     UILongPressGestureRecognizer *lpgr = [[UILongPressGestureRecognizer alloc]
        initWithTarget:self action:@selector(longPressHandler:)];
-    lpgr.minimumPressDuration = 1.0; //seconds
+    lpgr.minimumPressDuration = .5; //seconds
     lpgr.delegate = self;
     [self.photoCollectionView addGestureRecognizer:lpgr];
 }
 
 - (void)viewWillAppear:(BOOL)animated {
-    //NSLog(@"...PhotosViewController:viewWillAppear");
+    
+    NSMutableArray *returnList = [dbHelper selectFromTbl:@"Entry" colNames:@[@"PhotoPath"] whereCols:@[@"ID"]  whereColValues:@[self.selectedTrip.entryId]  orderByDesc:NO];
+    NSArray *returnRow = returnList[0];
+    self.selectedTrip.photoPath = returnRow[0];
+    
+    NSLog(@"...**PhotosViewController:viewWillAppear-entry photo: %@", self.selectedTrip.photoPath);
+    
     [self.photoCollectionView reloadData];
 }
 
  - (void)longPressHandler:(UILongPressGestureRecognizer *)lpgr {
      
      if (lpgr.state == UIGestureRecognizerStateBegan) {
-         //UIGestureRecognizerStateBegan, UIGestureRecognizerStateEnded
          
          CGPoint p = [lpgr locationInView:self.photoCollectionView];
          
@@ -136,7 +141,6 @@ NSString *addPhotoImage = @"camerared1.png";
     UIView *bgColorView = [[UIView alloc] init];
     bgColorView.backgroundColor = [UIColor redColor];
     bgColorView.layer.cornerRadius = 12;
-    //bgColorView.layer.borderWidth = 3.0f;
     bgColorView.layer.masksToBounds = YES;
     [cell setSelectedBackgroundView:bgColorView];
     
@@ -144,7 +148,7 @@ NSString *addPhotoImage = @"camerared1.png";
     UIImageView *photoView = (UIImageView *)[cell viewWithTag:99];
     
     NSString *photo = tripPhotos[indexPath.row];
-    //check if photo exists-------
+    NSLog(@"..PTC:cellForItem..:photo:%@, entry photoPath:%@", photo, self.selectedTrip.photoPath);
     if([photo isEqualToString:self.selectedTrip.photoPath])
     {
         UIView *bgColorViewCP = [[UIView alloc] init];
@@ -163,26 +167,26 @@ NSString *addPhotoImage = @"camerared1.png";
     }
     else
     {
-    NSURL* aURL = [NSURL URLWithString:photo];
-    
-    ALAssetsLibrary *library = [[ALAssetsLibrary alloc] init];
-    [library assetForURL:aURL resultBlock:^(ALAsset *asset)
-     {
-         if(asset)
+        NSURL* aURL = [NSURL URLWithString:photo];
+        
+        ALAssetsLibrary *library = [[ALAssetsLibrary alloc] init];
+        [library assetForURL:aURL resultBlock:^(ALAsset *asset)
          {
-             UIImage  *copyOfOriginalImage = [UIImage imageWithCGImage:[asset thumbnail] scale:1.0 orientation:UIImageOrientationUp];
-             
-             photoView.image = copyOfOriginalImage;
+             if(asset)
+             {
+                 UIImage  *copyOfOriginalImage = [UIImage imageWithCGImage:[asset thumbnail] scale:1.0 orientation:UIImageOrientationUp];
+                 
+                 photoView.image = copyOfOriginalImage;
+             }
+             else
+                 [self nonExistingPhoto:photo];
          }
-         else
-             [self nonExistingPhoto:photo];
-     }
-     
-        failureBlock:^(NSError *error)
-     {
-         // error handling
-         NSLog(@"...PhotosTripView:cellForItemAtIndexPath: error - %@", error.description);
-     }];
+         
+            failureBlock:^(NSError *error)
+         {
+             // error handling
+             NSLog(@"...PhotosTripView:cellForItemAtIndexPath: error - %@", error.description);
+         }];
     }
     return cell;
 }
@@ -234,20 +238,6 @@ NSString *addPhotoImage = @"camerared1.png";
 
 }
 
-
-//when user confirms on cover photo
-- (void)alertView:(UIAlertView *)alertView clickedButtonAtIndex:(NSInteger)buttonIndex
-{
-    if(buttonIndex == 0) //confirm yes on alertView
-    {
-        [dbHelper updateTbl:@"Entry" colNames:@[@"PhotoPath"]  colValues:@[selectedPhoto]  whereCol:@"Id" whereValue:self.selectedTrip.entryId];
-        self.selectedTrip.photoPath = selectedPhoto;
-        NSLog(@"...cover photo:%@", selectedPhoto);
-        [self.photoCollectionView reloadData];
-    }
-}
-
-
 //selecting photo from photo gallery
 - (IBAction)selectPhotos:(id)sender {
     if ([UIImagePickerController isSourceTypeAvailable:UIImagePickerControllerSourceTypeSavedPhotosAlbum])
@@ -276,8 +266,10 @@ NSString *addPhotoImage = @"camerared1.png";
     {
         if([photosToDelete containsObject:self.selectedTrip.photoPath])
         {
-            //NSLog(@"..deletePhotos:cover photo in deleted photos:%@", self.selectedTrip.photoPath);
+            NSLog(@"..deletePhotos:cover photo in deleted photos:%@", self.selectedTrip.photoPath);
+            
             [dbHelper updateTbl:@"Entry" colNames:@[@"PhotoPath"] colValues:@[@""] whereCol:@"Id" whereValue:self.selectedTrip.entryId];
+            
             self.selectedTrip.photoPath = @"";
         }
         for (int i = 0; i<photosToDelete.count; i++)
@@ -302,15 +294,16 @@ NSString *addPhotoImage = @"camerared1.png";
 
         selectedPhoto = [imageUrl absoluteString];
         
-        NSString *insertRowId = [dbHelper insertInToTbl:@"EntryPhotos" colNames:@[@"EntryId, PhotoPath"] colValues:@[self.selectedTrip.entryId, selectedPhoto] multiple:false];
+        NSString *insertRowId = [dbHelper insertInToTbl:@"EntryPhotos" colNames:@[@"EntryId, PhotoPath"] colValues:@[self.selectedTrip.entryId, selectedPhoto] multiple:NO];
         
         if(insertRowId)
-        {
+        {//if there was the addPhotoImage image, remove it before adding a real image
             if([tripPhotos[0] isEqualToString:addPhotoImage])
                 [tripPhotos removeObject:addPhotoImage];
+            
             [self confirmCoverPhoto];
             [tripPhotos addObject:selectedPhoto];
-            [self. photoCollectionView reloadData];
+            //[self. photoCollectionView reloadData];
         }
     }
 }
@@ -321,6 +314,20 @@ NSString *addPhotoImage = @"camerared1.png";
     UIAlertView *updateAlert = [[UIAlertView alloc] initWithTitle:alertSetCoverPhotoTitle message:@"" delegate: self cancelButtonTitle: @"YES"  otherButtonTitles:@"NO",nil];
     
     [updateAlert show];
+    //[self. photoCollectionView reloadData];
+}
+
+//when user confirms on cover photo
+- (void)alertView:(UIAlertView *)alertView clickedButtonAtIndex:(NSInteger)buttonIndex
+{
+    if(buttonIndex == 0) //confirm yes on alertView
+    {
+        [dbHelper updateTbl:@"Entry" colNames:@[@"PhotoPath"]  colValues:@[selectedPhoto]  whereCol:@"Id" whereValue:self.selectedTrip.entryId];
+        
+        self.selectedTrip.photoPath = selectedPhoto;
+    }
+    NSLog(@"...PTC:alertView clickButtonAtIndex - entry photo:%@", self.selectedTrip.photoPath);
+    [self.photoCollectionView reloadData];
 }
 
 -(void)image:(UIImage *)image finishedSavingWithError:(NSError *)error contextInfo:(void *)contextInfo

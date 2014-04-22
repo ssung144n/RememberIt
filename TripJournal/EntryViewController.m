@@ -29,10 +29,10 @@
 
 NSMutableArray *entryListItems;
 NSMutableArray *entryListItemsSwitch;
-NSString * selectedImage = @"";
+//NSString * selectedImage = @"";
 MapHelper *mapHelper;
 DBHelper *dbHelper;
-BOOL isEdit = false;
+BOOL isEdit = NO;
 NSString *listTitle;
 
 - (id)initWithNibName:(NSString *)nibNameOrNil bundle:(NSBundle *)nibBundleOrNil
@@ -60,27 +60,27 @@ NSString *listTitle;
     [self.mapView addGestureRecognizer:gesture];
     
     mapHelper = [[MapHelper alloc] init];
+    
     if(![mapHelper haveLocationServices])
         self.mapView.hidden = true;
     [mapHelper setDelegate:self];
     
      //self.navigationItem.hidesBackButton = YES;
     [self validateCamera];
-    
-    //NSLog(@"..EntryViewController:viewDidLoad - selectedTrip:%@", self.selectedTrip);
-    if(self.entry && self.entry.entryId)
+    if(self.entry.entryId)
     {
         [self setEditEntry];
     }
     else
     {
+        self.entry = [[TripEntry alloc] init];
         [mapHelper setCurrentLocationInfo]; //if first time loading app, init loc manager, loc, current loc, etc
         
         isEdit = false;
         [self newEntryListItemRecord]; //insert first list item row
         self.emailButton.hidden = TRUE;
-        selectedImage = @"";
-        self.morePhotosButton.hidden = true;
+        //selectedImage = @"";
+        self.labelMorePhotos.hidden = YES;
     }
     
     [self.note.layer setBorderColor: [[UIColor whiteColor] CGColor]];
@@ -106,18 +106,24 @@ NSString *listTitle;
     [[self.name layer] setCornerRadius:10];
 }
 
-- (void)handleTap:(UIGestureRecognizer *)gestureRecognizer
-{
-    [self performSegueWithIdentifier:@"ToMapFromEntry" sender:self];
-}
-
 -(void)viewWillAppear:(BOOL)animated {
     
     [super viewWillAppear:animated];
     
     //NSLog(@"..viewWillAppear: will callsetLocationMapInfo - lat:%@, lon:%@", mapHelper.latitude, mapHelper.longitude);
-    //[mapHelper setCurrentLocationInfo];
-    [self setLocationMapInfo];
+
+    [self setMapAndPhoto];
+}
+
+- (void)didReceiveMemoryWarning
+{
+    [super didReceiveMemoryWarning];
+    // Dispose of any resources that can be recreated.
+}
+
+- (void)handleTap:(UIGestureRecognizer *)gestureRecognizer
+{
+    [self performSegueWithIdentifier:@"ToMapFromEntry" sender:self];
 }
 
 -(void)setEditEntry
@@ -127,7 +133,7 @@ NSString *listTitle;
     self.name.text = self.entry.place;
     self.note.text = self.entry.note;
     
-    self.emailButton.hidden = false;
+    self.emailButton.hidden = NO;
     [self setEntryCoverPhoto];
     
     //get list items
@@ -150,12 +156,18 @@ NSString *listTitle;
 
 -(void)setEntryCoverPhoto
 {
-    if(self.entry.photoPath.length > 0)
+    if(self.entry.photoPath.length)
     {
-        self.morePhotosButton.hidden = false;
+        (NSLog(@"..EVC:setEntryPhoto-entryId:%@, photoPath:%@", self.entry.entryId, self.entry.photoPath));
+        if(self.entry.entryId)
+            self.labelMorePhotos.hidden = NO;
+        else
+            self.labelMorePhotos.hidden = YES;
         __block UIImage *photo = nil;
+        
         NSURL* aURL = [NSURL URLWithString:self.entry.photoPath];
-        selectedImage = self.entry.photoPath;
+        //selectedImage = self.entry.photoPath;
+        
         ALAssetsLibrary *library = [[ALAssetsLibrary alloc] init];
         [library assetForURL:aURL resultBlock:^(ALAsset *asset)
          {
@@ -168,39 +180,54 @@ NSString *listTitle;
          }];
     }
     else
-        self.morePhotosButton.hidden = true;
+    {
+        self.labelMorePhotos.hidden = YES;
+        self.buttonPhoto.imageView.image = [UIImage imageNamed:@"camerared1.png"];
+    }
 }
 
 -(void)newEntryListItemRecord
 {
     [entryListItems addObject:@""];
-    [entryListItemsSwitch addObject:[NSNumber numberWithBool:true]];
+    [entryListItemsSwitch addObject:[NSNumber numberWithBool:NO]]; //not checked..aka not selected when first added
 }
 
-- (void)didReceiveMemoryWarning
-{
-    [super didReceiveMemoryWarning];
-    // Dispose of any resources that can be recreated.
-}
 
--(void)setLocationMapInfo
+//called with viewWillAppear - all views with Nav Back - capture updated changes for Map and Photo
+-(void)setMapAndPhoto
 {
-    if([mapHelper haveLocationServices])
+    if(self.entry.entryId)
     {
-        if(self.entry.latitude && self.entry.longitude)
+        //NSLog(@"..EVC:setMapAndPhoto:entryId:%@, coverPhoto:%@", self.entry.entryId, self.entry.photoPath);
+        NSMutableArray *returnList = [dbHelper selectFromTbl:@"Entry" colNames:@[@"PhotoPath"] whereCols:@[@"ID"]  whereColValues:@[self.entry.entryId]  orderByDesc:NO];
+        if(returnList.count > 0)
         {
-           // NSLog(@"..setLocInfo..selectedTrip.lat: %@", self.selectedTrip.latitude);
-            mapHelper.latitude = self.entry.latitude;
-            mapHelper.longitude = self.entry.longitude;
+            NSLog(@"..EVC:setMapAndPhoto: returnList:%@", returnList[0]);
+            NSArray *returnRow = returnList[0];
+            NSLog(@"..EVC:setMapAndPhoto: returnList:%@", returnRow[0]);
+            if(![returnRow[0] isEqualToString:@""])
+            {
+                self.entry.photoPath = returnRow[0];
+                [self setEntryCoverPhoto];
+            }
         }
         
-        if(mapHelper.latitude && [mapHelper.latitude intValue] != 0)
-        {
-            [mapHelper placeAnnotationforMap:self.mapView setRegion:TRUE];
-        }
+        NSLog(@"..EVC:setMapAndPhoto:entryId:%@, coverPhoto:%@", self.entry.entryId, self.entry.photoPath);
+    }
+    
+    if(self.entry.latitude && self.entry.longitude)
+    {
+        mapHelper.latitude = self.entry.latitude;
+        mapHelper.longitude = self.entry.longitude;
+    }
+    
+    if(mapHelper.latitude && [mapHelper.latitude intValue] != 0)
+    {
+        [mapHelper placeAnnotationforMap:self.mapView setRegion:TRUE];
     }
 }
 
+//MAKE ALERT CLASS to handle alert creation
 -(void) validateCamera
 {
     //validate if user using physical device with camera
@@ -247,9 +274,10 @@ NSString *listTitle;
 - (NSString *)tableView:(UITableView *)tableView titleForHeaderInSection:(NSInteger)section
 {
     if([entryListItems[entryListItems.count - 1] isEqualToString:@""])
-        listTitle = [NSString stringWithFormat:@"List: %lu items", (entryListItems.count-1)];
+        listTitle = [NSString stringWithFormat:@"List: %u Items", (entryListItems.count-1)];
     else
-        listTitle = [NSString stringWithFormat:@"List: %lu items", (unsigned long)entryListItems.count];
+        listTitle = [NSString stringWithFormat:@"List: %lu Items", (unsigned long)entryListItems.count];
+    
     return listTitle;
 }
 
@@ -285,11 +313,12 @@ NSString *listTitle;
     cell.listItem.text = entryListItems[rowNum];
     
     NSNumber *switchOnOff = [NSNumber numberWithInteger: [entryListItemsSwitch[rowNum] integerValue]];
-    if([switchOnOff isEqualToNumber:[NSNumber numberWithBool:false]])
-    {
-        cell.listItem.backgroundColor = [UIColor lightGrayColor]; //default is whitecolore
-        cell.listItemSwitch.on = false;
-    }
+    if([switchOnOff boolValue])
+        cell.listItem.backgroundColor = [UIColor lightGrayColor];
+    else
+        cell.listItem.backgroundColor = [UIColor whiteColor];
+    
+    cell.listItemDoneButton.selected = [switchOnOff boolValue];
     
     //[cell.listItem addTarget:self action:@selector(listItemChanged:) forControlEvents:UIControlEventEditingDidEndOnExit];
     
@@ -342,23 +371,21 @@ NSString *listTitle;
         [self.view setFrame:frame];
     }
 }
-//protocol delegate
-- (void)switchToggleCell:(id)sender
+//protocol delegate for buttonCheckBox
+- (void)buttonListItemCell:(id)sender
 {
     NSIndexPath *indexpath = [self.listTbl indexPathForCell:sender];
     int row = (int)indexpath.row;
     
     EntryViewTableCell *selectedCell = (EntryViewTableCell *)sender;
 
-    BOOL switchOn = selectedCell.listItemSwitch.on;
-    entryListItemsSwitch[row] = [NSNumber numberWithBool:switchOn];
-    
-    if(!switchOn)
+    entryListItemsSwitch[row] = [NSNumber numberWithBool:selectedCell.listItemDoneButton.selected];
+    if(selectedCell.listItemDoneButton.selected)
         selectedCell.listItem.backgroundColor = [UIColor lightGrayColor];
     else
         selectedCell.listItem.backgroundColor = [UIColor whiteColor];
-
 }
+//----------------------------------
 
 /*
  //alternative solution-add target selection method
@@ -390,17 +417,18 @@ NSString *listTitle;
     if (editingStyle == UITableViewCellEditingStyleDelete)
     {
         [entryListItems removeObjectAtIndex:indexPath.row];
+        [entryListItemsSwitch removeObjectAtIndex:indexPath.row];
+        
         [self.listTbl reloadData];//so section list title will update
+        
         //[self.listTbl deleteRowsAtIndexPaths:@[indexPath] withRowAnimation:UITableViewRowAnimationAutomatic];
-
-        // Delete the row from the data source
-        //[tableView deleteRowsAtIndexPaths:@[indexPath] withRowAnimation:UITableViewRowAnimationFade];
+        //[self tableView:tableView titleForHeaderInSection:indexPath.section];
     }
     else if (editingStyle == UITableViewCellEditingStyleInsert)
     {
         // Add a row if the current row has value
         NSString *temp = [entryListItems[indexPath.row] stringByTrimmingCharactersInSet:[NSCharacterSet whitespaceCharacterSet]];
-        //NSLog(@"..EVC:commitEditingStyle-Insert:row-%ld:temp:%@", (long)indexPath.row, temp);
+
         if(![temp isEqualToString:@""])
         {
             [self newEntryListItemRecord];
@@ -412,7 +440,6 @@ NSString *listTitle;
         }
     }
 }
-
 
 /*
 #pragma mark - Navigation
@@ -437,17 +464,12 @@ NSString *listTitle;
     if([segue.identifier isEqualToString:@"ToMapFromEntry"]) {
         MapViewController *vc = [segue destinationViewController];
         
-        if(!(self.entry && self.entry.entryId))
-        {
-            self.entry = [[TripEntry alloc] init];
-        }
-        
         self.entry.latitude = mapHelper.latitude;
         self.entry.longitude = mapHelper.longitude;
         
         [vc setSelectedTrip: self.entry];
     }
-    else if([segue.identifier isEqualToString:@"ToPhotosFromEntry"]) {
+    else if([segue.identifier isEqualToString:@"ToPhotos"]) {
         PhotosTripViewController *vc = [segue destinationViewController];
         [vc setSelectedTrip:self.entry];
     }
@@ -457,14 +479,20 @@ NSString *listTitle;
 // TO DO - popup selection of take photo or select existing photo
 
 - (IBAction)buttonPhotoPick:(id)sender {
-    NSLog(@"..EVC:buttonPhotoPick: %@", selectedImage);
-    UIImagePickerController *picker = [[UIImagePickerController alloc] init];
-    picker.delegate = self;
-    picker.allowsEditing = YES;
-    //picker.sourceType = UIImagePickerControllerSourceTypeCamera;
-    picker.sourceType = UIImagePickerControllerSourceTypePhotoLibrary;
-    
-    [self presentViewController:picker animated:YES completion:NULL];
+    //NSLog(@"..EVC:buttonPhotoPick: %@", self.entry.photoPath);
+    //if have cover photo - button pick goes to +Photos button
+    if(self.entry.entryId && self.entry.photoPath.length)
+        [self performSegueWithIdentifier:@"ToPhotos" sender:self];
+    else
+    {
+        UIImagePickerController *picker = [[UIImagePickerController alloc] init];
+        picker.delegate = self;
+        picker.allowsEditing = YES;
+        //picker.sourceType = UIImagePickerControllerSourceTypeCamera;
+        picker.sourceType = UIImagePickerControllerSourceTypePhotoLibrary;
+        
+        [self presentViewController:picker animated:YES completion:NULL];
+    }
 }
 
 - (void)imagePickerController:(UIImagePickerController *)picker didFinishPickingMediaWithInfo:(NSDictionary *)info
@@ -476,14 +504,16 @@ NSString *listTitle;
         self.buttonPhoto.imageView.image = chosenImage;
         NSURL *imageUrl = info[UIImagePickerControllerReferenceURL];
         
-        selectedImage = [imageUrl absoluteString];
-        NSLog(@"..EVC:didFinishPickingMediaWithInfo: %@", selectedImage);
+        self.entry.photoPath = [imageUrl absoluteString];
+        NSLog(@"..EVC:didFinishPickingMediaWithInfo: %@", self.entry.photoPath);
+        [self setEntryCoverPhoto];
     }
     [picker dismissViewControllerAnimated:YES completion:NULL];
 }
 
 - (void)imagePickerControllerDidCancel:(UIImagePickerController *)picker {
     [self setEntryCoverPhoto]; //if cancel on imagePicker, reset to previous cover photo
+    
     [picker dismissViewControllerAnimated:YES completion:NULL];
     
 }
@@ -513,28 +543,27 @@ NSString *listTitle;
     if(![self validateForSave])
         return;
     
-    if(!self.entry)
-        self.entry = [[TripEntry alloc] init];
     self.entry.place = self.name.text;
     self.entry.note = self.note.text;
 
-    self.entry.photoPath = selectedImage;
+    //self.entry.photoPath = selectedImage;
     self.entry.latitude = mapHelper.latitude;
     self.entry.longitude = mapHelper.longitude;
-    
+   
     self.entry = [dbHelper saveEntry:self.entry];
+     NSLog(@"..EVC:saveButtonClick-Id:%@, entry photo:%@",self.entry.entryId, self.entry.photoPath);
     
     if(self.entry.entryId && self.entry.entryId.length)
     {
-        self.emailButton.hidden = false;
-        if(selectedImage.length > 0)
+        self.emailButton.hidden = NO;
+        if(self.entry.photoPath.length)
         {
-            self.morePhotosButton.hidden = false;
+            self.labelMorePhotos.hidden = NO;
             //check if photo path in entry
-            NSArray *returnList = [dbHelper selectFromTbl:@"EntryPhotos"  colNames:@[@"PhotoPath"]  whereCols:@[@"EntryId", @"PhotoPath"] whereColValues:@[self.entry.entryId, selectedImage] orderByDesc:false];
+            NSArray *returnList = [dbHelper selectFromTbl:@"EntryPhotos"  colNames:@[@"PhotoPath"]  whereCols:@[@"EntryId", @"PhotoPath"] whereColValues:@[self.entry.entryId, self.entry.photoPath] orderByDesc:false];
 
             if(returnList.count == 0)
-                [dbHelper insertInToTbl:@"EntryPhotos" colNames:@[@"EntryId, PhotoPath"] colValues:@[self.entry.entryId, selectedImage] multiple:false];
+                [dbHelper insertInToTbl:@"EntryPhotos" colNames:@[@"EntryId, PhotoPath"] colValues:@[self.entry.entryId, self.entry.photoPath] multiple:false];
         }
         
         if(isEdit)
@@ -549,15 +578,10 @@ NSString *listTitle;
             if(![entryListItems[i] isEqualToString:@""])
                 [entryItemsToAdd addObject:[NSString stringWithFormat:@"%@\",\"%@\",\"%@", self.entry.entryId, entryListItems[i], entryListItemsSwitch[i] ]];
         }
-
-        NSString *lastRowId = [dbHelper insertInToTbl:@"EntryListItems" colNames:@[@"EntryId, ListItem, ListItemSwitch"] colValues:entryItemsToAdd multiple:true];
-        
-        if(!lastRowId)//error with insert entryListItems
+        if(entryItemsToAdd.count > 0)
         {
-            
-            UIAlertView *alert = [[UIAlertView alloc] initWithTitle:@"Unable To Save Entry List Items" message:@""
-                                                           delegate:nil cancelButtonTitle:@"OK" otherButtonTitles: nil];
-            [alert show];
+            NSString *lastRowId = [dbHelper insertInToTbl:@"EntryListItems" colNames:@[@"EntryId, ListItem, ListItemSwitch"] colValues:entryItemsToAdd multiple:YES];
+            NSLog(@"..EVC:saveButtonClick-adding entries:last row:%@", lastRowId);
         }
     }
     else
@@ -578,9 +602,9 @@ NSString *listTitle;
                 if(![entryListItems[i] isEqualToString:@""])
                 {
                     if([entryListItemsSwitch[i] intValue] == 1)
-                        [msgBody appendFormat:@"  *%@\r\n", entryListItems[i]];
+                        [msgBody appendFormat:@"  *<Done> %@\r\n", entryListItems[i]];
                     else
-                        [msgBody appendFormat:@"  *<done> %@\r\n", entryListItems[i]];
+                        [msgBody appendFormat:@"  *%@\r\n", entryListItems[i]];
                 }
                 
             }
@@ -593,7 +617,6 @@ NSString *listTitle;
     [mc setSubject:emailTitle];
     [mc setMessageBody:[NSMutableString stringWithString:msgBody] isHTML:NO];
     
-    //NSLog(@"..EVC:sendEmail: photoPath-%@: selectedImage-%@", self.entry.photoPath, selectedImage);
     if(!([self.entry.photoPath isEqualToString:@""]))
     {
         NSData* photoData = UIImageJPEGRepresentation(self.buttonPhoto.imageView.image, 1.0);
@@ -630,7 +653,7 @@ NSString *listTitle;
 
 - (void)updateMap
 {
-    NSLog(@"..EntryViewController:updateMap - latitude: %@", mapHelper.latitude);
+    //NSLog(@"..EntryViewController:updateMap - latitude: %@", mapHelper.latitude);
     [mapHelper placeAnnotationforMap:self.mapView setRegion:TRUE];
 }
 

@@ -32,10 +32,7 @@
 @property (weak, nonatomic) IBOutlet MKMapView *mapView;
 @property (weak, nonatomic) IBOutlet UIButton *emailButton;
 
-//--
-@property (weak) id <MapHelperDelegate> dataSource;
-//--
-@property (weak, nonatomic) IBOutlet UIButton *morePhotosButton;
+@property (weak, nonatomic) IBOutlet UILabel *labelMorePhotos;
 
 - (IBAction)removeKB:(id)sender;
 

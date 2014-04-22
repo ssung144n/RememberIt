@@ -15,12 +15,11 @@
 @interface ShowPhotoViewController : UIViewController
 
 @property (weak, nonatomic) NSString *photoPath;
-//@property (weak, nonatomic) NSString *entryId;
 @property (strong, nonatomic) TripEntry *selectedTrip;
 
 @property (weak, nonatomic) IBOutlet UIImageView *photoImageView;
 
-- (IBAction)done:(id)sender;
+//- (IBAction)done:(id)sender;
 - (IBAction)setAsCoverPhoto:(id)sender;
 
 @end

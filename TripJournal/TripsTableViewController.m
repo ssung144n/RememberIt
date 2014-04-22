@@ -123,6 +123,7 @@
 - (void)tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath
 {
     selectedTrip = tripsTable[indexPath.row];
+    NSLog(@"..TTVC:didSelectRowAtIndex..entryId:%@, name:%@", selectedTrip.entryId, selectedTrip.place);
     
     [self performSegueWithIdentifier:@"ToEditEntry" sender:self];
 }
