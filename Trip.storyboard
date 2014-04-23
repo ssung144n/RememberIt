@@ -119,18 +119,16 @@
                                     <tableViewCell alpha="0.79999999999999982" contentMode="scaleToFill" selectionStyle="default" hidesAccessoryWhenEditing="NO" indentationLevel="1" indentationWidth="0.0" reuseIdentifier="ListCell" rowHeight="44" id="gH8-ER-e5T" customClass="EntryViewTableCell">
                                         <rect key="frame" x="0.0" y="22" width="298" height="44"/>
                                         <autoresizingMask key="autoresizingMask"/>
-                                        <tableViewCellContentView key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" alpha="0.74999999999999978" contentMode="center" tableViewCell="gH8-ER-e5T" id="p0Z-52-ZxI">
+                                        <tableViewCellContentView key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" alpha="0.79999999999999982" contentMode="center" tableViewCell="gH8-ER-e5T" id="p0Z-52-ZxI">
                                             <rect key="frame" x="0.0" y="0.0" width="298" height="43"/>
                                             <autoresizingMask key="autoresizingMask"/>
                                             <subviews>
                                                 <textField opaque="NO" clipsSubviews="YES" contentMode="scaleToFill" contentHorizontalAlignment="left" contentVerticalAlignment="center" borderStyle="roundedRect" placeholder="Enter Item" minimumFontSize="17" translatesAutoresizingMaskIntoConstraints="NO" id="pVi-vI-Ixb">
                                                     <rect key="frame" x="50" y="7" width="241" height="30"/>
                                                     <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
-                                                    <color key="backgroundColor" red="0.78823536630000002" green="0.88627457620000005" blue="0.94901967050000002" alpha="1" colorSpace="deviceRGB"/>
-                                                    <fontDescription key="fontDescription" type="system" pointSize="14"/>
+                                                    <fontDescription key="fontDescription" type="system" pointSize="15"/>
                                                     <textInputTraits key="textInputTraits" returnKeyType="done"/>
                                                     <connections>
-                                                        <action selector="doneListItemEdit:" destination="gH8-ER-e5T" eventType="editingDidEndOnExit" id="W58-Rg-wK7"/>
                                                         <action selector="editingBegin:" destination="gH8-ER-e5T" eventType="editingDidBegin" id="oUd-Ai-zGb"/>
                                                         <action selector="editingEnd:" destination="gH8-ER-e5T" eventType="editingDidEnd" id="Qmg-XV-vYJ"/>
                                                         <action selector="removeKB:" destination="go9-X3-MTu" eventType="editingDidEndOnExit" id="tSC-tZ-Mat"/>

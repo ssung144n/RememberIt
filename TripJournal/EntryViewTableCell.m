@@ -34,11 +34,6 @@
     // Configure the view for the selected state
 }
 
-- (IBAction)doneListItemEdit:(id)sender {
-    [sender resignFirstResponder];
-    
-    [self.delegate textFieldChangedCell:self];
-}
 
 - (IBAction)editingBegin:(id)sender {
     [self.delegate textFieldEditingBeginCell:self];

@@ -10,10 +10,8 @@
 
 @protocol TableCellDelegate
 @optional
-- (void)textFieldChangedCell:(id)sender;
 - (void)textFieldEditingBeginCell:(id)sender;
 - (void)textFieldEditingEndCell:(id)sender;
-- (void)switchToggleCell:(id)sender;
 - (void)buttonListItemCell:(id)sender;
 @end
 
@@ -22,7 +20,6 @@
 @property (weak, nonatomic) IBOutlet UITextField *listItem;
 @property (weak, nonatomic) IBOutlet UIButton *listItemDoneButton;
 
-- (IBAction)doneListItemEdit:(id)sender;
 - (IBAction)editingBegin:(id)sender;
 - (IBAction)editingEnd:(id)sender;
 

@@ -21,7 +21,7 @@
 @interface EntryViewController ()
 
 #define SCROLLUP 65
-#define ROWTOSCROLL 2
+#define ROWTOSCROLL 1
 
 @end
 
@@ -54,9 +54,13 @@ NSString *listTitle;
     entryListItems = [[NSMutableArray alloc] init];
     entryListItemsSwitch = [[NSMutableArray alloc] init];
     
-    UITapGestureRecognizer *gesture = [[UITapGestureRecognizer alloc]
-                                          initWithTarget:self action:@selector(handleTap:)];
-    [self.mapView addGestureRecognizer:gesture];
+    UITapGestureRecognizer *mapTap = [[UITapGestureRecognizer alloc]
+                                          initWithTarget:self action:@selector(handleMapTap:)];
+    [self.mapView addGestureRecognizer:mapTap];
+    
+    //Unfortunately, this eats up the select on tablecells
+    //singleTap = [[UITapGestureRecognizer alloc] initWithTarget:self action:@selector(handleSingleTap:)];
+    //[self.view addGestureRecognizer:singleTap];
     
     mapHelper = [[MapHelper alloc] init];
     
@@ -99,7 +103,7 @@ NSString *listTitle;
     [[self.listTbl layer] setCornerRadius:7];
     [self.listTbl setClipsToBounds: YES];
     
-    //dismiss virtual keyboard on textview
+    //dismiss virtual keyboard
     [self dismissKeyBoardRecognizer];
 
     //set listTbl for editing from start
@@ -125,7 +129,7 @@ NSString *listTitle;
     // Dispose of any resources that can be recreated.
 }
 
-- (void)handleTap:(UIGestureRecognizer *)gestureRecognizer
+- (void)handleMapTap:(UIGestureRecognizer *)gestureRecognizer
 {
     [self performSegueWithIdentifier:@"ToMapFromEntry" sender:self];
 }
@@ -248,6 +252,7 @@ NSString *listTitle;
 }
 
 //dismiss the keyboard
+
 -(void)dismissKeyBoardRecognizer
 {
     CGRect screenRect = [[UIScreen mainScreen] bounds];
@@ -268,10 +273,13 @@ NSString *listTitle;
 }
 
 -(void)dismissKeyboard {
+    /*
     if([self.note isFirstResponder])
         [self.note resignFirstResponder];
     else if([self.name isFirstResponder])
         [self.name resignFirstResponder];
+     */
+    [self.view endEditing:YES];
 }
 
 - (NSString *)tableView:(UITableView *)tableView titleForHeaderInSection:(NSInteger)section
@@ -326,18 +334,6 @@ NSString *listTitle;
 }
 
 //http://www.codigator.com/tutorials/ios-uitableview-tutorial-custom-cell-and-delegates/
-//protocol delegate in custom tablecell for controlEvent for textField
-- (void)textFieldChangedCell:(id)sender
-{
-    NSIndexPath *indexpath = [self.listTbl indexPathForCell:sender];
-    int row = (int)indexpath.row;
-    
-    EntryViewTableCell *selectedCell = (EntryViewTableCell *)sender;
-    NSString *txtValue = selectedCell.listItem.text;
-    
-    entryListItems[row] = [self checkForQuotes:txtValue];
-    [self.listTbl reloadData]; //so section list title will update
-}
 
 //protocol delegate in custom tablecell to move up view so keyboard doesn't block list entry item
 - (void)textFieldEditingBeginCell:(id)sender
@@ -368,6 +364,12 @@ NSString *listTitle;
         
         [self.view setFrame:frame];
     }
+    
+    EntryViewTableCell *selectedCell = (EntryViewTableCell *)sender;
+    NSString *txtValue = selectedCell.listItem.text;
+    
+    entryListItems[row] = [self checkForQuotes:txtValue];
+    [self.listTbl reloadData]; //so section list title will update
 }
 //protocol delegate for buttonCheckBox
 - (void)buttonListItemCell:(id)sender
@@ -412,6 +414,7 @@ NSString *listTitle;
 //delete or insert in edit mode
 - (void)tableView:(UITableView *)tableView commitEditingStyle:(UITableViewCellEditingStyle)editingStyle forRowAtIndexPath:(NSIndexPath *)indexPath
 {
+    NSLog(@"..EVC:commitEditingStyle-row:%d, editingStyle:%d", indexPath.row, editingStyle);
     if (editingStyle == UITableViewCellEditingStyleDelete)
     {
         [entryListItems removeObjectAtIndex:indexPath.row];
@@ -584,6 +587,7 @@ NSString *listTitle;
     else
         NSLog(@"..saveEntry returned with empty entryId");
 }
+
 
 - (IBAction)sendEmail:(id)sender {
     NSString *emailTitle = [NSString stringWithFormat:@"RememberIt - %@", self.entry.place];
