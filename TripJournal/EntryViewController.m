@@ -83,15 +83,23 @@ NSString *listTitle;
         self.labelMorePhotos.hidden = YES;
     }
     
+    [self.name.layer setBorderColor: [[UIColor whiteColor] CGColor]];
+    [[self.name layer] setBorderWidth:2.3];
+    
     [self.note.layer setBorderColor: [[UIColor whiteColor] CGColor]];
     [[self.note layer] setBorderWidth:2.3];
-    [[self.note layer] setCornerRadius:10];
+    [[self.note layer] setCornerRadius:7];
     [self.note setClipsToBounds: YES];
     
     [self.buttonPhoto.layer setBorderColor: [[UIColor greenColor] CGColor]];
     [[self.buttonPhoto layer] setBorderWidth:2.3];
     [[self.buttonPhoto layer] setCornerRadius:10];
     [self.buttonPhoto setClipsToBounds: YES];
+    
+    [self.listTbl.layer setBorderColor: [[UIColor whiteColor] CGColor]];
+    [[self.listTbl layer] setBorderWidth:2.3];
+    [[self.listTbl layer] setCornerRadius:7];
+    [self.listTbl setClipsToBounds: YES];
     
     //dismiss virtual keyboard on textview
     [self dismissKeyBoardRecognizer];

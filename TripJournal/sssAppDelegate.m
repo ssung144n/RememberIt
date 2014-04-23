@@ -34,7 +34,7 @@
      */
     
     
-    [[UINavigationBar appearance] setBackgroundImage:[UIImage imageNamed:@"orangeGd1.png"] forBarMetrics:UIBarMetricsDefault];
+    //[[UINavigationBar appearance] setBackgroundImage:[UIImage imageNamed:@"bg1_640x960.png"] forBarMetrics:UIBarMetricsDefault];
 
     return YES;
 }
