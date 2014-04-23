@@ -89,16 +89,14 @@
 
 - (UITableViewCell *)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath
 {
-    static NSString *CellIdentifier = @"Cell";
-    UITableViewCell *cell = [tableView dequeueReusableCellWithIdentifier:CellIdentifier forIndexPath:indexPath];
-    if (cell == nil) {
-        cell = [[UITableViewCell alloc] initWithStyle:UITableViewCellStyleDefault reuseIdentifier:CellIdentifier];
-    }
+    //UITableViewCell *cell = [tableView dequeueReusableCellWithIdentifier:@"Cell" forIndexPath:indexPath];
+    UITableViewCell *cell = [tableView dequeueReusableCellWithIdentifier:@"Cell"];
+
     long rowCount = indexPath.row;
     TripEntry * trip = [tripsTable objectAtIndex:rowCount];
     cell.textLabel.text = trip.place;
     NSString *tripDates = [TripEntry checkDateForToday:trip.entryDate];
-    //tripDates = [NSString stringWithFormat:@"%@", trip.entryDate];
+
     cell.detailTextLabel.text = tripDates;
     if(trip.photoPath.length > 0)
     {

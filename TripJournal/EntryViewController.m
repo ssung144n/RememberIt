@@ -29,7 +29,6 @@
 
 NSMutableArray *entryListItems;
 NSMutableArray *entryListItemsSwitch;
-//NSString * selectedImage = @"";
 MapHelper *mapHelper;
 DBHelper *dbHelper;
 BOOL isEdit = NO;
@@ -79,7 +78,6 @@ NSString *listTitle;
         isEdit = false;
         [self newEntryListItemRecord]; //insert first list item row
         self.emailButton.hidden = TRUE;
-        //selectedImage = @"";
         self.labelMorePhotos.hidden = YES;
     }
     
@@ -117,8 +115,6 @@ NSString *listTitle;
 -(void)viewWillAppear:(BOOL)animated {
     
     [super viewWillAppear:animated];
-    
-    //NSLog(@"..viewWillAppear: will callsetLocationMapInfo - lat:%@, lon:%@", mapHelper.latitude, mapHelper.longitude);
 
     [self setMapAndPhoto];
 }
@@ -166,7 +162,7 @@ NSString *listTitle;
 {
     if(self.entry.photoPath.length)
     {
-        (NSLog(@"..EVC:setEntryPhoto-entryId:%@, photoPath:%@", self.entry.entryId, self.entry.photoPath));
+        //(NSLog(@"..EVC:setEntryPhoto-entryId:%@, photoPath:%@", self.entry.entryId, self.entry.photoPath));
         if(self.entry.entryId)
             self.labelMorePhotos.hidden = NO;
         else
@@ -174,7 +170,6 @@ NSString *listTitle;
         __block UIImage *photo = nil;
         
         NSURL* aURL = [NSURL URLWithString:self.entry.photoPath];
-        //selectedImage = self.entry.photoPath;
         
         ALAssetsLibrary *library = [[ALAssetsLibrary alloc] init];
         [library assetForURL:aURL resultBlock:^(ALAsset *asset)
@@ -210,9 +205,9 @@ NSString *listTitle;
         NSMutableArray *returnList = [dbHelper selectFromTbl:@"Entry" colNames:@[@"PhotoPath"] whereCols:@[@"ID"]  whereColValues:@[self.entry.entryId]  orderByDesc:NO];
         if(returnList.count > 0)
         {
-            NSLog(@"..EVC:setMapAndPhoto: returnList:%@", returnList[0]);
+            //NSLog(@"..EVC:setMapAndPhoto: returnList:%@", returnList[0]);
             NSArray *returnRow = returnList[0];
-            NSLog(@"..EVC:setMapAndPhoto: returnList:%@", returnRow[0]);
+            //NSLog(@"..EVC:setMapAndPhoto: returnList:%@", returnRow[0]);
             if(![returnRow[0] isEqualToString:@""])
             {
                 self.entry.photoPath = returnRow[0];
@@ -309,15 +304,10 @@ NSString *listTitle;
 {
     int rowNum = (int)indexPath.row;
     
-    static NSString *CellIdentifier = @"ListCell";
-    EntryViewTableCell *cell = [tableView dequeueReusableCellWithIdentifier:CellIdentifier forIndexPath:indexPath];
+    //EntryViewTableCell *cell = [tableView dequeueReusableCellWithIdentifier:@"ListCell" forIndexPath:indexPath];
+    EntryViewTableCell *cell = [tableView dequeueReusableCellWithIdentifier:@"ListCell"];
     
-    //may not need to check for nil since setting Identifier in IB
-    if (cell == nil) {
-        cell = [[EntryViewTableCell alloc] initWithStyle:UITableViewCellStyleDefault reuseIdentifier:CellIdentifier];
-        cell.editingAccessoryType = YES;
-    }
-    
+    cell.editingAccessoryType = YES;
     cell.listItem.text = entryListItems[rowNum];
     
     NSNumber *switchOnOff = [NSNumber numberWithInteger: [entryListItemsSwitch[rowNum] integerValue]];
@@ -430,7 +420,6 @@ NSString *listTitle;
         [self.listTbl reloadData];//so section list title will update
         
         //[self.listTbl deleteRowsAtIndexPaths:@[indexPath] withRowAnimation:UITableViewRowAnimationAutomatic];
-        //[self tableView:tableView titleForHeaderInSection:indexPath.section];
     }
     else if (editingStyle == UITableViewCellEditingStyleInsert)
     {
@@ -559,7 +548,7 @@ NSString *listTitle;
     self.entry.longitude = mapHelper.longitude;
    
     self.entry = [dbHelper saveEntry:self.entry];
-     NSLog(@"..EVC:saveButtonClick-Id:%@, entry photo:%@",self.entry.entryId, self.entry.photoPath);
+    //NSLog(@"..EVC:saveButtonClick-Id:%@, entry photo:%@",self.entry.entryId, self.entry.photoPath);
     
     if(self.entry.entryId && self.entry.entryId.length)
     {
@@ -597,7 +586,6 @@ NSString *listTitle;
 }
 
 - (IBAction)sendEmail:(id)sender {
-    // Email Subject
     NSString *emailTitle = [NSString stringWithFormat:@"RememberIt - %@", self.entry.place];
     NSMutableString *msgBody = [NSMutableString stringWithFormat:@"Note: %@\r\n", self.entry.note];
     if(entryListItems && entryListItems.count > 0)

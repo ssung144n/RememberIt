@@ -103,7 +103,6 @@ NSString *addPhotoImage = @"camerared1.png";
 
 - (UIEdgeInsets)collectionView:(UICollectionView*)collectionView layout:(UICollectionViewLayout *)collectionViewLayout insetForSectionAtIndex:(NSInteger)section {
     return UIEdgeInsetsMake(-60, 0, 0, 0); // top, left, bottom, right
-    //return UIEdgeInsetsMake(0, 0, 0, 0);
 }
 
 - (CGFloat)collectionView:(UICollectionView *)collectionView layout:(UICollectionViewLayout*)collectionViewLayout minimumLineSpacingForSectionAtIndex:(NSInteger)section
@@ -124,7 +123,6 @@ NSString *addPhotoImage = @"camerared1.png";
     if(tripPhotos.count == 0)
     {
         [tripPhotos addObject:addPhotoImage];
-        //NSLog(@"..Photos...nuberOfItemsInSection - %@", addPhotoImage);
     }
     return tripPhotos.count;
 }
@@ -163,7 +161,6 @@ NSString *addPhotoImage = @"camerared1.png";
     if([photo isEqualToString:addPhotoImage])
     {
         photoView.image = [UIImage imageNamed:photo];
-        //NSLog(@"..Photos...CelllforItemIndex:photo - %@", photoView.image);
     }
     else
     {
@@ -193,7 +190,6 @@ NSString *addPhotoImage = @"camerared1.png";
      
 -(void)nonExistingPhoto:(NSString *)photo
 {
-    //NSLog(@"...PhotosTripView:nonExistingPhoto: %@", photo);
     [tripPhotos removeObject:photo];
 
     [dbHelper deleteFromTbl:@"EntryPhotos" whereCol:@"EntryId" whereValues:@[self.selectedTrip.entryId] andCol:@"PhotoPath" andValue:photo];
@@ -266,8 +262,6 @@ NSString *addPhotoImage = @"camerared1.png";
     {
         if([photosToDelete containsObject:self.selectedTrip.photoPath])
         {
-            NSLog(@"..deletePhotos:cover photo in deleted photos:%@", self.selectedTrip.photoPath);
-            
             [dbHelper updateTbl:@"Entry" colNames:@[@"PhotoPath"] colValues:@[@""] whereCol:@"Id" whereValue:self.selectedTrip.entryId];
             
             self.selectedTrip.photoPath = @"";

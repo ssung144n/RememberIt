@@ -17,8 +17,6 @@
 
 @implementation MapViewController
 
-//CLLocationCoordinate2D entryLoc;
-
 - (id)initWithNibName:(NSString *)nibNameOrNil bundle:(NSBundle *)nibBundleOrNil
 {
     self = [super initWithNibName:nibNameOrNil bundle:nibBundleOrNil];
@@ -38,9 +36,6 @@
     //set saved location
     mapHelper.latitude = self.selectedTrip.latitude;
     mapHelper.longitude = self.selectedTrip.longitude;
-    
-    //entryLoc.latitude = [self.selectedTrip.latitude doubleValue];
-    //entryLoc.longitude = [self.selectedTrip.longitude doubleValue];
     
     [mapHelper placeAnnotationforMap:self.tripMap setRegion:TRUE];
     
@@ -86,7 +81,6 @@
 
 - (void)useMapApp
 {
-    //CLLocationCoordinate2D coordinate = CLLocationCoordinate2DMake(entryLoc.latitude, entryLoc.longitude);
     CLLocationCoordinate2D coordinate = CLLocationCoordinate2DMake([mapHelper.latitude doubleValue], [mapHelper.longitude doubleValue]);
     
     MKPlacemark *placemark = [[MKPlacemark alloc] initWithCoordinate:coordinate addressDictionary:nil];
