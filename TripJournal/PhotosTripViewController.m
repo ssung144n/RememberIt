@@ -100,11 +100,11 @@ NSString *addPhotoImage = @"camerared1.png";
          }
      }
  }
-
+/*
 - (UIEdgeInsets)collectionView:(UICollectionView*)collectionView layout:(UICollectionViewLayout *)collectionViewLayout insetForSectionAtIndex:(NSInteger)section {
     return UIEdgeInsetsMake(-60, 0, 0, 0); // top, left, bottom, right
 }
-
+*/
 - (CGFloat)collectionView:(UICollectionView *)collectionView layout:(UICollectionViewLayout*)collectionViewLayout minimumLineSpacingForSectionAtIndex:(NSInteger)section
 {
     return 1;

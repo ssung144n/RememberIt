@@ -58,7 +58,7 @@ NSString *listTitle;
                                           initWithTarget:self action:@selector(handleMapTap:)];
     [self.mapView addGestureRecognizer:mapTap];
     
-    //Unfortunately, this eats up the select on tablecells
+    //Need to add Pass Through gesture code to table view for this to work
     //singleTap = [[UITapGestureRecognizer alloc] initWithTarget:self action:@selector(handleSingleTap:)];
     //[self.view addGestureRecognizer:singleTap];
     
@@ -92,6 +92,7 @@ NSString *listTitle;
     [[self.note layer] setBorderWidth:2.3];
     [[self.note layer] setCornerRadius:7];
     [self.note setClipsToBounds: YES];
+    self.note.inputAccessoryView = [self addToolBarForKB];//add tool bar keyboard
     
     [self.buttonPhoto.layer setBorderColor: [[UIColor greenColor] CGColor]];
     [[self.buttonPhoto layer] setBorderWidth:2.3];
@@ -128,6 +129,27 @@ NSString *listTitle;
     [super didReceiveMemoryWarning];
     // Dispose of any resources that can be recreated.
 }
+
+//----- Add a ToolBar with a 'Done' button on number pad textfield ----
+- (UIView *)addToolBarForKB
+{
+    UIToolbar* numberToolbar = [[UIToolbar alloc]initWithFrame:CGRectMake(0, 0, 320, 50)];
+    numberToolbar.barStyle = UIBarStyleBlackTranslucent;
+    numberToolbar.items = [NSArray arrayWithObjects:
+                           [[UIBarButtonItem alloc]initWithBarButtonSystemItem:UIBarButtonSystemItemFlexibleSpace target:nil action:nil],
+                           [[UIBarButtonItem alloc]initWithTitle:@"Done" style:UIBarButtonItemStyleDone target:self action:@selector(doneWithKB)],
+                           nil];
+    [numberToolbar sizeToFit];
+    return numberToolbar;
+}
+
+-(void)doneWithKB
+{
+    [self.view endEditing:YES];
+}
+
+//---- End for Adding a ToolBar with a 'Done' button on number pad textfield ---
+
 
 - (void)handleMapTap:(UIGestureRecognizer *)gestureRecognizer
 {
@@ -252,7 +274,6 @@ NSString *listTitle;
 }
 
 //dismiss the keyboard
-
 -(void)dismissKeyBoardRecognizer
 {
     CGRect screenRect = [[UIScreen mainScreen] bounds];
@@ -273,12 +294,6 @@ NSString *listTitle;
 }
 
 -(void)dismissKeyboard {
-    /*
-    if([self.note isFirstResponder])
-        [self.note resignFirstResponder];
-    else if([self.name isFirstResponder])
-        [self.name resignFirstResponder];
-     */
     [self.view endEditing:YES];
 }
 

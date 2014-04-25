@@ -395,7 +395,7 @@
         <!--Photos Trip View Controller - Detail-->
         <scene sceneID="8Ar-38-BxZ">
             <objects>
-                <viewController wantsFullScreenLayout="YES" id="pjn-z0-gj2" customClass="PhotosTripViewController" sceneMemberID="viewController">
+                <viewController wantsFullScreenLayout="YES" automaticallyAdjustsScrollViewInsets="NO" id="pjn-z0-gj2" customClass="PhotosTripViewController" sceneMemberID="viewController">
                     <layoutGuides>
                         <viewControllerLayoutGuide type="top" id="VDc-tk-xNg"/>
                         <viewControllerLayoutGuide type="bottom" id="vgC-bt-45v"/>
@@ -416,7 +416,7 @@
                                 </collectionViewFlowLayout>
                                 <cells>
                                     <collectionViewCell opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" reuseIdentifier="Cell" id="RMD-cC-K1u">
-                                        <rect key="frame" x="0.0" y="64" width="105" height="120"/>
+                                        <rect key="frame" x="0.0" y="0.0" width="105" height="120"/>
                                         <autoresizingMask key="autoresizingMask"/>
                                         <view key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center">
                                             <rect key="frame" x="0.0" y="0.0" width="105" height="120"/>
@@ -527,7 +527,7 @@
         <simulatedScreenMetrics key="destination"/>
     </simulatedMetricsContainer>
     <inferredMetricsTieBreakers>
-        <segue reference="YdJ-UT-9eh"/>
         <segue reference="hk3-eO-VGt"/>
+        <segue reference="YdJ-UT-9eh"/>
     </inferredMetricsTieBreakers>
 </document>
