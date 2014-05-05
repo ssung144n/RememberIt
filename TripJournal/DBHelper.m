@@ -1,11 +1,3 @@
-//
-//  DBHelper.m
-//  TripJournal
-//
-//  Created by Sora Sung on 3/1/14.
-//  Copyright (c) 2014 Sora Sung. All rights reserved.
-//
-
 #import "DBHelper.h"
 
 @implementation DBHelper
@@ -29,7 +21,7 @@ sqlite3_stmt *statement;
         {
             if (sqlite3_open(dbpath, &rememberItDB) == SQLITE_OK){
                 char *errMsg;
-
+                
                 const char *sql_stmt =
                 "CREATE TABLE IF NOT EXISTS Entry (ID INTEGER PRIMARY KEY AUTOINCREMENT, Place TEXT, Note TEXT, StartDate TEXT, EndDate TEXT, Latitude TEXT, Longitude TEXT, Address TEXT, PhotoPath TEXT, EntryDate TEXT)";
                 
@@ -37,7 +29,7 @@ sqlite3_stmt *statement;
                 if (sqlite3_exec(rememberItDB, sql_stmt, NULL, NULL, &errMsg) == SQLITE_OK)
                 {
                     NSLog(@"...created table Entry");
-
+                    
                     sql_stmt =
                     "CREATE TABLE IF NOT EXISTS EntryPhotos (ID INTEGER PRIMARY KEY AUTOINCREMENT, EntryId Text, PhotoPath Text)";
                     
@@ -76,9 +68,9 @@ sqlite3_stmt *statement;
     if(entry.entryId && entry.entryId.length)
     {
         stmtSQL = [NSString stringWithFormat:
-                               @"Update Entry Set Place = \"%@\", Note = \"%@\", StartDate = \"%@\", EndDate = \"%@\", Latitude = \"%@\", Longitude = \"%@\", Address = \"%@\", PhotoPath = \"%@\" Where Id = %d", entry.place, entry.note, entry.startDate, entry.endDate, entry.latitude, entry.longitude, entry.address, entry.photoPath, [entry.entryId intValue]];
-    
-    
+                   @"Update Entry Set Place = \"%@\", Note = \"%@\", StartDate = \"%@\", EndDate = \"%@\", Latitude = \"%@\", Longitude = \"%@\", Address = \"%@\", PhotoPath = \"%@\" Where Id = %d", entry.place, entry.note, entry.startDate, entry.endDate, entry.latitude, entry.longitude, entry.address, entry.photoPath, [entry.entryId intValue]];
+        
+        
     }
     else
     {
@@ -92,7 +84,7 @@ sqlite3_stmt *statement;
         if (sqlite3_open(dbpath, &rememberItDB) == SQLITE_OK)
         {
             //NSLog(@"..saveData:%@", stmtSQL);
-
+            
             const char *sql_stmt = [stmtSQL UTF8String];
             sqlite3_prepare_v2(rememberItDB, sql_stmt, -1, &statement, NULL);
             int resultCode = sqlite3_step(statement);
@@ -213,7 +205,7 @@ sqlite3_stmt *statement;
         else
             [myStmt appendString: [NSString stringWithFormat:@"\"%@\" ,", whereValues[i]] ];
         
-            //[myStmt appendString: [NSString stringWithFormat:@"%@ ,", (long)[colValues[i]] integerValue] ];
+        //[myStmt appendString: [NSString stringWithFormat:@"%@ ,", (long)[colValues[i]] integerValue] ];
     }
     if(andCol)
         [myStmt appendString: [NSString stringWithFormat:@" And %@ = %@", andCol, andValue] ];
@@ -393,3 +385,4 @@ sqlite3_stmt *statement;
     return databasePath;
 }
 @end
+

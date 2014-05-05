@@ -18,7 +18,7 @@
 //Need to present the camera (or the photo library) modally, so need to implement the UINavigationControllerDelegate protocol
 
 //MAY NOT NEED MKMAPVIEWDELEGATE - adding long gesture directly to mapview...won't want other gestures enabled
-@interface EntryViewController : UIViewController <UIImagePickerControllerDelegate, UINavigationControllerDelegate,MFMailComposeViewControllerDelegate, MapHelperDelegate>
+@interface EntryViewController : UIViewController <UIImagePickerControllerDelegate, UINavigationControllerDelegate,MFMailComposeViewControllerDelegate, MapHelperDelegate, UITextFieldDelegate>
 //<UITableViewDataSource, UITableViewDelegate, TableCellDelegate, MKMapViewDelegate>
 
 @property (weak, nonatomic) IBOutlet UITextView *note;

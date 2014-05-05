@@ -7,8 +7,6 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
-		ED025ABF18D94F3E008614BB /* orangeGd1.png in Resources */ = {isa = PBXBuildFile; fileRef = ED025ABE18D94F3E008614BB /* orangeGd1.png */; };
-		ED4B6F9E18DCF8B4009D622B /* marker44by44.png in Resources */ = {isa = PBXBuildFile; fileRef = ED4B6F9D18DCF8B4009D622B /* marker44by44.png */; };
 		ED4B6FA018DCFAE1009D622B /* deletePhotos.png in Resources */ = {isa = PBXBuildFile; fileRef = ED4B6F9F18DCFAE1009D622B /* deletePhotos.png */; };
 		ED53EA6F18EB783100733A4A /* EntryViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = ED53EA6E18EB783100733A4A /* EntryViewController.m */; };
 		ED53EA7218EE1F9600733A4A /* EntryViewTableCell.m in Sources */ = {isa = PBXBuildFile; fileRef = ED53EA7118EE1F9600733A4A /* EntryViewTableCell.m */; };
@@ -54,8 +52,6 @@
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
-		ED025ABE18D94F3E008614BB /* orangeGd1.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = orangeGd1.png; sourceTree = "<group>"; };
-		ED4B6F9D18DCF8B4009D622B /* marker44by44.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = marker44by44.png; sourceTree = "<group>"; };
 		ED4B6F9F18DCFAE1009D622B /* deletePhotos.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = deletePhotos.png; sourceTree = "<group>"; };
 		ED53EA6D18EB783100733A4A /* EntryViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = EntryViewController.h; sourceTree = "<group>"; };
 		ED53EA6E18EB783100733A4A /* EntryViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = EntryViewController.m; sourceTree = "<group>"; };
@@ -140,8 +136,6 @@
 				ED584FA419049F3500C91808 /* greencheckhollowempty1_56x56.png */,
 				ED53EA7C18FDE90200733A4A /* camerared1.png */,
 				ED4B6F9F18DCFAE1009D622B /* deletePhotos.png */,
-				ED4B6F9D18DCF8B4009D622B /* marker44by44.png */,
-				ED025ABE18D94F3E008614BB /* orangeGd1.png */,
 			);
 			name = images;
 			sourceTree = "<group>";
@@ -320,8 +314,6 @@
 			buildActionMask = 2147483647;
 			files = (
 				ED71E2DE188E72F000276ABE /* Trip.storyboard in Resources */,
-				ED025ABF18D94F3E008614BB /* orangeGd1.png in Resources */,
-				ED4B6F9E18DCF8B4009D622B /* marker44by44.png in Resources */,
 				ED4B6FA018DCFAE1009D622B /* deletePhotos.png in Resources */,
 				ED71E2B5188E729400276ABE /* InfoPlist.strings in Resources */,
 				ED71E2C0188E729400276ABE /* Images.xcassets in Resources */,

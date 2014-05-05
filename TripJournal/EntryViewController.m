@@ -84,7 +84,7 @@ NSString *listTitle;
         self.emailButton.hidden = TRUE;
         self.labelMorePhotos.hidden = YES;
     }
-    
+    self.name.delegate = self;
     [self.name.layer setBorderColor: [[UIColor whiteColor] CGColor]];
     [[self.name layer] setBorderWidth:2.3];
     
@@ -104,7 +104,7 @@ NSString *listTitle;
     [[self.listTbl layer] setCornerRadius:7];
     [self.listTbl setClipsToBounds: YES];
     
-    //dismiss virtual keyboard
+    //dismiss virtual keyboard - replace with textfield delegate return...to dismiss kboard
     [self dismissKeyBoardRecognizer];
 
     //set listTbl for editing from start
@@ -142,14 +142,18 @@ NSString *listTitle;
     [numberToolbar sizeToFit];
     return numberToolbar;
 }
-
+//dismiss keyboard on toolbar with 'Done' clicked
 -(void)doneWithKB
 {
     [self.view endEditing:YES];
 }
-
 //---- End for Adding a ToolBar with a 'Done' button on number pad textfield ---
 
+//TextField Delegate methods implementation ----------
+-(BOOL) textFieldShouldReturn: (UITextField *) textField {
+    [textField resignFirstResponder];
+    return YES;
+}
 
 - (void)handleMapTap:(UIGestureRecognizer *)gestureRecognizer
 {
@@ -332,6 +336,7 @@ NSString *listTitle;
     
     cell.editingAccessoryType = YES;
     cell.listItem.text = entryListItems[rowNum];
+    cell.listItem.delegate = self;
     
     NSNumber *switchOnOff = [NSNumber numberWithInteger: [entryListItemsSwitch[rowNum] integerValue]];
     if([switchOnOff boolValue])
@@ -347,8 +352,6 @@ NSString *listTitle;
 
     return cell;
 }
-
-//http://www.codigator.com/tutorials/ios-uitableview-tutorial-custom-cell-and-delegates/
 
 //protocol delegate in custom tablecell to move up view so keyboard doesn't block list entry item
 - (void)textFieldEditingBeginCell:(id)sender
